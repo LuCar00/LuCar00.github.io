@@ -1,0 +1,488 @@
+<meta charset="UTF-8">
+<title>Monochromatic Palette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --paper: #f4f1ea;
+    --paper-deep: #ebe7dd;
+    --ink: #181715;
+    --ink-soft: #6a655c;
+    --rule: #d4cfc3;
+    --accent: #a8400a;
+  }
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+  body {
+    padding: 44px 52px 52px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  /* Subtle paper grain */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(circle at 25% 30%, rgba(0,0,0,0.015) 1px, transparent 1px),
+      radial-gradient(circle at 75% 60%, rgba(0,0,0,0.012) 1px, transparent 1px);
+    background-size: 3px 3px, 5px 5px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body > * { position: relative; z-index: 1; }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 24px;
+  }
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 46px;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 0.95;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .header-meta {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    text-align: right;
+    line-height: 1.7;
+  }
+
+  .controls {
+    display: flex;
+    gap: 32px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .control label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+
+  .base-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    padding: 0 12px;
+    height: 42px;
+  }
+  .base-input input[type="color"] {
+    width: 28px;
+    height: 24px;
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    padding: 0;
+    background: none;
+  }
+  .base-input input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .base-input input[type="color"]::-webkit-color-swatch { border: none; }
+  .base-input input[type="color"]::-moz-color-swatch { border: none; }
+  .base-input input[type="text"] {
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    width: 92px;
+    text-transform: uppercase;
+    outline: none;
+    letter-spacing: 0.03em;
+  }
+
+  .mode-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23181715' stroke-width='1.5' fill='none' stroke-linecap='square'/%3E%3C/svg%3E") no-repeat right 14px center;
+    border: 1px solid var(--ink);
+    height: 42px;
+    padding: 0 38px 0 16px;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--ink);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    outline: none;
+    min-width: 200px;
+    transition: background-color 120ms;
+  }
+  .mode-select:hover { background-color: var(--paper-deep); }
+  .mode-select:focus { background-color: var(--paper-deep); }
+
+  .reset-btn {
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 0 18px;
+    height: 42px;
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    transition: all 140ms;
+  }
+  .reset-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+    background: var(--paper-deep);
+  }
+
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 2px;
+  }
+
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    animation: rise 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .swatch-color {
+    height: 300px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 16px 14px;
+    transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                background 160ms ease,
+                color 160ms ease;
+    overflow: hidden;
+  }
+  .swatch-color:hover {
+    transform: translateY(-8px);
+  }
+  .swatch-color .label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .swatch-color .hex {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .swatch-color .copied {
+    position: absolute;
+    top: 16px;
+    left: 14px;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 200ms, transform 200ms;
+    font-weight: 600;
+  }
+  .swatch-color.flash .copied {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .swatch.base .swatch-color {
+    outline: 2px solid var(--ink);
+    outline-offset: -2px;
+    height: 320px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+  }
+  .swatch.base .swatch-color::after {
+    content: '';
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 6px; height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+    opacity: 0.7;
+  }
+
+  .swatch-meta {
+    padding-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  .swatch-meta .step-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+  }
+  .swatch.base .step-label {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .swatch-meta input[type="number"],
+  .swatch-meta .value-anchor {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    background: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    padding: 4px 0;
+    outline: none;
+    transition: border-color 120ms;
+    -moz-appearance: textfield;
+  }
+  .swatch-meta input[type="number"]::-webkit-outer-spin-button,
+  .swatch-meta input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .swatch-meta input[type="number"]:focus,
+  .swatch-meta input[type="number"]:hover {
+    border-bottom-color: var(--ink);
+  }
+  .swatch-meta .value-anchor {
+    color: var(--ink-soft);
+    border-bottom-color: var(--rule);
+  }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+  }
+  footer #mode-hint em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    font-size: 13px;
+  }
+</style>
+
+<header>
+  <h1>Monochromatic <em>Palette</em></h1>
+  <div class="header-meta">
+    Nine Steps · One Anchor<br>
+    Built on chroma.js
+  </div>
+</header>
+
+<section class="controls">
+  <div class="control">
+    <label>Base Color</label>
+    <div class="base-input">
+      <input type="color" id="base-color" value="#4a7c9e">
+      <input type="text" id="base-hex" value="#4A7C9E" maxlength="7" spellcheck="false">
+    </div>
+  </div>
+
+  <div class="control">
+    <label>Generation Mode</label>
+    <select class="mode-select" id="mode-select">
+      <option value="brighten">Brighten / Darken</option>
+      <option value="lab">Lab Scale</option>
+      <option value="lch">LCH Scale</option>
+    </select>
+  </div>
+
+  <button class="reset-btn" id="reset-btn">Reset Values</button>
+</section>
+
+<section class="palette" id="palette"></section>
+
+<footer>
+  <span>Click any swatch to copy hex · edit values to fine-tune</span>
+  <span id="mode-hint"></span>
+</footer>
+
+<script>
+  const DEFAULTS = {
+    brighten: { darken: [1, 2, 3, 4], lighten: [1, 2, 3, 4] },
+    lab:      { darken: [0.2, 0.4, 0.6, 0.8], lighten: [0.2, 0.4, 0.6, 0.8] },
+    lch:      { darken: [0.2, 0.4, 0.6, 0.8], lighten: [0.2, 0.4, 0.6, 0.8] }
+  };
+
+  const MODE_HINTS = {
+    brighten: 'mode <em>brighten / darken</em> · range 0–~3 · 4 reaches pure white/black',
+    lab:      'mode <em>lab scale</em> · range 0–1 · 1 reaches pure white/black',
+    lch:      'mode <em>lch scale</em> · range 0–1 · preserves hue better in dark steps'
+  };
+
+  const state = {
+    base: '#4A7C9E',
+    mode: 'brighten',
+    values: clone(DEFAULTS.brighten)
+  };
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function computeColor(kind, idx) {
+    const v = state.values[kind][idx];
+    if (!isFinite(v)) return state.base;
+    if (state.mode === 'brighten') {
+      const c = chroma(state.base);
+      return (kind === 'lighten' ? c.brighten(v) : c.darken(v)).hex();
+    }
+    const endpoint = kind === 'lighten' ? 'white' : 'black';
+    return chroma.scale([state.base, endpoint]).mode(state.mode)(v).hex();
+  }
+
+  function pickTextColor(bg) {
+    return chroma.contrast(bg, 'white') > chroma.contrast(bg, '#181715')
+      ? '#ffffff' : '#181715';
+  }
+
+  const ORDER = [
+    { kind: 'darken',  idx: 3, label: 'Dark 4' },
+    { kind: 'darken',  idx: 2, label: 'Dark 3' },
+    { kind: 'darken',  idx: 1, label: 'Dark 2' },
+    { kind: 'darken',  idx: 0, label: 'Dark 1' },
+    { kind: 'base',    idx: null, label: 'Base' },
+    { kind: 'lighten', idx: 0, label: 'Light 1' },
+    { kind: 'lighten', idx: 1, label: 'Light 2' },
+    { kind: 'lighten', idx: 2, label: 'Light 3' },
+    { kind: 'lighten', idx: 3, label: 'Light 4' }
+  ];
+
+  function render() {
+    const palette = document.getElementById('palette');
+    palette.innerHTML = '';
+
+    ORDER.forEach((item, i) => {
+      const isBase = item.kind === 'base';
+      const color = isBase ? state.base : computeColor(item.kind, item.idx);
+      const textColor = pickTextColor(color);
+      const value = isBase ? null : state.values[item.kind][item.idx];
+
+      const sw = document.createElement('div');
+      sw.className = 'swatch' + (isBase ? ' base' : '');
+      sw.style.animationDelay = (i * 35) + 'ms';
+      sw.innerHTML = `
+        <div class="swatch-color" data-hex="${color.toUpperCase()}" style="background:${color}; color:${textColor};">
+          <div class="copied">Copied</div>
+          <div>
+            <div class="label">${item.label}</div>
+            <div class="hex">${color.toUpperCase()}</div>
+          </div>
+        </div>
+        <div class="swatch-meta">
+          <div class="step-label">${isBase ? 'Anchor' : 'Value'}</div>
+          ${isBase
+            ? '<div class="value-anchor">—</div>'
+            : `<input type="number" step="0.05" min="0" data-kind="${item.kind}" data-idx="${item.idx}" value="${value}">`}
+        </div>
+      `;
+      palette.appendChild(sw);
+    });
+
+    // Copy on swatch click
+    palette.querySelectorAll('.swatch-color').forEach(el => {
+      el.addEventListener('click', () => {
+        const hex = el.dataset.hex;
+        try { navigator.clipboard.writeText(hex); } catch(e) {}
+        el.classList.add('flash');
+        setTimeout(() => el.classList.remove('flash'), 900);
+      });
+    });
+
+    // Per-step value editing — updates only the affected swatch to preserve focus
+    palette.querySelectorAll('input[type="number"][data-kind]').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const v = parseFloat(inp.value);
+        if (!isFinite(v)) return;
+        const kind = inp.dataset.kind;
+        const idx = parseInt(inp.dataset.idx, 10);
+        state.values[kind][idx] = v;
+        const newColor = computeColor(kind, idx);
+        const swatchEl = inp.closest('.swatch').querySelector('.swatch-color');
+        swatchEl.style.background = newColor;
+        swatchEl.style.color = pickTextColor(newColor);
+        swatchEl.dataset.hex = newColor.toUpperCase();
+        swatchEl.querySelector('.hex').textContent = newColor.toUpperCase();
+      });
+    });
+
+    document.getElementById('mode-hint').innerHTML = MODE_HINTS[state.mode];
+  }
+
+  // ----- Base color inputs -----
+  const baseColorInput = document.getElementById('base-color');
+  const baseHexInput = document.getElementById('base-hex');
+
+  baseColorInput.addEventListener('input', () => {
+    state.base = baseColorInput.value.toUpperCase();
+    baseHexInput.value = state.base;
+    render();
+  });
+
+  baseHexInput.addEventListener('input', () => {
+    let v = baseHexInput.value.trim();
+    if (v && v[0] !== '#') v = '#' + v;
+    if (chroma.valid(v)) {
+      state.base = chroma(v).hex().toUpperCase();
+      baseColorInput.value = state.base;
+      render();
+    }
+  });
+
+  // ----- Mode toggle -----
+  document.getElementById('mode-select').addEventListener('change', (e) => {
+    state.mode = e.target.value;
+    state.values = clone(DEFAULTS[state.mode]);
+    render();
+  });
+
+  // ----- Reset -----
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    state.values = clone(DEFAULTS[state.mode]);
+    render();
+  });
+
+  render();
+</script>
