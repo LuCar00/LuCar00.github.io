@@ -90,6 +90,12 @@
         <circle cx="12" cy="14" r="8" />
       </svg>
     );
+    const Settings = ({ size = 16 }) => (
+      <svg {...svgProps(size)}>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+    );
 
     const SAGE = '#8FA987';
     const SAGE_SOFT = 'rgba(143, 169, 135, 0.15)';
@@ -104,6 +110,26 @@
       focus: 'Focus',
       short_break: 'Break',
       long_break: 'Long break',
+    };
+
+    const CHIME_SOUNDS = [
+      { id: 'chime-soft',   label: 'Soft chime',   path: './sounds/chime-soft.wav' },
+      { id: 'kalimba',      label: 'Kalimba',      path: './sounds/kalimba.wav' },
+      { id: 'wood-block',   label: 'Wood block',   path: './sounds/wood-block.wav' },
+      { id: 'singing-bowl', label: 'Singing bowl', path: './sounds/singing-bowl.wav' },
+    ];
+    const TICK_SOUNDS = [
+      { id: 'tick-wood',  label: 'Wood metronome', path: './sounds/tick-wood.wav' },
+      { id: 'tick-clock', label: 'Clock tick',     path: './sounds/tick-clock.wav' },
+      { id: 'tick-soft',  label: 'Soft click',     path: './sounds/tick-soft.wav' },
+    ];
+    const DEFAULT_SOUND_PREFS = {
+      shortBreakStart: 'chime-soft',
+      shortBreakEnd:   'chime-soft',
+      longBreakStart:  'singing-bowl',
+      longBreakEnd:    'chime-soft',
+      tickSound:       'tick-wood',
+      tickingEnabled:  false,
     };
 
     function FocusTracker() {
@@ -121,8 +147,11 @@
       const [block, setBlock] = useState('focus');
       const [focusCount, setFocusCount] = useState(0);
       const [loaded, setLoaded] = useState(false);
+      const [soundPrefs, setSoundPrefs] = useState(DEFAULT_SOUND_PREFS);
 
       const prevElapsedRef = useRef(0);
+      const lastTickRef = useRef(0);
+      const audioRef = useRef({ ctx: null, buffers: new Map() });
       const startedAtRef = useRef(null);
       const baseElapsedRef = useRef(0);
 
@@ -161,6 +190,9 @@
               if (typeof prefs.customShortBreak === 'number') setCustomShortBreak(prefs.customShortBreak);
               if (typeof prefs.customLongBreak === 'number') setCustomLongBreak(prefs.customLongBreak);
               if (typeof prefs.soundEnabled === 'boolean') setSoundEnabled(prefs.soundEnabled);
+              if (prefs.soundPrefs && typeof prefs.soundPrefs === 'object') {
+                setSoundPrefs({ ...DEFAULT_SOUND_PREFS, ...prefs.soundPrefs });
+              }
             }
           } catch (e) {}
           setLoaded(true);
@@ -171,32 +203,51 @@
       useEffect(() => {
         if (!loaded) return;
         window.storage.set('preferences', JSON.stringify({
-          preset, customFocus, customShortBreak, customLongBreak, soundEnabled
+          preset, customFocus, customShortBreak, customLongBreak, soundEnabled, soundPrefs
         })).catch(() => {});
-      }, [preset, customFocus, customShortBreak, customLongBreak, soundEnabled, loaded]);
+      }, [preset, customFocus, customShortBreak, customLongBreak, soundEnabled, soundPrefs, loaded]);
 
       useEffect(() => {
         if (isRunning || elapsed > 0) return;
         setTarget(getMinutesForBlock(block) * 60);
       }, [preset, customFocus, customShortBreak, customLongBreak, block, isRunning, elapsed, getMinutesForBlock]);
 
-      const playSound = useCallback(() => {
+      const ensureCtx = () => {
+        if (!audioRef.current.ctx) {
+          audioRef.current.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return audioRef.current.ctx;
+      };
+
+      const loadBuffer = async (path) => {
+        const { buffers } = audioRef.current;
+        if (buffers.has(path)) return buffers.get(path);
+        const ctx = ensureCtx();
+        const arr = await fetch(path).then(r => r.arrayBuffer());
+        const buf = await ctx.decodeAudioData(arr);
+        buffers.set(path, buf);
+        return buf;
+      };
+
+      const playPath = useCallback(async (path, gain = 1) => {
         if (!soundEnabled) return;
         try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.frequency.value = 528;
-          osc.type = 'sine';
-          gain.gain.setValueAtTime(0, ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.6);
-          osc.start(ctx.currentTime);
-          osc.stop(ctx.currentTime + 1.6);
+          const ctx = ensureCtx();
+          if (ctx.state === 'suspended') await ctx.resume();
+          const buf = await loadBuffer(path);
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          const g = ctx.createGain();
+          g.gain.value = gain;
+          src.connect(g).connect(ctx.destination);
+          src.start();
         } catch (e) {}
       }, [soundEnabled]);
+
+      const playSoundId = useCallback((catalog, id, gain = 1) => {
+        const s = catalog.find(x => x.id === id);
+        if (s) playPath(s.path, gain);
+      }, [playPath]);
 
       useEffect(() => {
         if (!isRunning) return;
@@ -213,10 +264,30 @@
 
       useEffect(() => {
         if (isRunning && target > 0 && prevElapsedRef.current < target && elapsed >= target) {
-          playSound();
+          let soundId;
+          if (block === 'focus') {
+            const nextIsLong = (focusCount + 1) >= 4;
+            soundId = nextIsLong ? soundPrefs.longBreakStart : soundPrefs.shortBreakStart;
+          } else if (block === 'short_break') {
+            soundId = soundPrefs.shortBreakEnd;
+          } else {
+            soundId = soundPrefs.longBreakEnd;
+          }
+          playSoundId(CHIME_SOUNDS, soundId);
         }
         prevElapsedRef.current = elapsed;
-      }, [elapsed, target, isRunning, playSound]);
+      }, [elapsed, target, isRunning, block, focusCount, soundPrefs, playSoundId]);
+
+      useEffect(() => {
+        if (!isRunning || !soundPrefs.tickingEnabled || block !== 'focus') {
+          lastTickRef.current = elapsed;
+          return;
+        }
+        if (elapsed > 0 && elapsed - lastTickRef.current === 1) {
+          playSoundId(TICK_SOUNDS, soundPrefs.tickSound, 0.4);
+        }
+        lastTickRef.current = elapsed;
+      }, [elapsed, isRunning, block, soundPrefs.tickingEnabled, soundPrefs.tickSound, playSoundId]);
 
       useEffect(() => {
         const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
@@ -315,7 +386,7 @@
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: SAGE }} />
                 <h1 className="text-xs font-medium tracking-[0.2em] text-stone-500 uppercase">
-                  {view === 'timer' ? blockLabel : 'Log'}
+                  {view === 'timer' ? blockLabel : view === 'log' ? 'Log' : 'Settings'}
                 </h1>
               </div>
               <div className="flex gap-1">
@@ -324,10 +395,20 @@
                   aria-label="Toggle sound">
                   {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
                 </button>
-                <button onClick={() => setView(view === 'timer' ? 'log' : 'timer')}
-                  className="p-2 text-stone-400 hover:text-stone-700 transition-colors"
-                  aria-label="Toggle view">
-                  {view === 'timer' ? <List size={16} /> : <Timer size={16} />}
+                <button onClick={() => setView('timer')}
+                  className={`p-2 transition-colors ${view === 'timer' ? 'text-stone-800' : 'text-stone-400 hover:text-stone-700'}`}
+                  aria-label="Timer view">
+                  <Timer size={16} />
+                </button>
+                <button onClick={() => setView('log')}
+                  className={`p-2 transition-colors ${view === 'log' ? 'text-stone-800' : 'text-stone-400 hover:text-stone-700'}`}
+                  aria-label="Log view">
+                  <List size={16} />
+                </button>
+                <button onClick={() => setView('settings')}
+                  className={`p-2 transition-colors ${view === 'settings' ? 'text-stone-800' : 'text-stone-400 hover:text-stone-700'}`}
+                  aria-label="Settings view">
+                  <Settings size={16} />
                 </button>
               </div>
             </div>
@@ -457,7 +538,7 @@
                   </>
                 )}
               </>
-            ) : (
+            ) : view === 'log' ? (
               <div className="space-y-10">
                 <div className="text-center">
                   <div className="text-6xl font-mono font-light tabular-nums text-stone-800">
@@ -510,6 +591,69 @@
                   ) : (
                     <div className="text-center text-sm text-stone-400 py-8">No sessions yet today.</div>
                   )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div>
+                  <div className="text-xs tracking-[0.2em] text-stone-400 uppercase mb-4">Sounds</div>
+                  {[
+                    { key: 'shortBreakStart', label: 'Short break start' },
+                    { key: 'shortBreakEnd',   label: 'Short break end' },
+                    { key: 'longBreakStart',  label: 'Long break start' },
+                    { key: 'longBreakEnd',    label: 'Long break end' },
+                  ].map(({ key, label }) => (
+                    <div key={key} className="flex items-center justify-between py-2 border-b border-stone-100">
+                      <span className="text-sm text-stone-600">{label}</span>
+                      <div className="flex items-center gap-2">
+                        <select value={soundPrefs[key]}
+                          onChange={(e) => setSoundPrefs({ ...soundPrefs, [key]: e.target.value })}
+                          className="bg-transparent border-b border-stone-200 text-sm text-stone-700 py-1 pr-2 focus:outline-none focus:border-stone-400">
+                          {CHIME_SOUNDS.map(s => (
+                            <option key={s.id} value={s.id}>{s.label}</option>
+                          ))}
+                        </select>
+                        <button onClick={() => playSoundId(CHIME_SOUNDS, soundPrefs[key])}
+                          className="text-xs tracking-wider text-stone-400 hover:text-stone-700 uppercase px-2 py-1 transition-colors"
+                          aria-label={`Test ${label} sound`}>
+                          Test
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div>
+                  <div className="text-xs tracking-[0.2em] text-stone-400 uppercase mb-4">Ticking</div>
+                  <div className="flex items-center justify-between py-2 border-b border-stone-100">
+                    <span className="text-sm text-stone-600">Tick every second (focus only)</span>
+                    <button onClick={() => setSoundPrefs({ ...soundPrefs, tickingEnabled: !soundPrefs.tickingEnabled })}
+                      className="relative w-10 h-5 rounded-full transition-colors"
+                      style={{ backgroundColor: soundPrefs.tickingEnabled ? SAGE : '#D6D3D1' }}
+                      aria-label="Toggle ticking">
+                      <span className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all"
+                        style={{ left: soundPrefs.tickingEnabled ? '22px' : '2px' }} />
+                    </button>
+                  </div>
+                  <div className={`flex items-center justify-between py-2 border-b border-stone-100 transition-opacity ${soundPrefs.tickingEnabled ? '' : 'opacity-40 pointer-events-none'}`}>
+                    <span className="text-sm text-stone-600">Tick sound</span>
+                    <div className="flex items-center gap-2">
+                      <select value={soundPrefs.tickSound}
+                        onChange={(e) => setSoundPrefs({ ...soundPrefs, tickSound: e.target.value })}
+                        disabled={!soundPrefs.tickingEnabled}
+                        className="bg-transparent border-b border-stone-200 text-sm text-stone-700 py-1 pr-2 focus:outline-none focus:border-stone-400 disabled:cursor-not-allowed">
+                        {TICK_SOUNDS.map(s => (
+                          <option key={s.id} value={s.id}>{s.label}</option>
+                        ))}
+                      </select>
+                      <button onClick={() => playSoundId(TICK_SOUNDS, soundPrefs.tickSound, 0.4)}
+                        disabled={!soundPrefs.tickingEnabled}
+                        className="text-xs tracking-wider text-stone-400 hover:text-stone-700 uppercase px-2 py-1 transition-colors disabled:cursor-not-allowed"
+                        aria-label="Test tick sound">
+                        Test
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
