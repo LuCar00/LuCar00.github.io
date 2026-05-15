@@ -130,7 +130,106 @@
       longBreakEnd:    'chime-soft',
       tickSound:       'tick-wood',
       tickingEnabled:  false,
+      spotifyPlaylistUri: 'spotify:playlist:37i9dQZF1DWWQRwui0ExPn',
     };
+
+    // ─── Spotify integration ────────────────────────────────
+    const SPOTIFY_CLIENT_ID = '8fcb91adb2a54a12ac7fad19eece5a2b';
+    const SPOTIFY_REDIRECT_URI = window.location.origin + '/focustracker/';
+    const SPOTIFY_SCOPES = [
+      'streaming',
+      'user-read-email',
+      'user-read-private',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+      'user-modify-playback-state',
+      'user-read-playback-state',
+    ].join(' ');
+    const SPOTIFY_DEFAULT_PLAYLIST = {
+      uri: 'spotify:playlist:37i9dQZF1DWWQRwui0ExPn',
+      name: 'Lofi Beats (Spotify, may not play)',
+    };
+
+    function b64url(buf) {
+      let s = '';
+      const arr = new Uint8Array(buf);
+      for (let i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]);
+      return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+    async function pkceChallenge(verifier) {
+      return b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+    }
+    function randStr(len = 64) {
+      const arr = new Uint8Array(len);
+      crypto.getRandomValues(arr);
+      return b64url(arr.buffer).slice(0, len);
+    }
+
+    async function spotifyBeginAuth() {
+      const verifier = randStr(64);
+      const challenge = await pkceChallenge(verifier);
+      const state = randStr(16);
+      sessionStorage.setItem('spotify_pkce_verifier', verifier);
+      sessionStorage.setItem('spotify_pkce_state', state);
+      const params = new URLSearchParams({
+        client_id: SPOTIFY_CLIENT_ID,
+        response_type: 'code',
+        redirect_uri: SPOTIFY_REDIRECT_URI,
+        code_challenge_method: 'S256',
+        code_challenge: challenge,
+        state,
+        scope: SPOTIFY_SCOPES,
+      });
+      window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+    }
+
+    async function spotifyExchangeCode(code, returnedState) {
+      const expected = sessionStorage.getItem('spotify_pkce_state');
+      if (!expected || expected !== returnedState) throw new Error('PKCE state mismatch');
+      const verifier = sessionStorage.getItem('spotify_pkce_verifier');
+      if (!verifier) throw new Error('Missing PKCE verifier');
+      const body = new URLSearchParams({
+        client_id: SPOTIFY_CLIENT_ID,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: SPOTIFY_REDIRECT_URI,
+        code_verifier: verifier,
+      });
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+      });
+      if (!res.ok) throw new Error('Token exchange failed: ' + res.status);
+      const d = await res.json();
+      sessionStorage.removeItem('spotify_pkce_verifier');
+      sessionStorage.removeItem('spotify_pkce_state');
+      return {
+        access_token: d.access_token,
+        refresh_token: d.refresh_token,
+        expires_at: Date.now() + d.expires_in * 1000,
+      };
+    }
+
+    async function spotifyRefresh(refresh_token) {
+      const body = new URLSearchParams({
+        client_id: SPOTIFY_CLIENT_ID,
+        grant_type: 'refresh_token',
+        refresh_token,
+      });
+      const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+      });
+      if (!res.ok) throw new Error('Refresh failed: ' + res.status);
+      const d = await res.json();
+      return {
+        access_token: d.access_token,
+        refresh_token: d.refresh_token || refresh_token,
+        expires_at: Date.now() + d.expires_in * 1000,
+      };
+    }
 
     function FocusTracker() {
       const [preset, setPreset] = useState('25/5/10');
@@ -149,9 +248,25 @@
       const [loaded, setLoaded] = useState(false);
       const [soundPrefs, setSoundPrefs] = useState(DEFAULT_SOUND_PREFS);
 
+      const [spotifyTokens, setSpotifyTokens] = useState(null);
+      const [spotifyUser, setSpotifyUser] = useState(null);
+      const [spotifyPremium, setSpotifyPremium] = useState(null);
+      const [spotifyPlaylists, setSpotifyPlaylists] = useState([]);
+      const [spotifyConnecting, setSpotifyConnecting] = useState(false);
+      const [spotifyError, setSpotifyError] = useState(null);
+
       const prevElapsedRef = useRef(0);
       const lastTickRef = useRef(0);
       const audioRef = useRef({ ctx: null, buffers: new Map() });
+      const playerRef = useRef(null);
+      const deviceIdRef = useRef(null);
+      const tokensRef = useRef(null);
+      const externalPlaybackRef = useRef(false);
+      const fadeIntervalRef = useRef(null);
+      const fadeFiredRef = useRef(false);
+      const musicStartedRef = useRef(false);
+
+      const spotifyConnected = !!spotifyTokens && spotifyPremium === true;
       const startedAtRef = useRef(null);
       const baseElapsedRef = useRef(0);
 
@@ -249,6 +364,204 @@
         if (s) playPath(s.path, gain);
       }, [playPath]);
 
+      // Keep tokensRef in sync with state for use inside async callbacks
+      useEffect(() => { tokensRef.current = spotifyTokens; }, [spotifyTokens]);
+
+      // Persist tokens to localStorage
+      useEffect(() => {
+        if (spotifyTokens) {
+          try { localStorage.setItem('spotifyAuth', JSON.stringify(spotifyTokens)); } catch (e) {}
+        } else {
+          try { localStorage.removeItem('spotifyAuth'); } catch (e) {}
+        }
+      }, [spotifyTokens]);
+
+      // Mount: handle OAuth callback ?code=…&state=… OR restore tokens from localStorage
+      useEffect(() => {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get('code');
+        const returnedState = url.searchParams.get('state');
+        if (code) {
+          setSpotifyConnecting(true);
+          spotifyExchangeCode(code, returnedState)
+            .then(tokens => {
+              setSpotifyTokens(tokens);
+              url.searchParams.delete('code');
+              url.searchParams.delete('state');
+              history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
+            })
+            .catch(err => {
+              setSpotifyError(err.message || 'Auth failed');
+              setSpotifyConnecting(false);
+              history.replaceState({}, '', url.pathname);
+            });
+        } else {
+          try {
+            const stored = localStorage.getItem('spotifyAuth');
+            if (stored) setSpotifyTokens(JSON.parse(stored));
+          } catch (e) {}
+        }
+      }, []);
+
+      // Token refresh: schedule a silent refresh ~60s before expiry
+      useEffect(() => {
+        if (!spotifyTokens) return;
+        const ms = Math.max(15_000, spotifyTokens.expires_at - Date.now() - 60_000);
+        const id = setTimeout(async () => {
+          try {
+            const fresh = await spotifyRefresh(spotifyTokens.refresh_token);
+            setSpotifyTokens(fresh);
+          } catch (e) {
+            setSpotifyError('Spotify session expired — reconnect in Settings.');
+            setSpotifyTokens(null);
+          }
+        }, ms);
+        return () => clearTimeout(id);
+      }, [spotifyTokens]);
+
+      // SDK + Player lifecycle
+      useEffect(() => {
+        if (!spotifyTokens) {
+          if (playerRef.current) {
+            try { playerRef.current.disconnect(); } catch (e) {}
+            playerRef.current = null;
+          }
+          deviceIdRef.current = null;
+          musicStartedRef.current = false;
+          externalPlaybackRef.current = false;
+          setSpotifyPremium(null);
+          setSpotifyUser(null);
+          setSpotifyPlaylists([]);
+          return;
+        }
+
+        // Fetch profile (premium check) + playlists once per connection
+        if (spotifyPremium === null) {
+          fetch('https://api.spotify.com/v1/me', { headers: { Authorization: 'Bearer ' + spotifyTokens.access_token } })
+            .then(r => r.ok ? r.json() : null)
+            .then(u => {
+              if (!u) return;
+              setSpotifyUser({ name: u.display_name || u.email || 'Spotify user' });
+              setSpotifyPremium(u.product === 'premium');
+              setSpotifyConnecting(false);
+            })
+            .catch(() => setSpotifyConnecting(false));
+
+          fetch('https://api.spotify.com/v1/me/playlists?limit=50', { headers: { Authorization: 'Bearer ' + spotifyTokens.access_token } })
+            .then(r => r.ok ? r.json() : { items: [] })
+            .then(d => setSpotifyPlaylists((d.items || []).map(p => ({ uri: p.uri, name: p.name }))))
+            .catch(() => {});
+        }
+
+        if (playerRef.current) return;
+
+        const initPlayer = () => {
+          if (playerRef.current || !window.Spotify) return;
+          const player = new window.Spotify.Player({
+            name: 'Focus Tracker',
+            getOAuthToken: cb => cb(tokensRef.current?.access_token || ''),
+            volume: 1.0,
+          });
+          player.addListener('ready', ({ device_id }) => { deviceIdRef.current = device_id; });
+          player.addListener('not_ready', () => { deviceIdRef.current = null; });
+          player.addListener('account_error', () => {
+            setSpotifyPremium(false);
+            try { player.disconnect(); } catch (e) {}
+          });
+          player.addListener('initialization_error', ({ message }) => setSpotifyError(message));
+          player.addListener('authentication_error', () => {
+            setSpotifyError('Spotify auth expired — reconnect.');
+            setSpotifyTokens(null);
+          });
+          player.addListener('player_state_changed', state => {
+            if (!state) { externalPlaybackRef.current = true; return; }
+            externalPlaybackRef.current = false;
+          });
+          player.connect();
+          playerRef.current = player;
+        };
+
+        if (window.Spotify) {
+          initPlayer();
+        } else {
+          window.onSpotifyWebPlaybackSDKReady = initPlayer;
+          if (!document.getElementById('spotify-sdk-script')) {
+            const s = document.createElement('script');
+            s.id = 'spotify-sdk-script';
+            s.src = 'https://sdk.scdn.co/spotify-player.js';
+            document.head.appendChild(s);
+          }
+        }
+      }, [spotifyTokens, spotifyPremium]);
+
+      // Music controls (no-ops when Spotify is not connected)
+      const startMusic = useCallback(async () => {
+        if (fadeIntervalRef.current) { clearInterval(fadeIntervalRef.current); fadeIntervalRef.current = null; }
+        fadeFiredRef.current = false;
+        if (!spotifyConnected || !playerRef.current || !deviceIdRef.current) return;
+        try {
+          await playerRef.current.setVolume(1.0);
+          const uri = soundPrefs.spotifyPlaylistUri || SPOTIFY_DEFAULT_PLAYLIST.uri;
+          if (!musicStartedRef.current || externalPlaybackRef.current) {
+            const res = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + deviceIdRef.current, {
+              method: 'PUT',
+              headers: {
+                Authorization: 'Bearer ' + tokensRef.current.access_token,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ context_uri: uri }),
+            });
+            if (res.ok || res.status === 204) {
+              musicStartedRef.current = true;
+              externalPlaybackRef.current = false;
+            } else if (res.status === 404) {
+              setSpotifyError('Spotify playlist could not be played (the default editorial playlist may not be available — pick one of your own in Settings).');
+            }
+          } else {
+            await playerRef.current.resume();
+          }
+        } catch (e) { /* polite */ }
+      }, [spotifyConnected, soundPrefs.spotifyPlaylistUri]);
+
+      const pauseMusic = useCallback(async () => {
+        if (fadeIntervalRef.current) { clearInterval(fadeIntervalRef.current); fadeIntervalRef.current = null; }
+        if (!spotifyConnected || !playerRef.current || externalPlaybackRef.current) return;
+        try { await playerRef.current.pause(); } catch (e) {}
+      }, [spotifyConnected]);
+
+      const fadeMusic = useCallback(() => {
+        if (!spotifyConnected || !playerRef.current || externalPlaybackRef.current) return;
+        if (fadeFiredRef.current) return;
+        fadeFiredRef.current = true;
+        if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
+        const steps = 40, stepMs = 100, targetVol = 0.1;
+        playerRef.current.getVolume().then(from => {
+          const delta = (targetVol - from) / steps;
+          let i = 0;
+          fadeIntervalRef.current = setInterval(() => {
+            i++;
+            if (!playerRef.current) {
+              clearInterval(fadeIntervalRef.current); fadeIntervalRef.current = null; return;
+            }
+            const v = i >= steps ? targetVol : (from + delta * i);
+            playerRef.current.setVolume(v).catch(() => {});
+            if (i >= steps) { clearInterval(fadeIntervalRef.current); fadeIntervalRef.current = null; }
+          }, stepMs);
+        }).catch(() => {});
+      }, [spotifyConnected]);
+
+      const restoreVolume = useCallback(async () => {
+        if (fadeIntervalRef.current) { clearInterval(fadeIntervalRef.current); fadeIntervalRef.current = null; }
+        fadeFiredRef.current = false;
+        if (!spotifyConnected || !playerRef.current || externalPlaybackRef.current) return;
+        try { await playerRef.current.setVolume(1.0); } catch (e) {}
+      }, [spotifyConnected]);
+
+      const disconnectSpotify = useCallback(() => {
+        setSpotifyTokens(null);
+        setSpotifyError(null);
+      }, []);
+
       useEffect(() => {
         if (!isRunning) return;
         const tick = () => setElapsed(Math.floor(computeElapsed()));
@@ -273,10 +586,12 @@
           } else {
             soundId = soundPrefs.longBreakEnd;
           }
+          if (spotifyConnected) soundId = 'wood-block';
           playSoundId(CHIME_SOUNDS, soundId);
+          if (spotifyConnected && block === 'focus') fadeMusic();
         }
         prevElapsedRef.current = elapsed;
-      }, [elapsed, target, isRunning, block, focusCount, soundPrefs, playSoundId]);
+      }, [elapsed, target, isRunning, block, focusCount, soundPrefs, playSoundId, spotifyConnected, fadeMusic]);
 
       useEffect(() => {
         if (!isRunning || !soundPrefs.tickingEnabled || block !== 'focus') {
@@ -299,16 +614,25 @@
       const handleStart = () => {
         startedAtRef.current = Date.now();
         setIsRunning(true);
+        if (block === 'focus') startMusic();
       };
       const handlePause = () => {
         baseElapsedRef.current = computeElapsed();
         startedAtRef.current = null;
         setIsRunning(false);
+        if (block === 'focus') pauseMusic();
       };
-      const handleAdd10 = () => setTarget(t => t + 10 * 60);
-      const handleDouble = () => setTarget(t => t * 2);
+      const handleAdd10 = () => {
+        setTarget(t => t + 10 * 60);
+        if (block === 'focus') restoreVolume();
+      };
+      const handleDouble = () => {
+        setTarget(t => t * 2);
+        if (block === 'focus') restoreVolume();
+      };
 
       const handleReset = async () => {
+        if (block === 'focus') pauseMusic();
         if (block === 'focus' && elapsed >= 30) {
           const session = {
             id: Date.now(),
@@ -596,7 +920,69 @@
             ) : (
               <div className="space-y-8">
                 <div>
-                  <div className="text-xs tracking-[0.2em] text-stone-400 uppercase mb-4">Sounds</div>
+                  <div className="flex items-baseline justify-between mb-4">
+                    <div className="text-xs tracking-[0.2em] text-stone-400 uppercase">Spotify</div>
+                    <div className="text-[10px] tracking-wider text-stone-400 uppercase">Premium required</div>
+                  </div>
+
+                  {spotifyError && (
+                    <div className="mb-3 text-xs text-red-600 bg-red-50 border border-red-100 rounded px-3 py-2">
+                      {spotifyError}
+                      <button onClick={() => setSpotifyError(null)} className="ml-2 underline">Dismiss</button>
+                    </div>
+                  )}
+
+                  {!spotifyTokens && !spotifyConnecting && (
+                    <button onClick={() => spotifyBeginAuth()}
+                      className="w-full py-2 border border-stone-300 rounded text-sm text-stone-700 hover:border-stone-500 hover:text-stone-900 transition-colors tracking-wider uppercase text-xs">
+                      Connect Spotify →
+                    </button>
+                  )}
+
+                  {spotifyConnecting && (
+                    <div className="text-sm text-stone-500 py-2">Connecting…</div>
+                  )}
+
+                  {spotifyTokens && spotifyPremium === false && (
+                    <div className="space-y-2 py-2">
+                      <div className="text-sm text-stone-700">Spotify Premium is required.</div>
+                      <div className="text-xs text-stone-500">Your account doesn't have Premium. Disconnect and try with a Premium account.</div>
+                      <button onClick={disconnectSpotify}
+                        className="text-xs tracking-wider text-stone-400 hover:text-stone-700 uppercase px-2 py-1 transition-colors">
+                        Disconnect
+                      </button>
+                    </div>
+                  )}
+
+                  {spotifyTokens && spotifyPremium === true && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between py-2 border-b border-stone-100">
+                        <span className="text-sm text-stone-600 truncate pr-2">Connected as {spotifyUser?.name || '…'}</span>
+                        <button onClick={disconnectSpotify}
+                          className="text-xs tracking-wider text-stone-400 hover:text-stone-700 uppercase px-2 py-1 transition-colors shrink-0">
+                          Disconnect
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b border-stone-100">
+                        <span className="text-sm text-stone-600">Playlist</span>
+                        <select value={soundPrefs.spotifyPlaylistUri}
+                          onChange={(e) => setSoundPrefs({ ...soundPrefs, spotifyPlaylistUri: e.target.value })}
+                          className="bg-transparent border-b border-stone-200 text-sm text-stone-700 py-1 pr-2 focus:outline-none focus:border-stone-400 max-w-[220px]">
+                          <option value={SPOTIFY_DEFAULT_PLAYLIST.uri}>{SPOTIFY_DEFAULT_PLAYLIST.name}</option>
+                          {spotifyPlaylists.map(p => (
+                            <option key={p.uri} value={p.uri}>{p.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-baseline justify-between mb-4">
+                    <div className="text-xs tracking-[0.2em] text-stone-400 uppercase">Sounds</div>
+                    <div className="text-[10px] tracking-wider text-stone-400 normal-case">used when Spotify is not connected</div>
+                  </div>
                   {[
                     { key: 'shortBreakStart', label: 'Short break start' },
                     { key: 'shortBreakEnd',   label: 'Short break end' },
@@ -624,7 +1010,10 @@
                 </div>
 
                 <div>
-                  <div className="text-xs tracking-[0.2em] text-stone-400 uppercase mb-4">Ticking</div>
+                  <div className="flex items-baseline justify-between mb-4">
+                    <div className="text-xs tracking-[0.2em] text-stone-400 uppercase">Ticking</div>
+                    <div className="text-[10px] tracking-wider text-stone-400 normal-case">used when Spotify is not connected</div>
+                  </div>
                   <div className="flex items-center justify-between py-2 border-b border-stone-100">
                     <span className="text-sm text-stone-600">Tick every second (focus only)</span>
                     <button onClick={() => setSoundPrefs({ ...soundPrefs, tickingEnabled: !soundPrefs.tickingEnabled })}
