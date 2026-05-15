@@ -594,7 +594,7 @@
       }, [elapsed, target, isRunning, block, focusCount, soundPrefs, playSoundId, spotifyConnected, fadeMusic]);
 
       useEffect(() => {
-        if (!isRunning || !soundPrefs.tickingEnabled || block !== 'focus') {
+        if (!isRunning || !soundPrefs.tickingEnabled || block !== 'focus' || spotifyConnected) {
           lastTickRef.current = elapsed;
           return;
         }
@@ -602,7 +602,7 @@
           playSoundId(TICK_SOUNDS, soundPrefs.tickSound, 0.4);
         }
         lastTickRef.current = elapsed;
-      }, [elapsed, isRunning, block, soundPrefs.tickingEnabled, soundPrefs.tickSound, playSoundId]);
+      }, [elapsed, isRunning, block, soundPrefs.tickingEnabled, soundPrefs.tickSound, playSoundId, spotifyConnected]);
 
       useEffect(() => {
         const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
@@ -1009,7 +1009,7 @@
                   ))}
                 </div>
 
-                <div>
+                <div className={`transition-opacity ${spotifyConnected ? 'opacity-40 pointer-events-none' : ''}`}>
                   <div className="flex items-baseline justify-between mb-4">
                     <div className="text-xs tracking-[0.2em] text-stone-400 uppercase">Ticking</div>
                     <div className="text-[10px] tracking-wider text-stone-400 normal-case">used when Spotify is not connected</div>
