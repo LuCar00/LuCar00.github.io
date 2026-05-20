@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Assistant – Prototipo registrazione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,700;0,6..12,800;1,6..12,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css" />
+<style>
+  :root {
+    /* Design tokens — colors */
+    --ai-ai: #8113aa;
+    --ai-ai-1: #b44ddc;
+    --ai-ai-2: #e97eff;
+    --ai-ai-3: #ffb1ff;
+    --ai-ai-4: #ffe5ff;
+    --ai-ai-plus-2: #22004d;
+    --general-white: #ffffff;
+    --general-black: #3f4254;
+    --greyscale-grey-3: #e1e1e7;
+
+    /* Design tokens — spacing */
+    --space-025: 2px;
+    --space-050: 4px;
+    --space-100: 8px;
+    --space-200: 16px;
+    --space-300: 24px;
+    --space-none: 0px;
+    --space-xxs: 4px;
+    --space-s: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--general-white);
+    font-family: 'Nunito Sans', system-ui, -apple-system, sans-serif;
+    font-variation-settings: 'YTLC' 500, 'wdth' 100;
+    color: var(--ai-ai);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .page {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 80px 24px;
+  }
+
+  /* ---------- AI Assistant container ---------- */
+  .ai-assistant {
+    width: 756px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-100) var(--space-100) var(--space-100) var(--space-200);
+    background: linear-gradient(to right, var(--ai-ai-4), var(--ai-ai-3));
+    border-radius: var(--space-100);
+    transition: padding 240ms ease;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-100);
+    min-height: 24px;
+    width: 100%;
+  }
+
+  .message {
+    flex: 1 0 0;
+    min-width: 0;
+    margin: 0;
+    font-size: 12px;
+    line-height: normal;
+    color: var(--ai-ai);
+    word-break: break-word;
+    transition: opacity 160ms ease;
+  }
+
+  .message strong {
+    font-weight: 800; /* Nunito Sans ExtraBold */
+  }
+
+  .status {
+    margin: 0;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ai-ai);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+
+  .ai-assistant[data-state="2"] .status,
+  .ai-assistant[data-state="3"] .status {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- Quick actions ---------- */
+  .quick-actions {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: var(--space-050);
+    align-self: stretch;
+  }
+
+  .btn-icon {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 1px solid transparent;
+    padding: var(--space-xxs);
+    border-radius: var(--space-025);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--general-white);
+    transition: transform 120ms ease, filter 120ms ease;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .btn-icon:active { transform: scale(0.96); }
+  .btn-icon:focus-visible { outline: 2px solid var(--ai-ai); outline-offset: 2px; }
+
+  .btn-icon i { font-size: 16px; line-height: 1; display: block; position: relative; z-index: 1; }
+
+  /* Mic — default look (states 1, 3, 4) */
+  .btn-mic {
+    background: var(--ai-ai);
+    border-color: var(--ai-ai);
+    color: var(--general-white);
+  }
+
+  /* Mic — listening look (state 2) with animated wave gradient */
+  .ai-assistant[data-state="2"] .btn-mic {
+    background: linear-gradient(
+      -45deg,
+      var(--ai-ai-2) 0%,
+      var(--ai-ai-plus-2) 25%,
+      var(--ai-ai-2) 50%,
+      var(--ai-ai-plus-2) 75%,
+      var(--ai-ai-2) 100%
+    );
+    background-size: 400% 400%;
+    border-color: var(--ai-ai-plus-2);
+    animation: gradient-wave 2.4s ease-in-out infinite;
+    box-shadow:
+      0 0 0 0 rgba(233, 126, 255, 0.6),
+      0 4px 12px -2px rgba(34, 0, 77, 0.35);
+  }
+
+  /* Subtle pulse halo for the listening mic */
+  .ai-assistant[data-state="2"] .btn-mic::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: var(--space-025);
+    background: linear-gradient(-45deg, var(--ai-ai-2), var(--ai-ai-plus-2), var(--ai-ai-2));
+    background-size: 300% 300%;
+    z-index: 0;
+    filter: blur(8px);
+    opacity: 0.55;
+    animation: gradient-wave 2.4s ease-in-out infinite;
+  }
+
+  /* Kebab */
+  .btn-kebab {
+    background: var(--ai-ai-4);
+    color: var(--ai-ai);
+  }
+
+  /* Close */
+  .btn-close {
+    background: transparent;
+    color: var(--ai-ai);
+  }
+
+  /* ---------- Kebab dropdown menu ---------- */
+  .kebab-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Active state of the kebab button while the menu is open */
+  .btn-kebab.is-open {
+    background: var(--ai-ai-1);
+    color: var(--general-white);
+  }
+
+  .kebab-menu {
+    position: absolute;
+    top: calc(100% + var(--space-050));
+    right: 0;
+    z-index: 20;
+    background: var(--general-white);
+    border: 1px solid var(--greyscale-grey-3);
+    border-radius: var(--space-050);
+    padding: var(--space-200);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-200);
+    box-shadow: 0 4px 16px -4px rgba(34, 0, 77, 0.12);
+    min-width: 180px;
+
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 160ms ease, transform 160ms ease;
+    pointer-events: none;
+  }
+
+  .kebab-menu.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .kebab-menu-item {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-100);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--general-black);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .kebab-menu-item i { font-size: 16px; line-height: 1; }
+  .kebab-menu-item:hover span { text-decoration: underline; }
+  .kebab-menu-item:focus-visible {
+    outline: 2px solid var(--ai-ai);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ---------- Note field ---------- */
+  .note-field {
+    width: 100%;
+    overflow: hidden;
+    max-height: 0;
+    min-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    transition: max-height 320ms ease, opacity 240ms ease, margin-top 240ms ease;
+  }
+
+  .ai-assistant[data-state="2"] .note-field,
+  .ai-assistant[data-state="3"] .note-field,
+  .ai-assistant[data-state="4"] .note-field {
+    max-height: 600px;
+    opacity: 1;
+    margin-top: var(--space-100);
+  }
+
+  .note-textarea {
+    border: 1px solid var(--ai-ai-2);
+    border-radius: 8px;
+    padding: var(--space-100);
+    background: var(--ai-ai-4);
+    min-height: 72px;
+    transition: background 320ms ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* State 2: note area has the listening-light background and a typing placeholder */
+  .ai-assistant[data-state="2"] .note-textarea {
+    height: 72px;
+    background: var(--ai-ai-4);
+  }
+
+  /* State 3: animated wave gradient on note area
+     Single 3-stop wave (white → ai-3 → white) on a horizontal background-size
+     keeps the motion as a clean single sweep along the textarea's diagonal,
+     mirroring the elegance of the button gradient on a wide aspect ratio. */
+  .ai-assistant[data-state="3"] .note-textarea {
+    background: linear-gradient(
+      97deg,
+      var(--general-white) 0%,
+      var(--ai-ai-3) 50%,
+      var(--general-white) 100%
+    );
+    background-size: 220% 100%;
+    animation: gradient-wave 3.6s ease-in-out infinite;
+  }
+
+  /* State 4: solid light bg (no animation) */
+  .ai-assistant[data-state="4"] .note-textarea {
+    background: var(--ai-ai-4);
+  }
+
+  .note-text {
+    margin: 0;
+    font-size: 12px;
+    line-height: normal;
+    color: var(--ai-ai-1);
+    word-break: break-word;
+    white-space: pre-wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* State 2: italic placeholder text being "dictated" */
+  .ai-assistant[data-state="2"] .note-text {
+    font-style: italic;
+    color: var(--ai-ai-1);
+  }
+
+  /* State 3: regular weight, color AI-1 */
+  .ai-assistant[data-state="3"] .note-text {
+    font-style: normal;
+    color: var(--ai-ai-1);
+  }
+
+  /* State 4: regular weight, color AI (darker) */
+  .ai-assistant[data-state="4"] .note-text {
+    font-style: normal;
+    color: var(--ai-ai);
+  }
+
+  /* Typing caret for state 2 */
+  .typing-caret {
+    display: inline-block;
+    width: 1px;
+    background: var(--ai-ai-1);
+    margin-left: 1px;
+    animation: blink 0.9s steps(1, end) infinite;
+    vertical-align: -2px;
+    height: 1em;
+  }
+
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  /* ---------- Animations ---------- */
+  @keyframes gradient-wave {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ---------- Animated ellipsis (status dots) ---------- */
+  .dots-anim {
+    display: inline-block;
+    white-space: pre;
+  }
+  .dots-anim span {
+    display: inline-block;
+    opacity: 0;
+  }
+  .dots-anim span:nth-child(1) { animation: dot1-cycle 1.6s infinite; }
+  .dots-anim span:nth-child(2) { animation: dot2-cycle 1.6s infinite; }
+  .dots-anim span:nth-child(3) { animation: dot3-cycle 1.6s infinite; }
+
+  /* Each dot fades in, does a small "pop" hop upward, settles back down,
+     and stays visible until the end of the cycle. At 100% → 0% all three
+     drop back to opacity 0 in a single beat. */
+  @keyframes dot1-cycle {
+    0%, 18%   { opacity: 0; transform: translateY(0); }
+    22%       { opacity: 1; transform: translateY(0); }
+    28%       { transform: translateY(-4px); }
+    34%, 100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes dot2-cycle {
+    0%, 38%   { opacity: 0; transform: translateY(0); }
+    42%       { opacity: 1; transform: translateY(0); }
+    48%       { transform: translateY(-4px); }
+    54%, 100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes dot3-cycle {
+    0%, 58%   { opacity: 0; transform: translateY(0); }
+    62%       { opacity: 1; transform: translateY(0); }
+    68%       { transform: translateY(-4px); }
+    74%, 100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- Text crossfade between states ---------- */
+  .message.is-fading,
+  .status.is-fading {
+    opacity: 0 !important;
+  }
+
+  /* ---------- Control panel (debug, not in design but useful for the demo) ---------- */
+  .demo-hint {
+    width: 756px;
+    max-width: 100%;
+    margin: 0 auto 24px auto;
+    font-size: 11px;
+    color: #777;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* Reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    .ai-assistant[data-state="2"] .btn-mic,
+    .ai-assistant[data-state="2"] .btn-mic::before,
+    .ai-assistant[data-state="3"] .note-textarea,
+    .dots-anim span {
+      animation: none;
+    }
+    .typing-caret { animation: none; opacity: 1; }
+    .dots-anim span { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <p class="demo-hint">
+      Clicca sul microfono per avviare la registrazione · Clicca di nuovo per terminarla · Clicca sulla X per resettare
+    </p>
+
+    <div class="ai-assistant" id="assistant" data-state="1">
+      <div class="header-row">
+        <p class="message" id="message">
+          <strong>Ciao!</strong> Fai partire la registrazione e raccontami com'è andato l'appuntamento.
+        </p>
+        <p class="status" id="status">Sto registrando...</p>
+
+        <div class="quick-actions">
+          <button class="btn-icon btn-mic" id="micBtn" type="button" aria-label="Microfono">
+            <i class="la la-microphone" aria-hidden="true"></i>
+          </button>
+
+          <div class="kebab-wrap">
+            <button class="btn-icon btn-kebab" id="kebabBtn" type="button"
+                    aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">
+              <i class="la la-ellipsis-v" aria-hidden="true"></i>
+            </button>
+
+            <div class="kebab-menu" id="kebabMenu" role="menu" aria-hidden="true">
+              <button class="kebab-menu-item" type="button" role="menuitem">
+                <i class="la la-laptop" aria-hidden="true"></i>
+                <span>Microfono Macbook Pro</span>
+              </button>
+              <button class="kebab-menu-item" type="button" role="menuitem">
+                <i class="la la-headphones" aria-hidden="true"></i>
+                <span>Microfono cuffie</span>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-icon btn-close" id="closeBtn" type="button" aria-label="Chiudi">
+            <i class="la la-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="note-field" id="noteField" aria-hidden="true">
+        <div class="note-textarea">
+          <p class="note-text" id="noteText"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const assistant = document.getElementById('assistant');
+  const messageEl  = document.getElementById('message');
+  const statusEl   = document.getElementById('status');
+  const noteTextEl = document.getElementById('noteText');
+  const noteField  = document.getElementById('noteField');
+  const micBtn     = document.getElementById('micBtn');
+  const closeBtn   = document.getElementById('closeBtn');
+  const kebabBtn   = document.getElementById('kebabBtn');
+  const kebabMenu  = document.getElementById('kebabMenu');
+
+  // ---- Texts per state ----
+  const MESSAGES = {
+    1: '<strong>Ciao!</strong> Fai partire la registrazione e raccontami com’è andato l’appuntamento.',
+    2: '<strong>Sto ascoltando…</strong> Clicca di nuovo sul microfono quando hai finito.',
+    3: '<strong>Grazie!</strong> Sto aggiungendo i feedback e le note in base a quello che mi hai raccontato.',
+    4: '<strong>Ottimo:</strong> feedback aggiunto! Clicca di nuovo sul microfono se vuoi fare aggiunte o correzioni.'
+  };
+
+  const DOTS_HTML = '<span class="dots-anim"><span>.</span><span>.</span><span>.</span></span>';
+
+  const STATUSES = {
+    1: '',
+    2: 'Sto registrando' + DOTS_HTML,
+    3: 'Sto ragionando' + DOTS_HTML,
+    4: ''
+  };
+
+  const DICTATED_TEXT_S2 = 'Qui appare il testo che l’utente sta “dettando” all’AI, man mano che parla…';
+
+  const FULL_TEXT = 'Qui appare il testo che l’utente ha dettato all’AI e che l’assistente ha usato per popolare le sezioni relative ai feedback e alle note. Ha la sola funzione di controllo, non può essere modificato a mano.\n---\nL’utente può decidere di aggiungere altri elementi facendo ripartire la registrazione. Ci sarà un elemento visivo a separare le registrazioni l’una dall’altra.';
+
+  const FADE_MS = 160;
+
+  // ---- State management ----
+  let currentState = 1;
+  let typingTimer = null;
+  let autoTransitionTimer = null;
+  const fadeIds = new WeakMap();
+
+  function clearTimers() {
+    if (typingTimer)            { clearTimeout(typingTimer); typingTimer = null; }
+    if (autoTransitionTimer)    { clearTimeout(autoTransitionTimer); autoTransitionTimer = null; }
+  }
+
+  /* Crossfade swap: fade out, change innerHTML, fade in.
+     Race-safe via per-element incrementing id stored in a WeakMap —
+     a newer call invalidates older pending swaps. */
+  function fadeSwap(el, newHtml, duration = FADE_MS) {
+    const next = (fadeIds.get(el) || 0) + 1;
+    fadeIds.set(el, next);
+    el.classList.add('is-fading');
+    setTimeout(() => {
+      if (fadeIds.get(el) !== next) return;
+      el.innerHTML = newHtml;
+      el.classList.remove('is-fading');
+    }, duration);
+  }
+
+  function applyState(n, instant = false) {
+    currentState = n;
+    assistant.setAttribute('data-state', String(n));
+
+    if (instant) {
+      messageEl.innerHTML = MESSAGES[n];
+      statusEl.innerHTML  = STATUSES[n];
+    } else {
+      fadeSwap(messageEl, MESSAGES[n]);
+      fadeSwap(statusEl,  STATUSES[n]);
+    }
+
+    // Note text by state
+    if (n === 1) {
+      noteTextEl.innerHTML = '';
+    } else if (n === 2) {
+      noteTextEl.innerHTML = '<span class="typing-caret">&nbsp;</span>';
+      typeText(noteTextEl, DICTATED_TEXT_S2, 5000, true);
+    } else if (n === 3) {
+      noteTextEl.innerHTML = formatMultiline(FULL_TEXT);
+    } else if (n === 4) {
+      noteTextEl.innerHTML = formatMultiline(FULL_TEXT);
+    }
+  }
+
+  function formatMultiline(text) {
+    return text
+      .split('\n')
+      .map(line => '<span style="display:block">' + escapeHtml(line) + '</span>')
+      .join('');
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function typeText(target, text, durationMs, showCaret) {
+    let i = 0;
+    const total = text.length;
+    const step = Math.max(15, Math.floor(durationMs / total));
+    target.textContent = '';
+
+    function tick() {
+      if (currentState !== 2) return;
+      i++;
+      const partial = text.slice(0, i);
+      target.innerHTML = escapeHtml(partial) + (showCaret && i < total ? '<span class="typing-caret">&nbsp;</span>' : '');
+      if (i < total) {
+        typingTimer = setTimeout(tick, step);
+      }
+    }
+    typingTimer = setTimeout(tick, step);
+  }
+
+  // ---- Transitions ----
+  function goToState(n) {
+    clearTimers();
+    applyState(n);
+
+    if (n === 3) {
+      // After a couple of seconds, auto-advance to state 4
+      autoTransitionTimer = setTimeout(() => {
+        goToState(4);
+      }, 4800);
+    }
+  }
+
+  // ---- Event handlers ----
+  micBtn.addEventListener('click', () => {
+    if (currentState === 1) {
+      goToState(2);
+    } else if (currentState === 2) {
+      goToState(3);
+    } else if (currentState === 4) {
+      // Optional: another tap on mic from "done" restarts a new recording
+      goToState(2);
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    goToState(1);
+  });
+
+  // ---- Kebab dropdown menu ----
+  function openKebabMenu() {
+    kebabMenu.classList.add('is-open');
+    kebabMenu.setAttribute('aria-hidden', 'false');
+    kebabBtn.classList.add('is-open');
+    kebabBtn.setAttribute('aria-expanded', 'true');
+    document.addEventListener('mousedown', onDocClickForMenu, true);
+    document.addEventListener('keydown', onKeyForMenu);
+  }
+
+  function closeKebabMenu() {
+    kebabMenu.classList.remove('is-open');
+    kebabMenu.setAttribute('aria-hidden', 'true');
+    kebabBtn.classList.remove('is-open');
+    kebabBtn.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('mousedown', onDocClickForMenu, true);
+    document.removeEventListener('keydown', onKeyForMenu);
+  }
+
+  function onDocClickForMenu(e) {
+    // Click inside the kebab wrap → let the button toggle handle it
+    if (e.target.closest('.kebab-wrap')) return;
+    closeKebabMenu();
+  }
+
+  function onKeyForMenu(e) {
+    if (e.key === 'Escape') closeKebabMenu();
+  }
+
+  kebabBtn.addEventListener('click', () => {
+    if (kebabMenu.classList.contains('is-open')) {
+      closeKebabMenu();
+    } else {
+      openKebabMenu();
+    }
+  });
+
+  kebabMenu.querySelectorAll('.kebab-menu-item').forEach(item => {
+    item.addEventListener('click', () => closeKebabMenu());
+  });
+
+  // ---- Init ----
+  applyState(1, true);
+})();
+</script>
+
+</body>
+</html>
