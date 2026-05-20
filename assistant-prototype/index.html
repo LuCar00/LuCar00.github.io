@@ -137,6 +137,8 @@
 
   .btn-icon:active { transform: scale(0.96); }
   .btn-icon:focus-visible { outline: 2px solid var(--ai-ai); outline-offset: 2px; }
+  .btn-icon:disabled { cursor: not-allowed; }
+  .kebab-menu-item:disabled { cursor: not-allowed; }
 
   .btn-icon i { font-size: 16px; line-height: 1; display: block; position: relative; z-index: 1; }
 
@@ -598,9 +600,19 @@
     typingTimer = setTimeout(tick, step);
   }
 
+  // ---- Controls lock (used during state 3 while the AI is "thinking") ----
+  const lockableButtons = [micBtn, kebabBtn, closeBtn];
+
+  function setControlsLocked(locked) {
+    lockableButtons.forEach(btn => { btn.disabled = locked; });
+    kebabMenu.querySelectorAll('.kebab-menu-item').forEach(item => { item.disabled = locked; });
+  }
+
   // ---- Transitions ----
   function goToState(n) {
     clearTimers();
+    setControlsLocked(n === 3);
+    if (n === 3) closeKebabMenu();
     applyState(n);
 
     if (n === 3) {
