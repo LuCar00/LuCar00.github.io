@@ -27,6 +27,7 @@
     --space-100: 8px;
     --space-200: 16px;
     --space-300: 24px;
+    --space-500: 40px;
     --space-none: 0px;
     --space-xxs: 4px;
     --space-s: 16px;
@@ -103,7 +104,13 @@
   }
 
   .ai-assistant[data-state="2"] .status,
-  .ai-assistant[data-state="3"] .status {
+  .ai-assistant[data-state="3"] .status,
+  .ai-assistant[data-state="listening1"]  .status,
+  .ai-assistant[data-state="thinking1"]   .status,
+  .ai-assistant[data-state="responding1"] .status,
+  .ai-assistant[data-state="listening2"]  .status,
+  .ai-assistant[data-state="thinking2"]   .status,
+  .ai-assistant[data-state="responding2"] .status {
     opacity: 1;
     transform: translateY(0);
   }
@@ -281,17 +288,19 @@
     border-radius: 8px;
     padding: var(--space-100);
     background: var(--ai-ai-4);
-    min-height: 72px;
+    min-height: 32px; /* one line (12px * ~1.2) + padding (8+8) ≈ 30px → 32px */
     transition: background 320ms ease;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-100);
   }
 
-  /* State 2: note area has the listening-light background and a typing placeholder */
-  .ai-assistant[data-state="2"] .note-textarea {
-    height: 72px;
-    background: var(--ai-ai-4);
-  }
+  /* State 2: note area has the listening-light background and a typing placeholder.
+     Height removed — box auto-grows from min-height (32px) to fit the dictated text,
+     just like a chat input. Background already set on the base rule. */
 
   /* State 3: animated wave gradient on note area
      Single 3-stop wave (white → ai-3 → white) on a horizontal background-size
@@ -417,69 +426,371 @@
     font-style: italic;
   }
 
+  /* ---------- Prototype wrap (page-level container) ---------- */
+  .prototype-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* ---------- Tab switcher (Record / Conversation) ---------- */
+  .tab-switcher {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--greyscale-grey-3);
+    border-radius: 8px;
+    background: var(--general-white);
+    margin: 0 auto 20px auto;
+  }
+  .tab {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    background: transparent;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--general-black);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+    white-space: nowrap;
+  }
+  .tab:hover { background: rgba(129, 19, 170, 0.06); }
+  .tab.is-active {
+    background: var(--ai-ai-4);
+    color: var(--ai-ai);
+    font-weight: 700;
+  }
+  .tab:focus-visible { outline: 2px solid var(--ai-ai); outline-offset: 2px; }
+
+  .tab-panel[hidden] { display: none; }
+
+  /* ---------- Conversation: note-field visibility ----------
+     Mirrors the existing "show note-field" rule for the Record states (2/3/4)
+     so the Conversation bar reveals the note area in every active state. */
+  .ai-assistant[data-state="listening1"] .note-field,
+  .ai-assistant[data-state="thinking1"]  .note-field,
+  .ai-assistant[data-state="responding1"] .note-field,
+  .ai-assistant[data-state="listening2"] .note-field,
+  .ai-assistant[data-state="thinking2"]  .note-field,
+  .ai-assistant[data-state="responding2"] .note-field,
+  .ai-assistant[data-state="end"]        .note-field {
+    max-height: 600px;
+    opacity: 1;
+    margin-top: var(--space-100);
+  }
+
+  /* ---------- Conversation: mic animated gradient (all active states) ---------- */
+  .ai-assistant[data-state="listening1"]  .btn-mic,
+  .ai-assistant[data-state="thinking1"]   .btn-mic,
+  .ai-assistant[data-state="responding1"] .btn-mic,
+  .ai-assistant[data-state="listening2"]  .btn-mic,
+  .ai-assistant[data-state="thinking2"]   .btn-mic,
+  .ai-assistant[data-state="responding2"] .btn-mic {
+    background: linear-gradient(
+      -45deg,
+      var(--ai-ai-2) 0%,
+      var(--ai-ai-plus-2) 25%,
+      var(--ai-ai-2) 50%,
+      var(--ai-ai-plus-2) 75%,
+      var(--ai-ai-2) 100%
+    );
+    background-size: 400% 400%;
+    border-color: var(--ai-ai-plus-2);
+    animation: gradient-wave 2.4s ease-in-out infinite;
+    box-shadow:
+      0 0 0 0 rgba(233, 126, 255, 0.6),
+      0 4px 12px -2px rgba(34, 0, 77, 0.35);
+  }
+  .ai-assistant[data-state="listening1"]  .btn-mic::before,
+  .ai-assistant[data-state="thinking1"]   .btn-mic::before,
+  .ai-assistant[data-state="responding1"] .btn-mic::before,
+  .ai-assistant[data-state="listening2"]  .btn-mic::before,
+  .ai-assistant[data-state="thinking2"]   .btn-mic::before,
+  .ai-assistant[data-state="responding2"] .btn-mic::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: var(--space-025);
+    background: linear-gradient(-45deg, var(--ai-ai-2), var(--ai-ai-plus-2), var(--ai-ai-2));
+    background-size: 300% 300%;
+    z-index: 0;
+    filter: blur(8px);
+    opacity: 0.55;
+    animation: gradient-wave 2.4s ease-in-out infinite;
+  }
+
+  /* ---------- Conversation: note-textarea animated gradient during thinking ---------- */
+  .ai-assistant[data-state="thinking1"] .note-textarea,
+  .ai-assistant[data-state="thinking2"] .note-textarea {
+    background: linear-gradient(
+      97deg,
+      var(--general-white) 0%,
+      var(--ai-ai-3) 50%,
+      var(--general-white) 100%
+    );
+    background-size: 220% 100%;
+    animation: gradient-wave 3.6s ease-in-out infinite;
+  }
+
+  /* ---------- Conversation: chat anchor (last-in-bottom) on all active states ---------- */
+  .ai-assistant[data-state="listening1"]  .note-textarea,
+  .ai-assistant[data-state="thinking1"]   .note-textarea,
+  .ai-assistant[data-state="responding1"] .note-textarea,
+  .ai-assistant[data-state="listening2"]  .note-textarea,
+  .ai-assistant[data-state="thinking2"]   .note-textarea,
+  .ai-assistant[data-state="responding2"] .note-textarea,
+  .ai-assistant[data-state="end"]         .note-textarea {
+    justify-content: flex-end;
+  }
+
+  /* ---------- Conversation: fixed-height (states 4..7), with overflow clipping the top ---------- */
+  .ai-assistant[data-state="listening2"]  .note-textarea,
+  .ai-assistant[data-state="thinking2"]   .note-textarea,
+  .ai-assistant[data-state="responding2"] .note-textarea,
+  .ai-assistant[data-state="end"]         .note-textarea {
+    height: 168px;
+  }
+
+  /* At "end", unlock vertical scroll while hiding the scrollbar cross-browser */
+  .ai-assistant[data-state="end"] .note-textarea {
+    overflow-y: auto;
+    justify-content: flex-start;  /* override flex-end — JS scrolls to bottom on entry */
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE / Edge */
+  }
+  .ai-assistant[data-state="end"] .note-textarea::-webkit-scrollbar {
+    display: none;                /* Chrome / Safari / Opera */
+  }
+
+  /* ---------- Bubbles (chat-style messages) ---------- */
+  .bubble-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-shrink: 0;
+  }
+  .bubble-row.user { padding-right: var(--space-500); }
+  .bubble-row.ai   { padding-left:  var(--space-500); }
+
+  .bubble {
+    width: 100%;
+    padding: var(--space-100);
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: normal;
+    color: var(--ai-ai);
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+  .bubble.user { background: var(--ai-ai-3); }
+  .bubble.ai   { background: var(--general-white); border: 1px solid var(--ai-ai-2); }
+  .bubble.is-typing { font-style: italic; }
+
+  /* Soft fade-in for newly appended AI bubbles (when .fade-in is set;
+     existing AI bubbles in the DOM are unaffected). */
+  .bubble.ai.fade-in {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 320ms ease, transform 320ms ease;
+  }
+  .bubble.ai.fade-in.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Italic "live typing" paragraph (user voice, before bubble consolidation) */
+  .conv-user-typing {
+    margin: 0;
+    font-size: 12px;
+    font-style: italic;
+    color: var(--ai-ai-1);
+    word-break: break-word;
+    white-space: pre-wrap;
+    flex-shrink: 0;
+  }
+
+  /* Morphing: the user-typing paragraph transforms in place into a user bubble.
+     5 properties animate over 400ms; font-style flips instantly under the
+     simultaneous color+background crossfade — visually imperceptible. */
+  .conv-user-typing.morphing {
+    transition:
+      background-color 400ms ease,
+      color 400ms ease,
+      padding 400ms ease,
+      border-radius 400ms ease,
+      margin-right 400ms ease;
+    background-color: var(--ai-ai-3);
+    color: var(--ai-ai);
+    padding: var(--space-100);
+    border-radius: 6px;
+    font-style: normal;
+    margin-right: var(--space-500); /* same right gap as a .bubble-row.user */
+  }
+
+  /* ---------- End-of-conversation banner ---------- */
+  .end-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 0;
+    width: 100%;
+    flex-shrink: 0;
+  }
+  .end-banner .divider {
+    height: 1px;
+    width: 80px;
+    background: var(--ai-ai-3);
+    transform: scaleX(0);
+    transition: transform 800ms ease;
+  }
+  .end-banner .divider.left  { transform-origin: right; }
+  .end-banner .divider.right { transform-origin: left; }
+  .end-banner .label {
+    font-size: 10px;
+    font-style: italic;
+    color: var(--ai-ai);
+    white-space: nowrap;
+    min-height: 1lh;  /* prevent empty→typed height jump that desyncs scroll-to-bottom */
+  }
+  .end-banner.is-revealing .divider { transform: scaleX(1); }
+
   /* Reduce motion */
   @media (prefers-reduced-motion: reduce) {
     .ai-assistant[data-state="2"] .btn-mic,
     .ai-assistant[data-state="2"] .btn-mic::before,
     .ai-assistant[data-state="3"] .note-textarea,
+    .ai-assistant[data-state="listening1"] .btn-mic,
+    .ai-assistant[data-state="thinking1"] .btn-mic,
+    .ai-assistant[data-state="responding1"] .btn-mic,
+    .ai-assistant[data-state="listening2"] .btn-mic,
+    .ai-assistant[data-state="thinking2"] .btn-mic,
+    .ai-assistant[data-state="responding2"] .btn-mic,
+    .ai-assistant[data-state="listening1"] .btn-mic::before,
+    .ai-assistant[data-state="thinking1"] .btn-mic::before,
+    .ai-assistant[data-state="responding1"] .btn-mic::before,
+    .ai-assistant[data-state="listening2"] .btn-mic::before,
+    .ai-assistant[data-state="thinking2"] .btn-mic::before,
+    .ai-assistant[data-state="responding2"] .btn-mic::before,
+    .ai-assistant[data-state="thinking1"] .note-textarea,
+    .ai-assistant[data-state="thinking2"] .note-textarea,
     .dots-anim span {
       animation: none;
     }
     .typing-caret { animation: none; opacity: 1; }
     .dots-anim span { opacity: 1; }
+    .end-banner .divider { transition: none; }
+    .conv-user-typing.morphing,
+    .bubble.ai.fade-in { transition: none; }
   }
 </style>
 </head>
 <body>
 
 <div class="page">
-  <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-    <p class="demo-hint">
-      Clicca sul microfono per avviare la registrazione · Clicca di nuovo per terminarla · Clicca sulla X per resettare
+  <div class="prototype-wrap">
+    <div class="tab-switcher" role="tablist" aria-label="Versioni dell'AI assistant">
+      <button class="tab is-active" type="button" role="tab" data-tab="record" aria-selected="true">Assistant (Record)</button>
+      <button class="tab" type="button" role="tab" data-tab="conversation" aria-selected="false">Assistant (Conversation)</button>
+    </div>
+
+    <p class="demo-hint" id="demoHint">
+      Clicca sul microfono per avviare la registrazione · Clicca di nuovo per terminarla · La X qui resetta la bar — in produzione la chiuderebbe (riapribile da un bottone nell'header della pagina)
     </p>
 
-    <div class="ai-assistant" id="assistant" data-state="1">
-      <div class="header-row">
-        <p class="message" id="message">
-          <strong>Ciao!</strong> Fai partire la registrazione e raccontami com'è andato l'appuntamento.
-        </p>
-        <p class="status" id="status">Sto registrando...</p>
+    <section class="tab-panel" data-panel="record">
+      <div class="ai-assistant" id="assistant" data-state="1">
+        <div class="header-row">
+          <p class="message" id="message">
+            <strong>Ciao!</strong> Fai partire la registrazione e raccontami com'è andato l'appuntamento.
+          </p>
+          <p class="status" id="status">Sto registrando...</p>
 
-        <div class="quick-actions">
-          <button class="btn-icon btn-mic" id="micBtn" type="button" aria-label="Microfono">
-            <i class="la la-microphone" aria-hidden="true"></i>
-          </button>
-
-          <div class="kebab-wrap">
-            <button class="btn-icon btn-kebab" id="kebabBtn" type="button"
-                    aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">
-              <i class="la la-ellipsis-v" aria-hidden="true"></i>
+          <div class="quick-actions">
+            <button class="btn-icon btn-mic" id="micBtn" type="button" aria-label="Microfono">
+              <i class="la la-microphone" aria-hidden="true"></i>
             </button>
 
-            <div class="kebab-menu" id="kebabMenu" role="menu" aria-hidden="true">
-              <button class="kebab-menu-item" type="button" role="menuitem">
-                <i class="la la-laptop" aria-hidden="true"></i>
-                <span>Microfono Macbook Pro</span>
+            <div class="kebab-wrap">
+              <button class="btn-icon btn-kebab" id="kebabBtn" type="button"
+                      aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">
+                <i class="la la-ellipsis-v" aria-hidden="true"></i>
               </button>
-              <button class="kebab-menu-item" type="button" role="menuitem">
-                <i class="la la-headphones" aria-hidden="true"></i>
-                <span>Microfono cuffie</span>
-              </button>
+
+              <div class="kebab-menu" id="kebabMenu" role="menu" aria-hidden="true">
+                <button class="kebab-menu-item" type="button" role="menuitem">
+                  <i class="la la-laptop" aria-hidden="true"></i>
+                  <span>Microfono Macbook Pro</span>
+                </button>
+                <button class="kebab-menu-item" type="button" role="menuitem">
+                  <i class="la la-headphones" aria-hidden="true"></i>
+                  <span>Microfono cuffie</span>
+                </button>
+              </div>
             </div>
+
+            <button class="btn-icon btn-close" id="closeBtn" type="button" aria-label="Chiudi">
+              <i class="la la-times" aria-hidden="true"></i>
+            </button>
           </div>
+        </div>
 
-          <button class="btn-icon btn-close" id="closeBtn" type="button" aria-label="Chiudi">
-            <i class="la la-times" aria-hidden="true"></i>
-          </button>
+        <div class="note-field" id="noteField" aria-hidden="true">
+          <div class="note-textarea">
+            <p class="note-text" id="noteText"></p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="note-field" id="noteField" aria-hidden="true">
-        <div class="note-textarea">
-          <p class="note-text" id="noteText"></p>
+    <section class="tab-panel" data-panel="conversation" hidden>
+      <div class="ai-assistant" data-state="idle">
+        <div class="header-row">
+          <p class="message">
+            <strong>Ciao!</strong> Clicca sul microfono per raccontarmi com'è andato l'appuntamento.
+          </p>
+          <p class="status"></p>
+
+          <div class="quick-actions">
+            <button class="btn-icon btn-mic" type="button" aria-label="Microfono">
+              <i class="la la-microphone" aria-hidden="true"></i>
+            </button>
+
+            <div class="kebab-wrap">
+              <button class="btn-icon btn-kebab" type="button"
+                      aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">
+                <i class="la la-ellipsis-v" aria-hidden="true"></i>
+              </button>
+
+              <div class="kebab-menu" role="menu" aria-hidden="true">
+                <button class="kebab-menu-item" type="button" role="menuitem">
+                  <i class="la la-laptop" aria-hidden="true"></i>
+                  <span>Microfono Macbook Pro</span>
+                </button>
+                <button class="kebab-menu-item" type="button" role="menuitem">
+                  <i class="la la-headphones" aria-hidden="true"></i>
+                  <span>Microfono cuffie</span>
+                </button>
+              </div>
+            </div>
+
+            <button class="btn-icon btn-close" type="button" aria-label="Chiudi">
+              <i class="la la-times" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="note-field" aria-hidden="true">
+          <div class="note-textarea"></div>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </div>
 
@@ -680,8 +991,397 @@
     item.addEventListener('click', () => closeKebabMenu());
   });
 
+  // ---- Expose reset for the tab switcher ----
+  window.__recordReset = function () {
+    closeKebabMenu();
+    goToState(1);
+  };
+
   // ---- Init ----
   applyState(1, true);
+})();
+
+/* ========================================================================
+   Conversation assistant bar — independent IIFE, scoped under
+   [data-panel="conversation"]. No ID collisions with the Record IIFE above.
+   ======================================================================== */
+(function ConversationBar() {
+  const root = document.querySelector('[data-panel="conversation"]');
+  if (!root) return;
+
+  const assistant   = root.querySelector('.ai-assistant');
+  const messageEl   = root.querySelector('.message');
+  const statusEl    = root.querySelector('.status');
+  const noteField   = root.querySelector('.note-field');
+  const noteContent = root.querySelector('.note-textarea');
+  const micBtn      = root.querySelector('.btn-mic');
+  const kebabBtn    = root.querySelector('.btn-kebab');
+  const closeBtn    = root.querySelector('.btn-close');
+  const kebabMenu   = root.querySelector('.kebab-menu');
+
+  const STATES = {
+    IDLE:        'idle',
+    LISTENING1:  'listening1',
+    THINKING1:   'thinking1',
+    RESPONDING1: 'responding1',
+    LISTENING2:  'listening2',
+    THINKING2:   'thinking2',
+    RESPONDING2: 'responding2',
+    END:         'end'
+  };
+
+  // Texts from the Figma frame
+  const USER_TURN_1 = 'Qui appare il testo che l’utente sta “dettando” all’AI, man mano che parla… l’assistente lo userà per popolare le sezioni relative ai feedback e alle note. Ha la sola funzione di controllo, non può essere modificato a mano.';
+  const AI_TURN_1   = 'Ho inserito questi feedback positivi: location/zona, micro-location, edificio, amenities. Ho impostato un feedback negativo per: calma/rumorosità, box/parcheggio. Ho aggiunto tra le note il commento positivo specifico sulle scuole dell’infanzia e le biblioteche nei dintorni.\n\nMi mancano i feedback per tempistiche e condizioni contrattuali, è corretto? Vuoi aggiungere altro?';
+  const USER_TURN_2 = USER_TURN_1;
+  const AI_TURN_2   = 'Ok, grazie mille — ora puoi modificare feedback e note direttamente qua sotto, oppure puoi ricominciare a parlare con me cliccando sul microfono. Buon lavoro!';
+
+  const MSG_IDLE   = '<strong>Ciao!</strong> Clicca sul microfono per raccontarmi com’è andato l’appuntamento.';
+  const MSG_ACTIVE = '<strong>Dimmi tutto…</strong> clicca di nuovo sul microfono per interrompere la conversazione.';
+
+  const DOTS_HTML = '<span class="dots-anim"><span>.</span><span>.</span><span>.</span></span>';
+  const STATUS_LISTENING  = 'Sto ascoltando'  + DOTS_HTML;
+  const STATUS_THINKING   = 'Sto ragionando'  + DOTS_HTML;
+  const STATUS_RESPONDING = 'Sto rispondendo' + DOTS_HTML;
+
+  // Timings (ms) — tuned for a believable speech-to-text rhythm
+  // (~28-32 ms/char for user dictation, ~19-25 ms/char for AI streaming).
+  const USER_TYPING_MS_1   = 7000;
+  const AI_TYPING_MS_1     = 7000;
+  const USER_TYPING_MS_2   = 5500;
+  const AI_TYPING_MS_2     = 4000;
+  const THINKING_MS        = 2500;
+  const STEP_PAUSE_MS      = 700;
+  const END_LABEL_TYPING_MS = 1500;
+  const USER_REPLY_DELAY_MS = 900;  // pause between "Sto ascoltando" appearing and the user starting to "reply"
+
+  let currentState = STATES.IDLE;
+  const timers = new Set();
+  const fadeIds = new WeakMap();
+  const FADE_MS = 160;
+
+  // Sentinels of last applied HTML, so we can skip the fade when a phase
+  // transition leaves message/status unchanged (e.g. "Dimmi tutto…" persists
+  // across listening1 → thinking1 → responding1 → listening2 → …).
+  let lastMessageHtml = null;
+  let lastStatusHtml  = null;
+
+  function schedule(fn, ms) {
+    const t = setTimeout(() => { timers.delete(t); fn(); }, ms);
+    timers.add(t);
+    return t;
+  }
+  function clearTimers() {
+    timers.forEach(t => clearTimeout(t));
+    timers.clear();
+  }
+
+  /* Crossfade swap for the message/status text (same pattern as Record). */
+  function fadeSwap(el, newHtml, duration) {
+    duration = duration || FADE_MS;
+    const next = (fadeIds.get(el) || 0) + 1;
+    fadeIds.set(el, next);
+    el.classList.add('is-fading');
+    schedule(() => {
+      if (fadeIds.get(el) !== next) return;
+      el.innerHTML = newHtml;
+      el.classList.remove('is-fading');
+    }, duration);
+  }
+
+  function setHeaderTexts(message, status, instant) {
+    const msgChanged    = (message !== lastMessageHtml);
+    const statusChanged = (status  !== lastStatusHtml);
+    if (instant) {
+      if (msgChanged)    messageEl.innerHTML = message;
+      if (statusChanged) statusEl.innerHTML  = status;
+    } else {
+      if (msgChanged)    fadeSwap(messageEl, message);
+      if (statusChanged) fadeSwap(statusEl,  status);
+    }
+    lastMessageHtml = message;
+    lastStatusHtml  = status;
+  }
+
+  function setState(name, instant) {
+    currentState = name;
+    assistant.setAttribute('data-state', name);
+
+    switch (name) {
+      case STATES.IDLE:
+        setHeaderTexts(MSG_IDLE, '', instant);
+        setControlsLocked(false);
+        break;
+      case STATES.LISTENING1:
+      case STATES.LISTENING2:
+        setHeaderTexts(MSG_ACTIVE, STATUS_LISTENING, instant);
+        setControlsLocked(false);
+        break;
+      case STATES.THINKING1:
+      case STATES.THINKING2:
+        setHeaderTexts(MSG_ACTIVE, STATUS_THINKING, instant);
+        setControlsLocked(true);
+        closeKebabMenu();
+        break;
+      case STATES.RESPONDING1:
+      case STATES.RESPONDING2:
+        setHeaderTexts(MSG_ACTIVE, STATUS_RESPONDING, instant);
+        setControlsLocked(true);
+        closeKebabMenu();
+        break;
+      case STATES.END:
+        setHeaderTexts(MSG_IDLE, '', instant);
+        setControlsLocked(false);
+        break;
+    }
+  }
+
+  /* ---------- Typing helper (textContent, adaptive step) ---------- */
+  function typeInto(el, text, totalMs, onDone) {
+    let i = 0;
+    const total = text.length;
+    const step = Math.max(12, Math.floor(totalMs / total));
+    el.textContent = '';
+    function tick() {
+      i++;
+      el.textContent = text.slice(0, i);
+      if (i < total) {
+        schedule(tick, step);
+      } else if (onDone) {
+        onDone();
+      }
+    }
+    schedule(tick, step);
+  }
+
+  /* ---------- Note content helpers ---------- */
+  function clearNoteContent() { noteContent.innerHTML = ''; }
+
+  function appendUserTypingParagraph() {
+    const p = document.createElement('p');
+    p.className = 'conv-user-typing';
+    noteContent.appendChild(p);
+    return p;
+  }
+
+  function appendBubble(role, withTyping) {
+    const row = document.createElement('div');
+    row.className = 'bubble-row ' + role;
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble ' + role + (withTyping ? ' is-typing' : '');
+    row.appendChild(bubble);
+    noteContent.appendChild(row);
+    return bubble;
+  }
+
+  /* ---------- Flow ---------- */
+  function startConversation() {
+    clearTimers();
+    clearNoteContent();
+    setState(STATES.LISTENING1);
+    const p = appendUserTypingParagraph();
+    typeInto(p, USER_TURN_1, USER_TYPING_MS_1, () => {
+      schedule(() => goToThinking1(), STEP_PAUSE_MS);
+    });
+  }
+
+  function goToThinking1() {
+    setState(STATES.THINKING1);
+    schedule(() => goToResponding1(), THINKING_MS);
+  }
+
+  function goToResponding1() {
+    setState(STATES.RESPONDING1);
+    // Morph the existing user-typing paragraph into a user bubble in place
+    // (background/color/padding/border-radius/margin-right transition in 400ms).
+    const typingP = noteContent.querySelector('.conv-user-typing:last-child');
+    if (typingP) typingP.classList.add('morphing');
+    // After a small overlap, append the AI bubble with a soft fade-in
+    // and start its typing once the bubble is visible.
+    schedule(() => {
+      const aiBubble = appendBubble('ai', true);
+      aiBubble.classList.add('fade-in');
+      requestAnimationFrame(() => aiBubble.classList.add('is-visible'));
+      schedule(() => {
+        typeInto(aiBubble, AI_TURN_1, AI_TYPING_MS_1, () => {
+          aiBubble.classList.remove('is-typing');
+          schedule(() => goToListening2(), STEP_PAUSE_MS);
+        });
+      }, 250);
+    }, 150);
+  }
+
+  function goToListening2() {
+    setState(STATES.LISTENING2);
+    // Brief pause: the human "reads" the AI question and starts replying.
+    schedule(() => {
+      const p = appendUserTypingParagraph();
+      typeInto(p, USER_TURN_2, USER_TYPING_MS_2, () => {
+        schedule(() => goToThinking2(), STEP_PAUSE_MS);
+      });
+    }, USER_REPLY_DELAY_MS);
+  }
+
+  function goToThinking2() {
+    setState(STATES.THINKING2);
+    // The trailing typing paragraph (already filled) stays visible in the box
+    // until we move to responding2 where we replace it with a user bubble.
+    schedule(() => goToResponding2(), THINKING_MS);
+  }
+
+  function goToResponding2() {
+    setState(STATES.RESPONDING2);
+    // Morph the listening2 user-typing paragraph into the second user bubble.
+    const typingP = noteContent.querySelector('.conv-user-typing:last-child');
+    if (typingP) typingP.classList.add('morphing');
+    schedule(() => {
+      const aiBubble = appendBubble('ai', true);
+      aiBubble.classList.add('fade-in');
+      requestAnimationFrame(() => aiBubble.classList.add('is-visible'));
+      schedule(() => {
+        typeInto(aiBubble, AI_TURN_2, AI_TYPING_MS_2, () => {
+          aiBubble.classList.remove('is-typing');
+          schedule(() => goToEnd(), STEP_PAUSE_MS);
+        });
+      }, 250);
+    }, 150);
+  }
+
+  function goToEnd() {
+    setState(STATES.END);
+    // Banner with typing label + animated dividers
+    const banner = document.createElement('div');
+    banner.className = 'end-banner';
+    banner.innerHTML = '<div class="divider left"></div><div class="label"></div><div class="divider right"></div>';
+    noteContent.appendChild(banner);
+    // CSS at "end" switches to flex-start; scroll to bottom so the end banner
+    // is visible first. RAF fires before the next paint — no flicker.
+    requestAnimationFrame(() => { noteContent.scrollTop = noteContent.scrollHeight; });
+    const label = banner.querySelector('.label');
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const endText = 'Fine conversazione - oggi, ' + hh + ':' + mm;
+    typeInto(label, endText, END_LABEL_TYPING_MS, () => {
+      // After the text is fully typed, expand the two dividers outward
+      banner.classList.add('is-revealing');
+    });
+  }
+
+  function reset() {
+    clearTimers();
+    clearNoteContent();
+    closeKebabMenu();
+    setState(STATES.IDLE, true);
+  }
+
+  /* ---------- Controls lock ---------- */
+  const lockable = [micBtn, kebabBtn, closeBtn];
+  function setControlsLocked(locked) {
+    lockable.forEach(b => { b.disabled = locked; });
+    kebabMenu.querySelectorAll('.kebab-menu-item').forEach(item => { item.disabled = locked; });
+  }
+
+  /* ---------- Kebab menu (local copy) ---------- */
+  function openKebabMenu() {
+    kebabMenu.classList.add('is-open');
+    kebabMenu.setAttribute('aria-hidden', 'false');
+    kebabBtn.classList.add('is-open');
+    kebabBtn.setAttribute('aria-expanded', 'true');
+    document.addEventListener('mousedown', onDocClickForMenu, true);
+    document.addEventListener('keydown', onKeyForMenu);
+  }
+  function closeKebabMenu() {
+    kebabMenu.classList.remove('is-open');
+    kebabMenu.setAttribute('aria-hidden', 'true');
+    kebabBtn.classList.remove('is-open');
+    kebabBtn.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('mousedown', onDocClickForMenu, true);
+    document.removeEventListener('keydown', onKeyForMenu);
+  }
+  function onDocClickForMenu(e) {
+    if (e.target.closest('.kebab-wrap')) return;
+    closeKebabMenu();
+  }
+  function onKeyForMenu(e) {
+    if (e.key === 'Escape') closeKebabMenu();
+  }
+
+  /* ---------- Event handlers ---------- */
+  micBtn.addEventListener('click', () => {
+    if (currentState === STATES.IDLE) {
+      startConversation();
+    } else if (currentState === STATES.LISTENING1 || currentState === STATES.LISTENING2) {
+      // Interrupt: morph the partially-typed user paragraph into a user bubble
+      // (if non-empty), then jump to the end banner once the morph settles.
+      clearTimers();
+      const lastTyping = noteContent.querySelector('.conv-user-typing:last-child');
+      if (lastTyping && lastTyping.textContent.trim()) {
+        lastTyping.classList.add('morphing');
+        schedule(() => goToEnd(), 450);
+      } else {
+        if (lastTyping) lastTyping.remove();
+        goToEnd();
+      }
+    } else if (currentState === STATES.END) {
+      // Fresh new conversation
+      startConversation();
+    }
+    // Other states are locked — the disabled attribute already blocks clicks
+  });
+
+  closeBtn.addEventListener('click', () => {
+    reset();
+  });
+
+  kebabBtn.addEventListener('click', () => {
+    if (kebabMenu.classList.contains('is-open')) {
+      closeKebabMenu();
+    } else {
+      openKebabMenu();
+    }
+  });
+
+  kebabMenu.querySelectorAll('.kebab-menu-item').forEach(item => {
+    item.addEventListener('click', () => closeKebabMenu());
+  });
+
+  /* ---------- Init + expose reset ---------- */
+  setState(STATES.IDLE, true);
+  window.__convReset = reset;
+})();
+
+/* ========================================================================
+   Tab switcher — toggles between [data-panel="record"] and [data-panel="conversation"]
+   and resets both demos so there's never residual state.
+   ======================================================================== */
+(function TabSwitcher() {
+  const tabs   = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.tab-panel');
+  const hint   = document.getElementById('demoHint');
+
+  const X_NOTE = 'La X qui resetta la bar — in produzione la chiuderebbe (riapribile da un bottone nell\'header della pagina)';
+  const HINTS = {
+    record:       'Clicca sul microfono per avviare la registrazione · Clicca di nuovo per terminarla · ' + X_NOTE,
+    conversation: 'Clicca sul microfono per iniziare la conversazione · Clicca di nuovo per chiuderla · ' + X_NOTE
+  };
+
+  function activate(name) {
+    tabs.forEach(t => {
+      const active = t.dataset.tab === name;
+      t.classList.toggle('is-active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    panels.forEach(p => { p.hidden = (p.dataset.panel !== name); });
+    if (hint && HINTS[name]) hint.textContent = HINTS[name];
+    // Reset both demos to avoid any residual state when switching back
+    if (typeof window.__recordReset === 'function') window.__recordReset();
+    if (typeof window.__convReset   === 'function') window.__convReset();
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => activate(tab.dataset.tab));
+  });
 })();
 </script>
 
