@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permessi — Prototipo esplorativo · Dils</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- Shell CRM "Next" — barra moduli (inerte nel prototipo) -->
+  <aside class="sidebar" aria-label="Navigazione moduli (decorativa nel prototipo)">
+    <a class="sidebar__logo" href="#" title="Next — home">
+      <img src="assets/dils-symbol-negative.svg" alt="Dils">
+    </a>
+    <nav class="sidebar__nav" id="sidebarNav"></nav>
+  </aside>
+
+  <header class="topbar">
+    <h1 class="topbar__title">Permessi</h1>
+    <div class="topbar__search">
+      <span id="searchIcon"></span>
+      <input type="search" placeholder="Placeholder" aria-label="Cerca">
+    </div>
+    <div class="topbar__actions" id="topbarActions"></div>
+  </header>
+
+  <main class="main" id="app" aria-live="polite"></main>
+
+  <div id="modalRoot"></div>
+  <div id="toastRoot" aria-live="assertive"></div>
+
+  <div class="persona-switcher" id="switcher" aria-label="Demo: cambia utente"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
