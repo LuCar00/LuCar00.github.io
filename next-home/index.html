@@ -6,47 +6,39 @@
 <meta name="theme-color" content="#ffffff">
 <title>Next · Homepage proattiva + AI</title>
 
-<!-- Body font: Nunito Sans (Dils body typeface) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&display=swap" rel="stylesheet">
-<!-- Icon set used by the Dils design system (self-hosted, works offline) -->
+<!-- Self-hosted Line Awesome (the Dils design-system icon set) -->
 <link rel="stylesheet" href="assets/la/css/line-awesome.min.css">
 
 <style>
-/* ============ FONTS ============ */
-/* Ivy Mode SemiBold — editorial headings (Dils brand, embedded) */
+/* ===== Ivy Mode SemiBold — editorial section/listing titles ===== */
 @font-face{
   font-family:"IvyMode";
   src:url("assets/fonts/IvyMode-SemiBold.woff2") format("woff2");
   font-weight:600; font-style:normal; font-display:swap;
 }
 
-/* ============ TOKENS (from Next Design Library) ============ */
+/* ===== Tokens (Next Design Library) ===== */
 :root{
-  /* text */
-  --ink:#3F4254;            /* Primary/Black */
+  --ink:#3f4254;            /* General/Black */
   --ink-2:#6d6d75;          /* Greyscale/Grey+2 */
   --ink-3:#b5b5c3;          /* Greyscale/Grey */
-  /* surfaces */
-  --bg:#f6f7fb;             /* Light/Light-4 page bg */
-  --card:#ffffff;
-  --line:#e1e1e7;           /* Greyscale/Grey-3 */
-  --line-2:#d3d3db;         /* Greyscale/Grey-2 */
-  --fill-soft:#edeff8;      /* Light/Light-3 */
-  --fill-soft-2:#e4e7f4;    /* Light/Light-2 */
-  /* brand */
-  --ai:#8113AA; --ai-2:#b371cc; --ai-soft:#e6d0ee;  /* AI purple */
-  --brass:#ae9142; --brass-1:#bea768; --brass-dk:#8b7435; --brass-soft:#efe9d9;
-  --green:#0bb783;          /* success */
-  --red:#e73838;            /* warning */
-  /* business units */
-  --bu-office:#8db9ca; --bu-retail:#ae9142; --bu-logistics:#789f90;
-  --bu-living:#d0a1ba; --bu-capital:#7e666d; --bu-corporate:#000000;
-  /* shape */
-  --r:8px; --r-sm:6px; --pill:999px;
+  --grey-2:#d3d3db;         /* Greyscale/Grey-2 */
+  --bg:#f6f7fb;             /* Light/Light-4 (page / tinted sections) */
+  --line:#e4e7f4;           /* Light/Light-2 (contact card border) */
+  --line-d:#d2d7ed;         /* Light/Light (deal card border, author chip bg) */
+  --soft:#edeff8;           /* Light/Light-3 (inactive segment, kebab bg) */
+  --soft-ink:#54565f;       /* Light/Light+3 (inactive segment text) */
+  --soft-border:#a8acbe;    /* Light/Light+1 (promemoria header btn border) */
+  --ai:#8113aa; --ai-2:#b371cc; --ai-soft:#e6d0ee;
+  --brass:#ae9142; --brass-1:#bea768; --brass-up:#8b7435; --brass-soft:#efe9d9;
+  --green:#0bb783; --red:#e73838; --yellow:#FFA800;
+  --office:#8db9ca; --living:#d0a1ba;
+  --pink:#A68195; --pink-bg:#F6ECF1;        /* Visti di recente cards */
+  --r:8px; --r-sm:4px; --r-card:6px; --pill:999px;
   --inset:24px;
-  /* time pills */
   --time-brass-bg:#f6efd8; --time-brass-ink:#7a6526;
   --time-grey-bg:#e9e9ef;  --time-grey-ink:#6d6d75;
 }
@@ -57,224 +49,208 @@ html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
 body{
   margin:0;background:#dfe1ea;color:var(--ink);
   font-family:"Nunito Sans","nunito-sans","Trebuchet MS",Arial,Helvetica,sans-serif;
-  font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;
+  font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased;
 }
-
-/* phone frame on desktop; full-bleed on a real phone.
-   No overflow on .app on mobile: the body is the single scroll container, so the
-   sticky top bar sticks to the viewport and the page scrolls normally.
-   Each .rail clips its own horizontal overflow, so the page never scrolls sideways. */
-.app{
-  max-width:430px;margin:0 auto;background:var(--bg);
-  position:relative;min-height:100vh;
-}
+.app{max-width:430px;margin:0 auto;background:var(--bg);position:relative;min-height:100vh;}
 @media(min-width:520px){
   body{padding:24px 0;}
-  /* overflow:clip rounds the corners WITHOUT creating a scroll container,
-     so position:sticky on the top bar keeps working (overflow:hidden would break it) */
   .app{box-shadow:0 24px 60px rgba(31,33,46,.28);border-radius:24px;overflow:clip;min-height:auto;}
   .topbar{border-radius:24px 24px 0 0;}
 }
-
 h1,h2,h3,h4,p{margin:0;}
-.ivy{font-family:"IvyMode",Georgia,"Times New Roman",serif;font-weight:600;letter-spacing:.1px;}
+.ivy{font-family:"IvyMode",Georgia,"Times New Roman",serif;font-weight:600;}
 a{color:inherit;text-decoration:none;}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0;}
 img{display:block;}
-
-/* scrollbar hide helper for rails */
 .no-bar{scrollbar-width:none;-ms-overflow-style:none;}
 .no-bar::-webkit-scrollbar{display:none;width:0;height:0;}
 
-/* ============ HORIZONTAL SNAP RAIL ============ */
+/* ===== Horizontal snap rails ===== */
 .rail{
-  display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
-  scroll-snap-type:x mandatory;
-  scroll-padding-left:var(--inset);
-  padding:6px var(--inset) 8px;
-  -webkit-overflow-scrolling:touch;     /* iOS momentum */
-  overscroll-behavior-x:contain;
+  display:flex;gap:16px;align-items:stretch;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-padding-left:var(--inset);
+  padding:6px var(--inset) 8px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
 }
 .rail>*{scroll-snap-align:start;flex:0 0 auto;}
+.rail-end{flex:0 0 1px;width:1px;}
 
-/* ============ TOP BAR ============ */
+/* ===== Top bar ===== */
 .topbar{
-  position:sticky;top:0;z-index:30;background:var(--card);
-  height:64px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:30;background:#fff;height:80px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;border-bottom:1px solid var(--soft);
 }
-.topbar .logo{font-size:24px;color:var(--ink);width:40px;height:40px;display:grid;place-items:center;}
-.topbar .actions{display:flex;align-items:center;gap:2px;}
-.icon-btn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
-  font-size:21px;color:var(--ink);transition:background .15s ease;}
-.icon-btn:active{background:var(--fill-soft);}
-.avatar{width:38px;height:38px;border-radius:50%;padding:2px;margin-left:4px;
-  background:linear-gradient(135deg,#ff2d8f,#a0228e);}
-.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #fff;}
+.topbar .logo{width:32px;height:32px;flex:0 0 32px;}
+.topbar .logo img{width:32px;height:32px;}
+.topbar .actions{display:flex;align-items:center;gap:15px;}
+/* Button_icon: 48x48 square, transparent, 32px glyph #3f4254 */
+.btn-icon{width:48px;height:48px;border-radius:var(--r-sm);display:flex;align-items:center;
+  justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:none;}
+.avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;flex:0 0 48px;
+  background:linear-gradient(180deg,#d6189a,#7d1e9e);}
+.avatar img{width:100%;height:100%;object-fit:cover;}
 
-/* ============ HERO ============ */
+/* ===== Hero ===== */
 .hero{position:relative;height:176px;margin-bottom:28px;}
 .hero .bg{position:absolute;inset:0;overflow:hidden;}
 .hero .bg img{width:100%;height:100%;object-fit:cover;}
-.hero .bg::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(20,22,34,.18),rgba(20,22,34,.42));}
-.hero h1{position:absolute;top:42px;left:0;right:0;text-align:center;color:#fff;
-  font-size:34px;text-shadow:0 2px 14px rgba(0,0,0,.35);}
-.search{position:absolute;left:var(--inset);right:var(--inset);bottom:-26px;
-  height:52px;background:#fff;border-radius:var(--r);display:flex;align-items:center;
-  gap:10px;padding:0 18px;box-shadow:0 12px 28px rgba(31,33,46,.16);}
-.search input{border:none;outline:none;flex:1;font-size:14px;color:var(--ink);
-  background:none;min-width:0;}
+.hero .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,22,34,.18),rgba(20,22,34,.42));}
+.hero h1{position:absolute;top:42px;left:0;right:0;text-align:center;color:#fff;font-size:34px;text-shadow:0 2px 14px rgba(0,0,0,.35);}
+.search{position:absolute;left:var(--inset);right:var(--inset);bottom:-26px;height:52px;background:#fff;
+  border-radius:var(--r);display:flex;align-items:center;gap:10px;padding:0 18px;box-shadow:0 12px 28px rgba(31,33,46,.16);}
+.search input{border:none;outline:none;flex:1;font-size:14px;color:var(--ink);background:none;min-width:0;}
 .search input::placeholder{color:var(--ink-3);}
-.search .la{font-size:20px;color:var(--ink-2);}
+.search .las{font-size:20px;color:var(--ink-2);}
 
-/* ============ SECTION SCAFFOLD ============ */
-.section{padding:22px 0 26px;}
+/* ===== Section scaffold ===== */
+.section{padding:40px 0;}
 .section.tint{background:var(--bg);}
 .section.white{background:#fff;}
-.sec-head{padding:0 var(--inset);margin-bottom:14px;}
-.sec-eyebrow{display:flex;align-items:center;gap:10px;color:var(--ink);}
-.sec-eyebrow .la{font-size:22px;}
-.sec-eyebrow .gem{color:var(--brass);}
-.sec-title{font-size:26px;line-height:1.1;margin-top:6px;}
-.sec-sub{color:var(--ink-2);font-size:13px;margin-top:4px;}
-.sec-head .row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
-.head-tools{display:flex;gap:8px;}
-.tool-btn{width:46px;height:42px;border:1px solid var(--line);border-radius:var(--r-sm);
-  display:grid;place-items:center;font-size:19px;color:var(--ink);background:#fff;}
+.sec-head{padding:0 var(--inset);margin-bottom:16px;}
+.sec-head .row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;}
+.sec-eyebrow{display:flex;flex-direction:column;gap:8px;}
+.sec-eyebrow .las,.sec-eyebrow .lar{font-size:32px;color:var(--ink);width:32px;height:32px;line-height:32px;}
+.sec-title{font-size:24px;line-height:28px;color:var(--ink);}
+.sec-sub{color:var(--ink);font-size:14px;font-weight:400;margin-top:2px;}
+.head-tools{display:flex;gap:8px;flex:0 0 auto;}
+/* tool button (Button_icon, bordered variant) 48x48 */
+.tool-btn{width:48px;height:48px;border:1px solid var(--ink);border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:#fff;}
 
-/* group title inside a section */
-.grp{padding:0 var(--inset);margin:18px 0 12px;display:flex;align-items:center;
-  justify-content:space-between;}
-.grp h3{font-size:17px;font-weight:700;}
-.grp p{font-size:12px;color:var(--ink-2);}
+/* group sub-header */
+.grp{padding:0 var(--inset);margin:24px 0 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.grp h3{font-size:20px;font-weight:800;color:var(--ink);line-height:1.1;}
+.grp p{font-size:14px;font-weight:400;color:var(--ink);margin-top:2px;}
 
-/* ============ SEGMENTED CONTROL (tab swap) ============ */
-.seg{display:flex;background:var(--fill-soft);border-radius:var(--r);padding:4px;
-  margin:0 var(--inset) 16px;gap:4px;}
-.seg-btn{flex:1;padding:11px 8px;border-radius:6px;font-size:13px;font-weight:700;
-  color:var(--ink);line-height:1.15;transition:background .2s ease,color .2s ease,box-shadow .2s ease;}
-.seg-btn.is-active{background:var(--ink);color:#fff;box-shadow:0 4px 10px rgba(63,66,84,.25);}
+/* ===== Segmented control (Button_group) — flush, no track, no inner pill ===== */
+.seg{display:flex;gap:1px;background:#fff;border-radius:var(--r-sm);overflow:hidden;margin:0 var(--inset) 16px;}
+.seg-btn{flex:1;min-width:0;min-height:40px;display:flex;align-items:center;justify-content:center;
+  padding:8px 16px;font-size:14px;font-weight:700;line-height:1.05;text-align:center;
+  background:var(--soft);color:var(--soft-ink);border:1px solid var(--soft);}
+.seg-btn.is-active{background:var(--ink);color:#fff;border-color:var(--ink);}
 
-/* ============ APP SELECTOR CARDS ============ */
-.app-card{width:96px;height:96px;border-radius:var(--r);padding:12px;color:#fff;
-  display:flex;flex-direction:column;justify-content:space-between;position:relative;}
-.app-card .la{font-size:23px;}
-.app-card span{font-size:12px;font-weight:700;line-height:1.1;}
-.app-card.light{background:#fff;color:var(--ink);border:1px solid var(--line);}
+/* ===== Applicativi app cards ===== */
+.app-card{width:80px;height:80px;border-radius:var(--r-card);padding:4px;color:#fff;
+  display:flex;flex-direction:column;gap:4px;}
+.app-card.center{align-items:center;}
+.app-card .las,.app-card .lar{font-size:24px;line-height:1;}
+.app-card span{font-size:14px;font-weight:700;line-height:1;text-align:center;width:100%;}
+.app-card.light{background:#fff;color:var(--ink-2);}
 
-/* ============ FOLLOW-UP / CONTACT CARDS ============ */
-.contact{width:316px;background:#fff;border:1px solid var(--line);border-radius:var(--r);
-  padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 2px 6px rgba(31,33,46,.04);}
-.contact .micro{font-size:12px;font-weight:700;color:var(--brass);}
-.contact .name{font-size:18px;font-weight:700;color:var(--ink);}
-.contact .top{display:flex;justify-content:space-between;gap:12px;}
-.chips{display:flex;gap:8px;flex-wrap:wrap;}
-.chip{border:1px solid var(--ink);border-radius:var(--pill);padding:5px 12px;font-size:12px;
-  font-weight:700;color:var(--ink);display:inline-flex;align-items:center;gap:6px;}
+/* ===== AI banner (Chip) ===== */
+.ai-banner{background:var(--ai-soft);border-radius:var(--r);padding:8px 16px;display:flex;gap:8px;align-items:center;}
+.ai-banner .las{font-size:24px;color:var(--ai-2);flex:0 0 24px;}
+.ai-banner span{flex:1;min-width:0;font-size:14px;font-weight:700;line-height:18px;color:var(--ai);}
+
+/* ===== Follow-up: contact + see-all cards ===== */
+.contact{width:300px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);
+  min-height:124px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.contact .zone-a{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
+.contact .main-col{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
+.contact .micro{font-size:12px;font-weight:700;color:var(--brass);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.contact .name{font-size:20px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.contact .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.contact .quick{display:flex;gap:8px;align-items:flex-start;}
+/* in-card phone/email Button_icon 48x48 */
+.sq-btn{width:48px;height:48px;border:1px solid var(--ink);border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:#fff;flex:0 0 48px;}
+.contact .foot{margin-top:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.contact .foot .line{display:flex;flex-direction:row;align-items:center;gap:4px;height:18px;white-space:nowrap;font-size:12px;color:var(--ink);}
+.contact .foot .line b{font-weight:700;}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--ink);border-radius:var(--pill);
+  padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;color:var(--ink);background:#fff;}
 .chip.solid{background:var(--ink);color:#fff;}
-.chip .la{font-size:13px;}
-.sq-btns{display:flex;gap:8px;}
-.sq-btn{width:46px;height:46px;border:1px solid var(--line-2);border-radius:var(--r-sm);
-  display:grid;place-items:center;font-size:20px;color:var(--ink);}
-.contact .foot{display:flex;align-items:baseline;gap:8px;border-top:1px solid var(--line);
-  padding-top:10px;font-size:12px;color:var(--ink-2);}
-.contact .foot b{color:var(--ink);font-size:13px;margin-left:auto;}
-.more-card{width:236px;background:var(--fill-soft);border-radius:var(--r);
-  display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;
-  color:var(--brass);font-weight:700;font-size:15px;padding:20px;}
-.more-card .la{font-size:18px;}
+.chip .las{font-size:16px;}
+.more-card{width:300px;background:var(--soft);border:1px solid var(--line);border-radius:var(--r-card);
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 24px;}
+.more-card .lab{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--brass-up);font-weight:700;font-size:16px;}
+.more-card .lab .las{font-size:24px;}
 
-/* ============ AI BANNER ============ */
-.ai-banner{margin:0 var(--inset) 16px;background:var(--ai-soft);border-radius:var(--r);
-  padding:14px 16px;display:flex;gap:12px;align-items:flex-start;color:var(--ai);
-  font-size:13px;font-weight:700;line-height:1.35;}
-.ai-ico{width:22px;height:22px;flex:0 0 22px;fill:var(--ai);margin-top:1px;}
-
-/* ============ CALENDAR ============ */
-.cal-title{padding:0 var(--inset);font-size:24px;margin-bottom:14px;}
+/* ===== Calendar ===== */
+.cal-title{padding:0 var(--inset);font-size:24px;line-height:28px;margin-bottom:14px;color:var(--ink);}
 .daypick{padding:4px var(--inset) 16px;}
-.day{width:62px;height:74px;border:1px solid var(--line);border-radius:var(--r);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  background:#fff;position:relative;}
+.day{width:62px;height:74px;border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;background:#fff;position:relative;}
 .day small{font-size:11px;color:var(--ink-2);font-weight:700;letter-spacing:.5px;}
 .day b{font-size:20px;color:var(--ink);}
 .day.is-sel{border-color:var(--ink-3);box-shadow:0 4px 10px rgba(31,33,46,.08);}
-.day.is-sel::after{content:"";position:absolute;top:8px;right:10px;width:7px;height:7px;
-  border-radius:50%;background:var(--green);}
+.day.is-sel::after{content:"";position:absolute;top:8px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--green);}
 .appt{padding:0 var(--inset);}
 .appt .ttl{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;}
 .appt .meta{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);margin-bottom:8px;}
-.appt .meta .la{font-size:16px;}
+.appt .meta .las{font-size:16px;}
 .appt .meta .walk{color:var(--brass);}
 .time-pill{border-radius:var(--pill);padding:5px 12px;font-size:13px;font-weight:700;}
 .time-pill.brass{background:var(--time-brass-bg);color:var(--time-brass-ink);}
 .time-pill.grey{background:var(--time-grey-bg);color:var(--time-grey-ink);}
 .link-brass{color:var(--brass);font-weight:700;display:inline-flex;align-items:center;gap:7px;}
-.appt-actions{display:flex;gap:10px;margin-top:6px;}
-.btn-brief{background:var(--ai);color:#fff;border-radius:var(--r-sm);height:56px;
-  display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:15px;}
-.btn-brief .la{font-size:19px;}
-.btn-brief.sq{width:56px;}
-.btn-brief.wide{flex:1;}
-.btn-ghost-sq{width:56px;height:56px;border:1px solid var(--line-2);border-radius:var(--r-sm);
-  display:grid;place-items:center;font-size:20px;color:var(--ink);background:#fff;}
 .appt-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;}
+.appt-actions{display:flex;gap:10px;}
 .divider{height:1px;background:var(--line);margin:18px var(--inset);}
-
-/* today list item */
 .today-item{padding:0 var(--inset);}
 .today-item .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 .today-item .ttl{font-size:15px;font-weight:700;color:var(--ink);margin:8px 0 12px;}
+/* purple AI buttons */
+.btn-purple{background:var(--ai);border:1px solid var(--ai);border-radius:var(--r-sm);min-height:48px;
+  display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-weight:700;font-size:16px;padding:8px 24px;}
+.btn-purple .las{font-size:24px;}
+.btn-purple.sq{width:56px;padding:8px;min-height:56px;}
+.btn-purple.wide{width:100%;}
+.btn-ghost-sq{width:56px;height:56px;border:1px solid var(--grey-2);border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ink);background:#fff;}
 
 /* reminder cards */
-.remind{width:316px;background:#fff;border:1px solid var(--line);border-radius:var(--r);
-  padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 6px rgba(31,33,46,.04);}
-.remind .top{display:flex;justify-content:space-between;align-items:flex-start;}
-.remind .when{display:flex;align-items:center;gap:8px;color:var(--brass);font-weight:700;font-size:13px;}
-.remind .when .la{font-size:17px;}
-.remind .by{font-size:12px;color:var(--ink-2);}
-.remind .by i{font-style:italic;}
-.remind h4{font-size:15px;font-weight:700;color:var(--ink);}
-.remind p{font-size:13px;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;
-  -webkit-box-orient:vertical;overflow:hidden;}
-.remind .foot{display:flex;align-items:center;gap:8px;color:var(--ink-3);font-size:14px;}
-.lc{width:26px;height:26px;border-radius:50%;background:var(--ai-soft);color:var(--ai);
-  display:grid;place-items:center;font-size:10px;font-weight:800;}
-.dots-btn{width:42px;height:42px;border:1px solid var(--line);border-radius:var(--r-sm);
-  display:grid;place-items:center;font-size:18px;color:var(--ink);background:#fff;flex:0 0 auto;}
+.remind{width:300px;background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:10px 10px 15px 15px;display:flex;flex-direction:column;gap:8px;}
+.remind .top{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
+.remind .tcol{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
+.remind .when{display:flex;align-items:center;gap:8px;}
+.remind .when .lar{font-size:24px;color:var(--yellow);}
+.remind .when b{font-size:14px;font-weight:600;line-height:18px;color:var(--yellow);white-space:nowrap;}
+.remind .by{font-size:12px;font-style:italic;color:var(--ink-2);}
+.kebab{width:48px;height:48px;background:var(--soft);border:1px solid var(--soft);border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);flex:0 0 48px;}
+.remind .lower{display:flex;flex-direction:column;gap:8px;}
+.remind h4{font-size:16px;font-weight:700;line-height:18px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.remind p{font-size:14px;font-weight:400;line-height:15px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.remind .foot{display:flex;align-items:center;gap:4px;}
+.remind .foot .las{font-size:12px;color:var(--ink-2);}
+.author{background:var(--line-d);border:1px solid var(--line-d);border-radius:var(--pill);padding:4px 8px;
+  font-size:12px;font-weight:800;line-height:18px;color:var(--ink);}
 
-/* ============ ULTIMI APPUNTAMENTI (deal cards) ============ */
-.deal{width:300px;background:#fff;border:1px solid var(--line);border-radius:var(--r);
-  padding:16px;display:flex;flex-direction:column;gap:11px;box-shadow:0 2px 8px rgba(31,33,46,.05);}
-.deal .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-.deal .name{font-size:17px;font-weight:700;color:var(--ink);}
-.tag-brass{align-self:flex-start;background:var(--brass);color:#fff;border-radius:var(--pill);
-  padding:6px 14px;font-size:13px;font-weight:700;}
-.deal .when{display:flex;align-items:center;gap:8px;color:var(--green);font-weight:700;font-size:13px;}
-.deal .when .la{font-size:16px;}
-.deal .loc{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:13px;}
-.deal .loc .la{font-size:16px;}
-.deal .prod{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);}
-.deal .prod .warn{color:var(--red);display:inline-flex;align-items:center;gap:5px;margin-left:auto;font-weight:700;}
-.deal .addlink{color:var(--brass);font-weight:700;text-decoration:underline;font-size:13px;}
-.btn-feedback{background:var(--ai);color:#fff;border-radius:var(--r-sm);height:52px;
-  display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:15px;margin-top:2px;}
-.btn-feedback .ai-ico{fill:#fff;width:19px;height:19px;}
-.btn-feedback .la{font-size:18px;}
+/* ===== Ultimi appuntamenti deal card ===== */
+.deal{width:300px;background:#fff;border:1px solid var(--line-d);border-radius:var(--r-card);min-height:124px;padding:16px;}
+.deal .gen{display:flex;flex-direction:column;gap:16px;}
+.deal .hrow{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
+.deal .lcol{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;}
+.deal .tg{display:flex;flex-direction:column;gap:8px;}   /* title + pill (small gap) */
+.deal .name{font-size:20px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tag-brass{align-self:flex-start;background:var(--brass);color:#fff;border-radius:var(--pill);padding:8px 16px;font-size:14px;font-weight:800;line-height:18px;}
+.deal .info{display:flex;flex-direction:column;gap:8px;}
+.deal .when{display:flex;align-items:center;gap:6px;color:var(--office);font-weight:700;font-size:14px;line-height:18px;}
+.deal .when .las{font-size:18px;}
+.deal .when .sep{width:1px;height:15px;background:var(--office);}
+.deal .loc{display:flex;align-items:center;gap:2px;color:var(--ink-3);font-size:14px;font-weight:700;line-height:18px;}
+.deal .loc .las{font-size:18px;}
+.deal .loc span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.deal .pl{display:flex;flex-direction:column;gap:0;}
+.deal .prod{display:flex;align-items:center;gap:8px;font-size:14px;line-height:24px;color:var(--ink);}
+.deal .prod b{font-weight:700;}
+.deal .warn{display:inline-flex;align-items:center;gap:2px;margin-left:auto;color:var(--red);font-weight:700;font-size:12px;}
+.deal .warn .las{font-size:18px;}
+.deal .addbox{height:48px;display:flex;align-items:center;justify-content:flex-start;}
+.deal .addlink{color:var(--brass);font-weight:600;text-decoration:underline;font-size:16px;line-height:24px;}
 
-/* ============ PERFORMANCE ============ */
+/* ===== Performance ===== */
 .legend{display:flex;flex-direction:column;gap:8px;padding:0 var(--inset);margin-bottom:16px;}
 .legend div{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-2);}
 .dot{width:13px;height:13px;border-radius:3px;flex:0 0 13px;}
-.dot.brass{background:var(--brass);} .dot.dark{background:var(--ink);}
-.dot.brass-1{background:var(--brass-1);}
+.dot.brass{background:var(--brass);} .dot.dark{background:var(--ink);} .dot.brass-1{background:var(--brass-1);}
 .metric{padding:0 var(--inset);margin-bottom:16px;}
 .metric .lab{font-size:13px;color:var(--ink);margin-bottom:7px;}
 .bar{height:26px;border-radius:var(--pill);background:var(--ink);overflow:hidden;display:flex;}
 .bar i{display:block;height:100%;background:var(--brass);}
-.metric .ends{display:flex;justify-content:space-between;font-size:13px;font-weight:800;
-  color:var(--ink);margin-top:6px;}
+.metric .ends{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:var(--ink);margin-top:6px;}
 .charts{padding:8px var(--inset) 0;}
 .chart-card{width:330px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 16px;}
 .chart-card h4{font-size:15px;font-weight:700;margin-bottom:14px;}
@@ -286,42 +262,48 @@ img{display:block;}
 .clegend div{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink);}
 .clegend b{margin-left:auto;font-weight:800;}
 
-/* ============ RECENTI (mini cards) ============ */
-.mini{width:150px;height:64px;background:#f6ecf1;border-radius:var(--r);padding:11px 12px;
-  display:flex;flex-direction:column;justify-content:space-between;}
-.mini.tall{height:78px;}
-.mini .mtop{display:flex;justify-content:space-between;align-items:center;color:var(--bu-capital);}
-.mini .mtop .home{font-size:17px;}
-.mini .mtop .heart{font-size:15px;color:var(--bu-living);}
-.mini .mtop .heart.off{color:#cda9bd;}
-.mini .lp{font-size:13px;font-weight:700;color:var(--ink);line-height:1.15;}
-.mini .ls{font-size:11px;color:var(--ink-2);}
+/* ===== Visti di recente mini cards ===== */
+.mini{width:auto;min-width:150px;background:var(--pink-bg);border-radius:var(--r-sm);padding:16px;
+  display:flex;flex-direction:row;gap:16px;align-items:flex-start;justify-content:space-between;}
+.mini .lcol{display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
+.mini .home{font-size:18px;color:var(--pink);}
+.mini .heart{font-size:16px;color:var(--pink);}
+.mini .lp{font-size:14px;font-weight:800;line-height:18px;color:var(--pink);white-space:nowrap;}
+.mini .ls{font-size:12px;font-weight:400;line-height:18px;color:var(--pink);white-space:nowrap;}
 
-/* ============ NEWS / ANNUNCI ============ */
-.estate{width:268px;background:#fff;border:1px solid var(--line);border-radius:var(--r);
-  overflow:hidden;box-shadow:0 2px 8px rgba(31,33,46,.05);}
-.estate .ph{position:relative;height:150px;}
+/* ===== Annunci & News ===== */
+/* property card */
+.estate{width:256px;height:384px;background:#fff;border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;}
+.estate .ph{flex:1 0 0;position:relative;}
 .estate .ph img{width:100%;height:100%;object-fit:cover;}
-.estate .ph img.flag{position:absolute;top:10px;left:10px;width:24px;height:18px;border-radius:3px;
-  object-fit:cover;box-shadow:0 1px 3px rgba(0,0,0,.3);z-index:2;}
-.estate .fav{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
-  background:rgba(255,255,255,.92);display:grid;place-items:center;color:var(--ink);font-size:15px;}
-.estate .body{padding:12px 14px 16px;}
-.estate .body .t{font-size:15px;font-weight:700;color:var(--ink);}
-.estate .body .s{font-size:12px;color:var(--ink-2);margin-top:3px;}
-.news-card{width:268px;height:172px;border-radius:var(--r);overflow:hidden;position:relative;color:#fff;}
-.news-card img{width:100%;height:100%;object-fit:cover;}
-.news-card::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(0,0,0,.05) 35%,rgba(0,0,0,.78));}
-.news-card .badge{position:absolute;top:12px;left:12px;z-index:2;background:#fff;color:var(--ink);
-  font-size:10px;font-weight:800;letter-spacing:.5px;padding:4px 9px;border-radius:4px;}
-.news-card .date{position:absolute;top:14px;right:12px;z-index:2;font-size:11px;font-weight:700;
-  text-shadow:0 1px 4px rgba(0,0,0,.5);}
-.news-card .cap{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;font-size:13px;
-  font-weight:700;line-height:1.25;}
-.rail-end{flex:0 0 1px;width:1px;}   /* lets the last card snap to the inset */
+.estate .ph .flags{position:absolute;top:16px;right:16px;display:flex;}
+.estate .body{flex:1 0 0;padding:16px;display:flex;flex-direction:column;gap:16px;}
+.estate .meta{display:flex;flex-direction:row;gap:5px;align-items:flex-start;}
+.cat-chip{flex:0 0 auto;height:20px;border-radius:50px;padding:1px 10px 0;display:flex;align-items:center;
+  font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;}
+.estate .meta .ref{flex:1;min-width:0;display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:700;line-height:18px;color:var(--ink-3);}
+.estate .meta .ref span:last-child{text-align:right;}
+.estate .et{font-family:"IvyMode",Georgia,serif;font-weight:600;font-size:22px;line-height:28px;color:var(--ink);}
+.estate .addr{display:flex;flex-direction:column;gap:4px;color:var(--ink);}
+.estate .addr .zone{font-size:16px;font-weight:700;line-height:1.15;}
+.estate .addr .full{font-size:14px;font-weight:400;line-height:18px;}
+/* flag circles */
+.flags{display:flex;}
+.flag{width:18px;height:18px;border-radius:50%;flex:0 0 18px;box-shadow:0 0 0 1.5px rgba(255,255,255,.85);}
+.flag.it{background:linear-gradient(90deg,#008C45 0 33.33%,#fff 33.33% 66.66%,#CD212A 66.66%);}
+.flag.nl{background:linear-gradient(180deg,#AE1C28 0 33.33%,#fff 33.33% 66.66%,#21468B 66.66%);margin-right:-2px;}
+/* news card */
+.news-card{width:255px;height:384px;border-radius:var(--r);overflow:hidden;position:relative;}
+.news-card>img{width:100%;height:100%;object-fit:cover;}
+.news-card .toprow{position:absolute;top:14px;left:14.5px;right:14.5px;display:flex;align-items:center;justify-content:space-between;}
+.label-chip{height:20px;border-radius:100px;padding:1px 10px 0;display:flex;align-items:center;background:#fff;
+  font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;}
+.news-card .scrim{position:absolute;left:0;right:0;bottom:0;background:rgba(34,34,34,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  border-radius:0 0 var(--r) var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;}
+.news-card .date{font-size:14px;font-weight:700;line-height:18px;color:var(--ink-3);}
+.news-card .nt{font-size:16px;font-weight:600;line-height:24px;color:#fff;}
+.news-card .tag{font-size:14px;font-weight:700;line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* ============ REDUCED MOTION ============ */
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
   .rail{scroll-snap-type:none;}
@@ -330,24 +312,16 @@ img{display:block;}
 </style>
 </head>
 <body>
-<!-- AI sparkle glyph (reused) -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="ai-spark" viewBox="0 0 24 24">
-    <path d="M11 1.5c.65 4.9 3.6 7.85 8.5 8.5-4.9.65-7.85 3.6-8.5 8.5-.65-4.9-3.6-7.85-8.5-8.5 4.9-.65 7.85-3.6 8.5-8.5Z"/>
-    <path d="M19 13.2c.3 2.2 1.6 3.5 3.8 3.8-2.2.3-3.5 1.6-3.8 3.8-.3-2.2-1.6-3.5-3.8-3.8 2.2-.3 3.5-1.6 3.8-3.8Z"/>
-  </symbol>
-</svg>
-
 <div class="app">
 
   <!-- ===== TOP BAR ===== -->
   <header class="topbar">
-    <div class="logo"><i class="las la-expand"></i></div>
+    <span class="logo"><img src="assets/logo.svg" alt="Next" width="32" height="32"></span>
     <div class="actions">
-      <button class="icon-btn" aria-label="Supporto"><i class="las la-headset"></i></button>
-      <button class="icon-btn" aria-label="Aggiungi contatto"><i class="las la-user-plus"></i></button>
-      <button class="icon-btn" aria-label="Calendario"><i class="las la-calendar"></i></button>
-      <button class="icon-btn" aria-label="Notifiche"><i class="las la-bell"></i></button>
+      <button class="btn-icon" aria-label="Supporto"><i class="las la-headset"></i></button>
+      <button class="btn-icon" aria-label="Aggiungi contatto"><i class="las la-user-plus"></i></button>
+      <button class="btn-icon" aria-label="Calendario"><i class="las la-calendar-alt"></i></button>
+      <button class="btn-icon" aria-label="Notifiche"><i class="las la-bell"></i></button>
       <span class="avatar"><img src="assets/avatar.jpg" alt="Luca"></span>
     </div>
   </header>
@@ -365,33 +339,30 @@ img{display:block;}
   <!-- ===== APP SELECTOR ===== -->
   <section class="section tint">
     <div class="sec-head">
-      <div class="sec-eyebrow"><i class="las la-gem gem"></i></div>
-      <h2 class="sec-title ivy">Applicativi</h2>
+      <div class="sec-eyebrow"><i class="las la-gem"></i><h2 class="sec-title ivy">Applicativi</h2></div>
     </div>
     <div class="seg" data-group="apps">
       <button class="seg-btn is-active" data-tab="business">Business</button>
       <button class="seg-btn" data-tab="support">Business support</button>
     </div>
-
     <div class="rail no-bar" data-group="apps" data-panel="business">
-      <div class="app-card" style="background:var(--bu-office)"><i class="las la-building"></i><span>Office</span></div>
-      <div class="app-card" style="background:var(--bu-retail)"><i class="las la-store"></i><span>Retail</span></div>
-      <div class="app-card" style="background:var(--bu-logistics)"><i class="las la-truck"></i><span>Logistics</span></div>
-      <div class="app-card" style="background:var(--bu-living)"><i class="las la-home"></i><span>Living</span></div>
-      <div class="app-card" style="background:var(--bu-capital)"><i class="las la-file-invoice-dollar"></i><span>Capital Markets</span></div>
-      <div class="app-card" style="background:var(--bu-corporate)"><i class="las la-award"></i><span>Corporate</span></div>
-      <div class="app-card light"><i class="las la-concierge-bell"></i><span>Hospitality</span></div>
+      <div class="app-card center" style="background:#8db9ca"><i class="las la-building"></i><span>Office</span></div>
+      <div class="app-card center" style="background:#ae9142"><i class="las la-store"></i><span>Retail</span></div>
+      <div class="app-card center" style="background:#789f90"><i class="las la-truck"></i><span>Logistics</span></div>
+      <div class="app-card center" style="background:#d0a1ba"><i class="las la-home"></i><span>Living</span></div>
+      <div class="app-card center" style="background:#7e666d"><i class="las la-file-invoice-dollar"></i><span>Capital Markets</span></div>
+      <div class="app-card center" style="background:#000"><i class="las la-award"></i><span>Corporate</span></div>
+      <div class="app-card center light"><i class="las la-concierge-bell"></i><span>Hospitality</span></div>
       <div class="rail-end"></div>
     </div>
-
     <div class="rail no-bar" data-group="apps" data-panel="support" hidden>
-      <div class="app-card" style="background:#1c1c1c"><i class="las la-flask"></i><span>Technology</span></div>
-      <div class="app-card" style="background:#0d8a9c"><i class="las la-bullhorn"></i><span>Marketing</span></div>
-      <div class="app-card" style="background:#57b85e"><i class="las la-money-bill-wave"></i><span>Finance</span></div>
-      <div class="app-card" style="background:#6b4d6b"><i class="las la-search-location"></i><span>Research</span></div>
-      <div class="app-card" style="background:var(--bu-living)"><i class="las la-users"></i><span>HR</span></div>
-      <div class="app-card" style="background:#4a4a4a"><i class="las la-laptop-code"></i><span>IT</span></div>
-      <div class="app-card" style="background:#8a8a3c"><i class="las la-gavel"></i><span>Legal</span></div>
+      <div class="app-card" style="background:#000"><i class="las la-flask"></i><span>Technology</span></div>
+      <div class="app-card" style="background:#008193"><i class="las la-copyright"></i><span>Marketing</span></div>
+      <div class="app-card" style="background:#64b46e"><i class="las la-money-bill-wave"></i><span>Finance</span></div>
+      <div class="app-card" style="background:#5c4366"><i class="las la-search-location"></i><span>Research</span></div>
+      <div class="app-card" style="background:#d4a7ce"><i class="las la-users"></i><span>HR</span></div>
+      <div class="app-card" style="background:#575756"><i class="las la-laptop-code"></i><span>IT</span></div>
+      <div class="app-card" style="background:#828027"><i class="las la-gavel"></i><span>Legal</span></div>
       <div class="rail-end"></div>
     </div>
   </section>
@@ -400,73 +371,66 @@ img{display:block;}
   <section class="section white">
     <div class="sec-head">
       <div class="row">
-        <div>
-          <div class="sec-eyebrow"><i class="las la-share"></i></div>
-          <h2 class="sec-title ivy">Follow-up in sospeso</h2>
-        </div>
+        <div class="sec-eyebrow"><i class="las la-share"></i><h2 class="sec-title ivy">Follow-up in sospeso</h2></div>
         <div class="head-tools">
-          <button class="tool-btn"><i class="las la-user-friends"></i></button>
+          <button class="tool-btn"><i class="las la-users"></i></button>
           <button class="tool-btn"><i class="las la-sync"></i></button>
         </div>
       </div>
     </div>
 
     <div class="grp"><div><h3>Da non dimenticare</h3><p>Le opportunità senza follow-up da più tempo</p></div></div>
-    <div class="rail no-bar">
-      <div class="contact">
-        <div class="top">
-          <div><div class="micro">Porta Bella 15</div><div class="name">Marica Marcelli</div></div>
-          <div class="sq-btns"><button class="sq-btn"><i class="las la-phone"></i></button><button class="sq-btn"><i class="las la-envelope"></i></button></div>
-        </div>
-        <div class="chips"><span class="chip">Vendita</span><span class="chip solid"><i class="las la-star"></i>Lead</span></div>
-        <div class="foot">Ultimo contatto <b>12/03/2026</b></div>
-      </div>
-      <div class="contact">
-        <div class="top">
-          <div><div class="micro">Living agency · Milan</div><div class="name">Antonio Antonelli</div></div>
-          <div class="sq-btns"><button class="sq-btn"><i class="las la-phone"></i></button><button class="sq-btn"><i class="las la-envelope"></i></button></div>
-        </div>
-        <div class="chips"><span class="chip">Vendita</span><span class="chip solid"><i class="las la-star"></i>Lead</span></div>
-        <div class="foot">Ultimo contatto <b>12/03/2026</b></div>
-      </div>
-      <a class="more-card">Altre opportunità<br>da non dimenticare <i class="las la-arrow-right"></i></a>
-      <div class="rail-end"></div>
-    </div>
+    <div class="rail no-bar" id="fu1"></div>
 
     <div class="grp"><div><h3>Le più recenti</h3><p>Nuove opportunità senza follow-up</p></div></div>
-    <div class="rail no-bar">
-      <div class="contact">
-        <div class="top">
-          <div><div class="micro">Porta Bella 15</div><div class="name">Marisa Ferrero</div></div>
-          <div class="sq-btns"><button class="sq-btn"><i class="las la-phone"></i></button><button class="sq-btn"><i class="las la-envelope"></i></button></div>
-        </div>
-        <div class="chips"><span class="chip">Vendita</span><span class="chip solid"><i class="las la-star"></i>Lead</span></div>
-        <div class="foot">Ultimo contatto <b>12/03/2026</b></div>
-      </div>
-      <a class="more-card">Altre opportunità<br>recenti <i class="las la-arrow-right"></i></a>
-      <div class="rail-end"></div>
-    </div>
+    <div class="rail no-bar" id="fu2"></div>
   </section>
 
   <!-- ===== CALENDAR ===== -->
   <section class="section tint">
     <div class="sec-head">
-      <div class="sec-eyebrow"><i class="las la-calendar"></i></div>
-      <h2 class="sec-title ivy">I miei appuntamenti</h2>
+      <div class="sec-eyebrow"><i class="las la-calendar-alt"></i><h2 class="sec-title ivy">I miei appuntamenti</h2></div>
     </div>
     <div class="seg" data-group="cal">
-      <button class="seg-btn" data-tab="oggi">Appuntamenti di oggi</button>
-      <button class="seg-btn is-active" data-tab="prossimi">Prossimi appuntamenti</button>
+      <button class="seg-btn is-active" data-tab="oggi">Appuntamenti di oggi</button>
+      <button class="seg-btn" data-tab="prossimi">Prossimi appuntamenti</button>
       <button class="seg-btn" data-tab="promem">Promemoria</button>
     </div>
 
-    <div class="ai-banner">
-      <svg class="ai-ico"><use href="#ai-spark"/></svg>
-      <span>Clicca su Brief per farmi fare un riassunto di tutte le informazioni utili per l'appuntamento</span>
+    <!-- panel: OGGI (default) -->
+    <div data-group="cal" data-panel="oggi">
+      <div style="padding:0 var(--inset);margin-bottom:16px"><div class="ai-banner">
+        <i class="las la-atom"></i><span>Clicca su Brief per farmi fare un riassunto di tutte le informazioni utili per l'appuntamento</span>
+      </div></div>
+      <h3 class="cal-title ivy">Appuntamenti di oggi</h3>
+      <div class="today-item">
+        <div class="head"><span class="time-pill brass">09:00 · 09:30</span><button class="btn-ghost-sq"><i class="las la-ellipsis-v"></i></button></div>
+        <div class="meta" style="margin-top:10px"><i class="las la-walking walk"></i>Meeting generico</div>
+        <div class="meta"><i class="las la-map-marker-alt"></i>Piazza Armando Diaz, 7 · 20123 · Milano</div>
+        <div class="ttl">Dils Living · Asia Morgante | Incontro esplorativo nuove opportunità</div>
+        <button class="btn-purple wide"><i class="las la-atom"></i>Brief <i class="las la-file-alt"></i></button>
+      </div>
+      <div class="divider"></div>
+      <div class="today-item">
+        <span class="time-pill grey">11:30 · 12:00</span>
+        <div class="meta" style="margin-top:10px"><i class="las la-calendar"></i>Appuntamento Outlook</div>
+        <div class="ttl" style="margin-bottom:0">KPI definition</div>
+      </div>
+      <div class="divider"></div>
+      <div class="today-item">
+        <div class="head"><span class="time-pill brass">14:00 · 15:30</span><button class="btn-ghost-sq"><i class="las la-ellipsis-v"></i></button></div>
+        <div class="meta" style="margin-top:10px"><i class="las la-walking walk"></i>Meeting generico</div>
+        <div class="meta"><a class="link-brass"><i class="las la-desktop"></i>Evento online</a></div>
+        <div class="ttl">Dils Living · Gianni Giannini | Presentazione nuove opportunità su Milano e Roma</div>
+        <button class="btn-purple wide"><i class="las la-atom"></i>Brief <i class="las la-file-alt"></i></button>
+      </div>
     </div>
 
-    <!-- panel: prossimi (default) -->
-    <div data-group="cal" data-panel="prossimi">
+    <!-- panel: PROSSIMI -->
+    <div data-group="cal" data-panel="prossimi" hidden>
+      <div style="padding:0 var(--inset);margin-bottom:16px"><div class="ai-banner">
+        <i class="las la-atom"></i><span>Clicca su Brief per farmi fare un riassunto di tutte le informazioni utili per l'appuntamento</span>
+      </div></div>
       <h3 class="cal-title ivy">Prossimi appuntamenti</h3>
       <div class="rail daypick no-bar">
         <div class="day"><small>LUN</small><b>24</b></div>
@@ -481,7 +445,7 @@ img{display:block;}
         <div class="appt-row">
           <div class="meta" style="margin:0"><i class="las la-walking walk"></i><span class="time-pill brass">10:30 · 11:00</span></div>
           <div class="appt-actions">
-            <button class="btn-brief sq"><i class="las la-file-alt"></i></button>
+            <button class="btn-purple sq"><i class="las la-file-alt"></i></button>
             <button class="btn-ghost-sq"><i class="las la-ellipsis-v"></i></button>
           </div>
         </div>
@@ -494,60 +458,12 @@ img{display:block;}
       </div>
     </div>
 
-    <!-- panel: oggi -->
-    <div data-group="cal" data-panel="oggi" hidden>
-      <h3 class="cal-title ivy">Appuntamenti di oggi</h3>
-      <div class="today-item">
-        <div class="head">
-          <span class="time-pill brass">09:00 · 09:30</span>
-          <button class="btn-ghost-sq" style="width:46px;height:46px"><i class="las la-ellipsis-v"></i></button>
-        </div>
-        <div class="meta" style="margin-top:10px"><i class="las la-walking walk"></i>Meeting generico</div>
-        <div class="meta"><i class="las la-map-marker"></i>Piazza Armando Diaz, 7 · 20123 · Milano</div>
-        <div class="ttl">Dils Living · Asia Morgante | Incontro esplorativo nuove opportunità</div>
-        <button class="btn-brief wide" style="width:100%"><svg class="ai-ico" style="fill:#fff;width:19px;height:19px"><use href="#ai-spark"/></svg>Brief <i class="las la-file-alt"></i></button>
-      </div>
-      <div class="divider"></div>
-      <div class="today-item">
-        <span class="time-pill grey">11:30 · 12:00</span>
-        <div class="meta" style="margin-top:10px"><i class="las la-calendar"></i>Appuntamento Outlook</div>
-        <div class="ttl" style="margin-bottom:0">KPI definition</div>
-      </div>
-      <div class="divider"></div>
-      <div class="today-item">
-        <div class="head">
-          <span class="time-pill brass">14:00 · 15:30</span>
-          <button class="btn-ghost-sq" style="width:46px;height:46px"><i class="las la-ellipsis-v"></i></button>
-        </div>
-        <div class="meta" style="margin-top:10px"><i class="las la-walking walk"></i>Meeting generico</div>
-        <div class="meta"><a class="link-brass"><i class="las la-desktop"></i>Evento online</a></div>
-        <div class="ttl">Dils Living · Gianni Giannini | Presentazione nuove opportunità su Milano e Roma</div>
-        <button class="btn-brief wide" style="width:100%"><svg class="ai-ico" style="fill:#fff;width:19px;height:19px"><use href="#ai-spark"/></svg>Brief <i class="las la-file-alt"></i></button>
-      </div>
-    </div>
-
-    <!-- panel: promemoria -->
+    <!-- panel: PROMEMORIA (no AI banner) -->
     <div data-group="cal" data-panel="promem" hidden>
-      <div class="grp"><h3 style="font-size:20px">Promemoria</h3>
-        <div class="head-tools"><button class="tool-btn"><i class="las la-calendar"></i></button><button class="tool-btn"><i class="las la-bell"></i></button></div>
+      <div class="grp"><h3>Promemoria</h3>
+        <div class="head-tools"><button class="tool-btn"><i class="las la-calendar"></i></button><button class="tool-btn" style="border-color:var(--soft-border)"><i class="lar la-bell"></i></button></div>
       </div>
-      <div class="rail no-bar">
-        <div class="remind">
-          <div class="top"><div class="when"><i class="las la-bell"></i>Oggi · 14:30</div><button class="dots-btn"><i class="las la-ellipsis-v"></i></button></div>
-          <div class="by">da Marco Gargano <i>il 23/04/2026</i></div>
-          <h4>Appunti vari da ricordare</h4>
-          <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati che tutto proceda.</p>
-          <div class="foot"><i class="las la-link"></i><span class="lc">LC</span></div>
-        </div>
-        <div class="remind">
-          <div class="top"><div class="when"><i class="las la-bell"></i>Oggi · 14:30</div><button class="dots-btn"><i class="las la-ellipsis-v"></i></button></div>
-          <div class="by">da Marco Gargano <i>il 23/04/2026</i></div>
-          <h4>Chiamare il tecnico</h4>
-          <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati che tutto proceda.</p>
-          <div class="foot"><i class="las la-link"></i><span class="lc">LC</span></div>
-        </div>
-        <div class="rail-end"></div>
-      </div>
+      <div class="rail no-bar" id="promem"></div>
     </div>
   </section>
 
@@ -555,124 +471,82 @@ img{display:block;}
   <section class="section white">
     <div class="sec-head">
       <div class="row">
-        <div>
-          <div class="sec-eyebrow"><i class="las la-calendar-check"></i></div>
-          <h2 class="sec-title ivy">Ultimi appuntamenti</h2>
-        </div>
-        <div class="head-tools"><button class="tool-btn"><i class="las la-sync"></i></button></div>
+        <div class="sec-eyebrow"><i class="las la-calendar-check"></i><h2 class="sec-title ivy">Ultimi appuntamenti</h2></div>
+        <div class="head-tools"><button class="tool-btn"><i class="las la-sync-alt"></i></button></div>
       </div>
     </div>
-    <div class="ai-banner">
-      <svg class="ai-ico"><use href="#ai-spark"/></svg>
-      <span>Clicca su Feedback per raccontarmi com'è andato l'appuntamento.</span>
-    </div>
+    <div style="padding:0 var(--inset);margin-bottom:16px"><div class="ai-banner">
+      <i class="las la-atom"></i><span>Clicca su Feedback per raccontarmi com'è andato l'appuntamento.</span>
+    </div></div>
     <div class="rail no-bar" id="deals"></div>
   </section>
 
   <!-- ===== PERFORMANCE ===== -->
   <section class="section tint">
     <div class="sec-head">
-      <div class="sec-eyebrow"><i class="las la-chart-pie"></i></div>
-      <h2 class="sec-title ivy">Performance</h2>
+      <div class="sec-eyebrow"><i class="las la-chart-pie"></i><h2 class="sec-title ivy">Performance</h2></div>
     </div>
     <div class="grp"><div><h3>Opportunità attive</h3><p>Rapporto con/senza follow up</p></div></div>
     <div class="legend">
       <div><span class="dot brass"></span>Opportunità con follow up</div>
       <div><span class="dot dark"></span>Opportunità senza follow up</div>
     </div>
-    <div class="metric">
-      <div class="lab">Numeriche generali</div>
-      <div class="bar"><i style="width:25%"></i></div>
-      <div class="ends"><span>4</span><span>12</span></div>
-    </div>
-    <div class="metric">
-      <div class="lab">Volume d'affari</div>
-      <div class="bar"><i style="width:15%"></i></div>
-      <div class="ends"><span>1.2mil</span><span>6.8mil</span></div>
-    </div>
+    <div class="metric"><div class="lab">Numeriche generali</div><div class="bar"><i style="width:25%"></i></div><div class="ends"><span>4</span><span>12</span></div></div>
+    <div class="metric"><div class="lab">Volume d'affari</div><div class="bar"><i style="width:15%"></i></div><div class="ends"><span>1.2mil</span><span>6.8mil</span></div></div>
 
     <div class="grp"><h3>Deals &amp; trattative</h3></div>
     <div class="seg" data-group="perf">
       <button class="seg-btn is-active" data-tab="anno">Anno in corso</button>
       <button class="seg-btn" data-tab="totale">Totale</button>
     </div>
-
-    <!-- panel anno -->
     <div data-group="perf" data-panel="anno">
       <div class="rail charts no-bar">
         <div class="chart-card">
           <h4>Numeriche generali</h4>
           <div class="donut-wrap">
             <div class="donut" style="background:conic-gradient(var(--brass) 0 48%,var(--brass-1) 48% 82%,var(--ink) 82% 100%)"></div>
-            <span class="pct" style="left:74%;top:42%">48%</span>
-            <span class="pct" style="left:30%;top:34%">34%</span>
-            <span class="pct" style="left:44%;top:84%">18%</span>
+            <span class="pct" style="left:74%;top:42%">48%</span><span class="pct" style="left:30%;top:34%">34%</span><span class="pct" style="left:44%;top:84%">18%</span>
           </div>
-          <div class="clegend">
-            <div><span class="dot brass"></span>Deal vinti <b>32</b></div>
-            <div><span class="dot brass-1"></span>Trattative <b>23</b></div>
-            <div><span class="dot dark"></span>Deal persi <b>12</b></div>
-          </div>
+          <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>32</b></div><div><span class="dot brass-1"></span>Trattative <b>23</b></div><div><span class="dot dark"></span>Deal persi <b>12</b></div></div>
         </div>
         <div class="chart-card">
           <h4>Volume d'affari</h4>
           <div class="donut-wrap">
             <div class="donut" style="background:conic-gradient(var(--brass) 0 33.4%,var(--ink) 33.4% 93.7%,var(--brass-1) 93.7% 100%)"></div>
-            <span class="pct" style="left:78%;top:40%">33.4%</span>
-            <span class="pct" style="left:45%;top:85%">60.3%</span>
-            <span class="pct" style="left:33%;top:24%">6.3%</span>
+            <span class="pct" style="left:78%;top:40%">33.4%</span><span class="pct" style="left:45%;top:85%">60.3%</span><span class="pct" style="left:33%;top:24%">6.3%</span>
           </div>
-          <div class="clegend">
-            <div><span class="dot brass"></span>Deal vinti <b>4,43mil</b></div>
-            <div><span class="dot brass-1"></span>Trattative <b>835k</b></div>
-            <div><span class="dot dark"></span>Deal persi <b>8mil</b></div>
-          </div>
+          <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>4,43mil</b></div><div><span class="dot brass-1"></span>Trattative <b>835k</b></div><div><span class="dot dark"></span>Deal persi <b>8mil</b></div></div>
         </div>
         <div class="rail-end"></div>
       </div>
     </div>
-
-    <!-- panel totale (illustrative cumulative figures) -->
     <div data-group="perf" data-panel="totale" hidden>
       <div class="rail charts no-bar">
         <div class="chart-card">
           <h4>Numeriche generali</h4>
           <div class="donut-wrap">
             <div class="donut" style="background:conic-gradient(var(--brass) 0 52%,var(--brass-1) 52% 80%,var(--ink) 80% 100%)"></div>
-            <span class="pct" style="left:74%;top:42%">52%</span>
-            <span class="pct" style="left:30%;top:34%">28%</span>
-            <span class="pct" style="left:44%;top:84%">20%</span>
+            <span class="pct" style="left:74%;top:42%">52%</span><span class="pct" style="left:30%;top:34%">28%</span><span class="pct" style="left:44%;top:84%">20%</span>
           </div>
-          <div class="clegend">
-            <div><span class="dot brass"></span>Deal vinti <b>148</b></div>
-            <div><span class="dot brass-1"></span>Trattative <b>79</b></div>
-            <div><span class="dot dark"></span>Deal persi <b>57</b></div>
-          </div>
+          <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>148</b></div><div><span class="dot brass-1"></span>Trattative <b>79</b></div><div><span class="dot dark"></span>Deal persi <b>57</b></div></div>
         </div>
         <div class="chart-card">
           <h4>Volume d'affari</h4>
           <div class="donut-wrap">
             <div class="donut" style="background:conic-gradient(var(--brass) 0 41%,var(--ink) 41% 95%,var(--brass-1) 95% 100%)"></div>
-            <span class="pct" style="left:78%;top:38%">41%</span>
-            <span class="pct" style="left:45%;top:85%">54%</span>
-            <span class="pct" style="left:33%;top:24%">5%</span>
+            <span class="pct" style="left:78%;top:38%">41%</span><span class="pct" style="left:45%;top:85%">54%</span><span class="pct" style="left:33%;top:24%">5%</span>
           </div>
-          <div class="clegend">
-            <div><span class="dot brass"></span>Deal vinti <b>21,7mil</b></div>
-            <div><span class="dot brass-1"></span>Trattative <b>2,6mil</b></div>
-            <div><span class="dot dark"></span>Deal persi <b>28,4mil</b></div>
-          </div>
+          <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>21,7mil</b></div><div><span class="dot brass-1"></span>Trattative <b>2,6mil</b></div><div><span class="dot dark"></span>Deal persi <b>28,4mil</b></div></div>
         </div>
         <div class="rail-end"></div>
       </div>
     </div>
   </section>
 
-  <!-- ===== RECENTI ===== -->
+  <!-- ===== VISTI DI RECENTE ===== -->
   <section class="section white">
     <div class="sec-head">
-      <div class="sec-eyebrow"><i class="las la-history"></i></div>
-      <h2 class="sec-title ivy">Visti di recente</h2>
+      <div class="sec-eyebrow"><i class="las la-history"></i><h2 class="sec-title ivy">Visti di recente</h2></div>
     </div>
     <div class="grp"><h3>Pipelines</h3><button class="tool-btn"><i class="las la-trash-alt"></i></button></div>
     <div class="rail no-bar" id="pipe"></div>
@@ -680,10 +554,10 @@ img{display:block;}
     <div class="rail no-bar" id="oppo"></div>
   </section>
 
-  <!-- ===== NEWS ===== -->
-  <section class="section white" style="padding-bottom:40px">
+  <!-- ===== ANNUNCI & NEWS ===== -->
+  <section class="section white">
     <div class="sec-head">
-      <h2 class="sec-title ivy">Annunci &amp; news</h2>
+      <div class="sec-eyebrow"><i class="las la-rss"></i><h2 class="sec-title ivy">Annunci &amp; news</h2></div>
       <p class="sec-sub">Ultimi annunci pubblicati</p>
     </div>
     <div class="rail no-bar" id="estates"></div>
@@ -694,76 +568,119 @@ img{display:block;}
 </div>
 
 <script>
-/* ---------- generic tab-swap: any [data-group] segmented control ---------- */
+/* generic tab-swap */
 document.querySelectorAll('.seg .seg-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const seg=btn.closest('.seg'), group=seg.dataset.group, tab=btn.dataset.tab;
     seg.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('is-active',b===btn));
-    document.querySelectorAll('[data-group="'+group+'"][data-panel]').forEach(p=>{
-      p.hidden = (p.dataset.panel!==tab);
-    });
+    document.querySelectorAll('[data-group="'+group+'"][data-panel]').forEach(p=>{ p.hidden=(p.dataset.panel!==tab); });
   });
 });
 
-/* ---------- repeated content (kept in JS to keep the markup readable) ---------- */
-// Ultimi appuntamenti — 3 identical deal cards
-const dealHTML = `
-  <div class="deal">
-    <div class="top"><div class="name">Dils Living | Sara Rossi</div>
-      <button class="dots-btn"><i class="las la-ellipsis-v"></i></button></div>
-    <span class="tag-brass">New Life 44</span>
-    <div class="when"><i class="las la-eye"></i>04/06/2026 | 9:00 · 10:00</div>
-    <div class="loc"><i class="las la-map-marker"></i>Via Generale Massimo Decimo Meridio</div>
-    <div class="prod">Prodotti associati: <b>2</b><span class="warn"><i class="las la-exclamation-triangle"></i>1 senza feedback</span></div>
-    <a class="addlink">Vuoi aggiungere nuovi prodotti?</a>
-    <button class="btn-feedback"><svg class="ai-ico"><use href="#ai-spark"/></svg>Feedback <i class="las la-microphone"></i></button>
+/* ---- Follow-up contact cards ---- */
+function contactCard(micro,name){
+  return `<div class="contact">
+    <div class="zone-a">
+      <div class="main-col">
+        <div class="micro">${micro}</div><div class="name">${name}</div>
+        <div class="chips"><span class="chip">Vendita</span><span class="chip solid"><i class="las la-star"></i>Lead</span></div>
+      </div>
+      <div class="quick"><button class="sq-btn"><i class="las la-phone"></i></button><button class="sq-btn"><i class="lar la-envelope"></i></button></div>
+    </div>
+    <div class="foot"><div class="line">Ultimo contatto <b>12/03/2026</b></div></div>
   </div>`;
+}
+function seeAll(txt){ return `<a class="more-card"><span class="lab">${txt} <i class="las la-arrow-right"></i></span></a>`; }
+document.getElementById('fu1').innerHTML =
+  contactCard('Porta Bella 15','Marica Marcelli') + contactCard('Living agency · Milan','Antonio Antonelli')
+  + seeAll('Altre opportunità<br>da non dimenticare') + '<div class="rail-end"></div>';
+document.getElementById('fu2').innerHTML =
+  contactCard('Porta Bella 15','Marisa Ferrero') + seeAll('Altre opportunità<br>recenti') + '<div class="rail-end"></div>';
+
+/* ---- Promemoria reminder cards ---- */
+const remindHTML = (title)=>`<div class="remind">
+  <div class="top">
+    <div class="tcol"><div class="when"><i class="lar la-bell"></i><b>Oggi - 14:30</b></div>
+      <div class="by">da Marco Gargano il 23/04/2026</div></div>
+    <button class="kebab"><i class="las la-ellipsis-v"></i></button>
+  </div>
+  <div class="lower">
+    <h4>${title}</h4>
+    <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati che tutto proceda.</p>
+    <div class="foot"><i class="las la-user-check"></i><span class="author">LC</span></div>
+  </div>
+</div>`;
+document.getElementById('promem').innerHTML = remindHTML('Appunti vari da ricordare') + remindHTML('Chiamare il tecnico') + '<div class="rail-end"></div>';
+
+/* ---- Ultimi appuntamenti deal cards ---- */
+const dealHTML = `<div class="deal"><div class="gen">
+  <div class="hrow">
+    <div class="lcol">
+      <div class="tg"><div class="name">Dils Living | Sara Rossi</div><span class="tag-brass">New Life 44</span></div>
+      <div class="info">
+        <div class="when"><i class="las la-eye"></i>04/06/2026<span class="sep"></span>9:00 - 10:00</div>
+        <div class="loc"><i class="las la-map-marker-alt"></i><span>Via Generale Massimo Decimo Meridio</span></div>
+      </div>
+    </div>
+    <button class="tool-btn"><i class="las la-ellipsis-v"></i></button>
+  </div>
+  <div class="pl">
+    <div class="prod">Prodotti associati: <b>2</b><span class="warn"><i class="las la-exclamation-triangle"></i>1 senza feedback</span></div>
+    <div class="addbox"><a class="addlink">Vuoi aggiungere nuovi prodotti?</a></div>
+  </div>
+  <button class="btn-purple"><i class="las la-atom"></i>Feedback <i class="las la-microphone"></i></button>
+</div></div>`;
 document.getElementById('deals').innerHTML = dealHTML.repeat(3) + '<div class="rail-end"></div>';
 
-// Recenti — mini cards
-function miniCards(n, tall){
+/* ---- Visti di recente mini cards ---- */
+function miniCards(n,two){
   let h='';
   for(let i=0;i<n;i++){
-    const fav = i<2 ? '<i class="las la-heart heart"></i>' : '<i class="lar la-heart heart off"></i>';
-    h+=`<div class="mini ${tall?'tall':''}">
-      <div class="mtop"><i class="las la-home home"></i>${fav}</div>
-      <div class="lp">Label primaria</div>${tall?'<div class="ls">Label secondaria</div>':''}</div>`;
+    const heart = i<2 ? '<i class="las la-heart heart"></i>' : '<i class="lar la-heart heart"></i>';
+    h+=`<div class="mini"><div class="lcol"><i class="las la-home home"></i>
+      <div class="lp">Label primaria</div>${two?'<div class="ls">Label secondaria</div>':''}</div>${heart}</div>`;
   }
   return h+'<div class="rail-end"></div>';
 }
 document.getElementById('pipe').innerHTML = miniCards(8,false);
 document.getElementById('oppo').innerHTML = miniCards(8,true);
 
-// News — property listings
-const estates = [
-  ['prop1.jpg','Torrazzo Milano','Risorgimento · Vigentino'],
-  ['prop2.jpg','Crespi Corso Genova','Corso Genova · Milano'],
-  ['prop3.jpg','Adamello 10','Fondazione Prada · Milano'],
-  ['prop4.jpg','Iupiri Lake Building','Roma · Viale Industria'],
-  ['prop5.jpg','Garibaldi Tower','Porta Nuova · Milano'],
-  ['prop6.jpg','Brera Loft 22','Brera · Milano'],
+/* ---- Annunci property cards ---- */
+const flags=(two)=>`<div class="flags">${two?'<span class="flag nl"></span>':''}<span class="flag it"></span></div>`;
+const estates=[
+  ['prop1.jpg','LIVING','#d0a1ba','Vendita','VRS-216','Versus Milano','Ripamonti · Vigentino','Milano, Via Bernardino Verro, 62',true],
+  ['prop2.jpg','OFFICE','#8db9ca','Vendita','CRS-118','Crespi Corso Genova','Corso Genova','Milano, Corso Genova 7',true],
+  ['prop3.jpg','LIVING','#d0a1ba','Vendita','ADM-010','Adamello 10','Fondazione Prada · Parco Romana','Milano, Via Adamello 10',false],
+  ['prop4.jpg','OFFICE','#8db9ca','Vendita','TUP-180','Tupini Lake Building','','Roma, Viale Umberto Tupini 180',true],
+  ['prop5.jpg','LIVING','#d0a1ba','Vendita','GRB-044','Garibaldi Tower','Porta Nuova','Milano, Piazza Gae Aulenti',true],
+  ['prop6.jpg','OFFICE','#8db9ca','Affitto','BRE-022','Brera Loft 22','Brera','Milano, Via Brera 22',false],
 ];
-document.getElementById('estates').innerHTML = estates.map(([img,t,s])=>`
+document.getElementById('estates').innerHTML = estates.map(([img,cat,col,tx,ref,t,zone,addr,two])=>`
   <div class="estate">
-    <div class="ph"><img src="assets/${img}" alt="">
-      <img class="flag" src="assets/flag-it.jpg" alt="IT">
-      <span class="fav"><i class="lar la-heart"></i></span></div>
-    <div class="body"><div class="t">${t}</div><div class="s">${s}</div></div>
+    <div class="ph"><img src="assets/${img}" alt="">${flags(two)}</div>
+    <div class="body">
+      <div class="meta"><span class="cat-chip" style="background:${col}">${cat}</span>
+        <span class="ref"><span>${tx}</span><span>${ref}</span></span></div>
+      <div class="et">${t}</div>
+      <div class="addr">${zone?`<div class="zone">${zone}</div>`:''}<div class="full">${addr}</div></div>
+    </div>
   </div>`).join('') + '<div class="rail-end"></div>';
 
-// News — dils.com cards
-const news = [
-  ['news1.jpg','NEWS','12 giugno 2026','Il mercato logistico italiano cresce nel Q2'],
-  ['news2.jpg','NEWS','08 giugno 2026','Nuovo polo distributivo nel Nord Italia'],
-  ['news3.jpg','RICERCA','30 maggio 2026','Office market: assorbimento in rialzo a Milano'],
-  ['news4.jpg','NEWS','22 maggio 2026','Living: domanda record nelle grandi città'],
-  ['news5.jpg','NEWS','15 maggio 2026','Investimenti retail, segnali di ripresa'],
-  ['news6.jpg','RICERCA','03 maggio 2026','Capital Markets, outlook semestrale'],
+/* ---- News cards ---- */
+const news=[
+  ['news1.jpg','NEWS','22 dicembre 2025','Dils advisor nella vendita di un asset nell’area di Scalo di Porta Romana, Milano','Capital Markets, Uffici',true],
+  ['news2.jpg','NEWS','08 dicembre 2025','Nuovo polo distributivo logistico nel Nord Italia','Logistica, Capital Markets',true],
+  ['news3.jpg','RICERCA','30 novembre 2025','Office market: assorbimento in rialzo nel terzo trimestre a Milano','Uffici, Ricerca',false],
+  ['news4.jpg','NEWS','22 novembre 2025','Living: domanda record nelle grandi città italiane','Living, Residenziale',true],
+  ['news5.jpg','NEWS','15 novembre 2025','Investimenti retail, primi segnali di ripresa nel semestre','Retail, Capital Markets',false],
+  ['news6.jpg','RICERCA','03 novembre 2025','Capital Markets, l’outlook semestrale sul mercato immobiliare','Capital Markets, Ricerca',true],
 ];
-document.getElementById('news').innerHTML = news.map(([img,badge,date,cap])=>`
+document.getElementById('news').innerHTML = news.map(([img,label,date,title,tag,two])=>`
   <div class="news-card"><img src="assets/${img}" alt="">
-    <span class="badge">${badge}</span><span class="date">${date}</span>
-    <div class="cap">${cap}</div></div>`).join('') + '<div class="rail-end"></div>';
+    <div class="toprow"><span class="label-chip">${label}</span>${flags(two)}</div>
+    <div class="scrim"><div class="date">${date}</div>
+      <div class="nt">${title}</div><div class="tag">${tag}</div></div>
+  </div>`).join('') + '<div class="rail-end"></div>';
 </script>
 </body>
 </html>
