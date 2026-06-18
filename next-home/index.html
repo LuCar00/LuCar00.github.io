@@ -315,7 +315,7 @@ img{display:block;}
 .tpill.grey{background:var(--line-d);color:var(--ink);}
 .trow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--brass);}
 .trow .las{font-size:16px;}
-.trow.out{color:var(--ink-2);}
+.trow.out{color:var(--ink-2);gap:8px;}
 .lrow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--ink-3);min-width:0;max-width:100%;}
 .lrow .las{font-size:16px;flex:0 0 auto;}
 .lrow span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -340,9 +340,16 @@ img{display:block;}
 .appt-card .titlerow .appt-title{flex:1;min-width:0;padding-left:0;}
 .appt-card .appt-title{padding-left:0;}
 .appt-body{display:flex;flex-direction:column;gap:8px;}
+.appt-body>.tpill,.kpi-detail>.tpill{align-self:flex-start;}  /* pill hugs its text; don't let the flex column stretch it full-width */
 .appt-content{display:flex;flex-direction:column;gap:4px;}
 .detailrow{display:flex;gap:16px;align-items:center;}
 .detailrow .lrow{flex:1;min-width:0;}
+/* KPI / Outlook ("less data") card specifics */
+.kebab-slot{width:48px;height:48px;flex:0 0 48px;}            /* reserves the hidden kebab box */
+.appt-card.kpi .titlerow{align-items:center;}                 /* title vertically centered in the 48px row */
+.appt-card.kpi.pross{justify-content:center;}                 /* Prossimi KPI content vertically centered */
+.kpi-detail{display:flex;flex-direction:column;gap:16px;}     /* Prossimi: pill stacked above Outlook */
+.lrow.kpilink span{text-decoration:underline;}               /* Prossimi Outlook is an underlined link */
 
 /* ===== "Aggiungi nuovi prodotti" outline button (Ultimi card) ===== */
 .add-btn{width:100%;min-height:48px;background:#fff;border:1px solid var(--brass);border-radius:var(--r-sm);
@@ -457,10 +464,10 @@ img{display:block;}
           </div>
           <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
         </div>
-        <div class="appt-card oggi darker">
+        <div class="appt-card oggi darker kpi">
           <div class="appt-body">
-            <span class="tpill grey">11:30 - 12:00</span>
-            <div class="appt-title">KPI definition</div>
+            <span class="tpill grey">12:00 - 12:30</span>
+            <div class="titlerow"><div class="appt-title">KPI definition</div><span class="kebab-slot"></span></div>
             <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>
           </div>
         </div>
@@ -502,12 +509,12 @@ img{display:block;}
           </div>
           <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
         </div>
-        <div class="appt-card pross sm">
+        <div class="appt-card pross sm kpi">
           <div class="appt-content">
-            <div class="appt-title">Definizione KPI prossimo semestre</div>
-            <div class="detailrow">
+            <div class="titlerow"><div class="appt-title">Definizione KPI prossimo semestre</div><span class="kebab-slot"></span></div>
+            <div class="kpi-detail">
               <span class="tpill grey">11:00 - 12:00</span>
-              <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>
+              <div class="lrow kpilink"><i class="las la-calendar"></i><span>Appuntamento Outlook</span></div>
             </div>
           </div>
         </div>
