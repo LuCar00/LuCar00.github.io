@@ -69,7 +69,7 @@ img{display:block;}
 .rail{
   display:flex;gap:16px;align-items:stretch;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;scroll-padding-left:var(--inset);
-  padding:6px var(--inset) 8px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  padding:0 var(--inset);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
 }
 .rail>*{scroll-snap-align:start;flex:0 0 auto;}
 .rail-end{flex:0 0 1px;width:1px;}
@@ -118,7 +118,7 @@ img{display:block;}
   display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:#fff;}
 
 /* group sub-header */
-.grp{padding:0 var(--inset);margin:24px 0 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.grp{padding:0 var(--inset);margin:24px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .grp h3{font-size:20px;font-weight:800;color:var(--ink);line-height:1.1;}
 .grp p{font-size:14px;font-weight:400;color:var(--ink);margin-top:2px;}
 
@@ -129,12 +129,11 @@ img{display:block;}
   background:var(--soft);color:var(--soft-ink);border:1px solid var(--soft);}
 .seg-btn.is-active{background:var(--ink);color:#fff;border-color:var(--ink);}
 
-/* ===== Applicativi app cards ===== */
-.app-card{width:80px;height:80px;border-radius:var(--r-card);padding:4px;color:#fff;
-  display:flex;flex-direction:column;gap:4px;}
-.app-card.center{align-items:center;}
-.app-card .las,.app-card .lar{font-size:24px;line-height:1;}
-.app-card span{font-size:14px;font-weight:700;line-height:1;text-align:center;width:100%;}
+/* ===== Applicativi app cards (120x120: icon top-left, label bottom-center) ===== */
+.app-card{width:120px;height:120px;border-radius:var(--r-card);padding:8px;color:#fff;
+  display:flex;flex-direction:column;justify-content:space-between;}
+.app-card .las,.app-card .lar{font-size:24px;line-height:1;align-self:flex-start;}
+.app-card span{font-size:16px;font-weight:700;line-height:normal;text-align:center;width:100%;}
 .app-card.light{background:#fff;color:var(--ink-2);}
 
 /* ===== AI banner (Chip) ===== */
@@ -143,13 +142,14 @@ img{display:block;}
 .ai-banner span{flex:1;min-width:0;font-size:14px;font-weight:700;line-height:18px;color:var(--ai);}
 
 /* ===== Follow-up: contact + see-all cards ===== */
-.contact{width:300px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);
-  min-height:124px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.contact{width:340px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);
+  min-height:124px;padding:16px;display:flex;flex-direction:column;gap:16px;}
 .contact .zone-a{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
-.contact .main-col{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
+.contact .main-col{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;}
+.contact .nameblock{display:flex;flex-direction:column;gap:4px;}
 .contact .micro{font-size:12px;font-weight:700;color:var(--brass);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .contact .name{font-size:20px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.contact .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.contact .chips{display:flex;flex-wrap:wrap;gap:8px;}
 .contact .quick{display:flex;gap:8px;align-items:flex-start;}
 /* in-card phone/email Button_icon 48x48 */
 .sq-btn{width:48px;height:48px;border:1px solid var(--ink);border-radius:var(--r-sm);
@@ -161,13 +161,13 @@ img{display:block;}
   padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;color:var(--ink);background:#fff;}
 .chip.solid{background:var(--ink);color:#fff;}
 .chip .las{font-size:16px;}
-.more-card{width:300px;background:var(--soft);border:1px solid var(--line);border-radius:var(--r-card);
+.more-card{width:340px;background:var(--soft);border:1px solid var(--line);border-radius:var(--r-card);
   display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 24px;}
 .more-card .lab{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--brass-up);font-weight:700;font-size:16px;}
 .more-card .lab .las{font-size:24px;}
 
 /* ===== Calendar ===== */
-.cal-title{padding:0 var(--inset);font-size:24px;line-height:28px;margin-bottom:14px;color:var(--ink);}
+.cal-title{padding:0 var(--inset);font-size:20px;font-weight:800;line-height:1.2;margin-bottom:16px;color:var(--ink);}
 .daypick{padding:4px var(--inset) 16px;}
 .day{width:62px;height:74px;border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:2px;background:#fff;position:relative;}
@@ -304,6 +304,29 @@ img{display:block;}
 .news-card .nt{font-size:16px;font-weight:600;line-height:24px;color:#fff;}
 .news-card .tag{font-size:14px;font-weight:700;line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
+/* ===== Appointment items (Oggi / Prossimi) — compact, divider only, no card box ===== */
+.appt-list{padding:0 var(--inset);}
+.appt-item{padding:16px 0;border-bottom:1px solid var(--line-d);display:flex;flex-direction:column;gap:8px;}
+.appt-item:last-child{border-bottom:none;}
+.appt-item .arow{display:flex;gap:4px;align-items:flex-start;}
+.appt-item .acol{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
+.tpill{display:inline-flex;align-items:center;border-radius:var(--pill);padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;background:var(--brass-soft);color:var(--brass);white-space:nowrap;}
+.tpill.grey{background:#e1e1e7;color:#48484e;}
+.trow{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;line-height:1.2;color:var(--brass);}
+.trow .las{font-size:16px;}
+.trow.out{color:var(--ink-2);}
+.lrow{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;line-height:1.2;color:var(--ink-3);min-width:0;max-width:100%;}
+.lrow .las{font-size:16px;flex:0 0 auto;}
+.lrow span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lrow.online{color:var(--ink-2);}
+.lrow.online span{text-decoration:underline;}
+.appt-title{font-size:16px;font-weight:800;line-height:1.25;color:var(--ink);padding-left:4px;}
+.psq{width:48px;height:48px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;flex:0 0 48px;}
+.psq.ghost{background:#fff;color:var(--ink);border:1px solid var(--ink);}
+.psq.purple{background:var(--ai);color:#fff;border:1px solid var(--ai);}
+.brief-bar{width:100%;min-height:48px;background:var(--ai);border:1px solid var(--ai);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-weight:700;font-size:16px;padding:8px 24px;}
+.brief-bar .las{font-size:24px;}
+
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
   .rail{scroll-snap-type:none;}
@@ -318,10 +341,7 @@ img{display:block;}
   <header class="topbar">
     <span class="logo"><img src="assets/logo.svg" alt="Next" width="32" height="32"></span>
     <div class="actions">
-      <button class="btn-icon" aria-label="Supporto"><i class="las la-headset"></i></button>
-      <button class="btn-icon" aria-label="Aggiungi contatto"><i class="las la-user-plus"></i></button>
-      <button class="btn-icon" aria-label="Calendario"><i class="las la-calendar-alt"></i></button>
-      <button class="btn-icon" aria-label="Notifiche"><i class="las la-bell"></i></button>
+      <button class="btn-icon" aria-label="Menu"><i class="las la-bars"></i></button>
       <span class="avatar"><img src="assets/avatar.jpg" alt="Luca"></span>
     </div>
   </header>
@@ -402,27 +422,39 @@ img{display:block;}
       <div style="padding:0 var(--inset);margin-bottom:16px"><div class="ai-banner">
         <i class="las la-atom"></i><span>Clicca su Brief per farmi fare un riassunto di tutte le informazioni utili per l'appuntamento</span>
       </div></div>
-      <h3 class="cal-title ivy">Appuntamenti di oggi</h3>
-      <div class="today-item">
-        <div class="head"><span class="time-pill brass">09:00 · 09:30</span><button class="btn-ghost-sq"><i class="las la-ellipsis-v"></i></button></div>
-        <div class="meta" style="margin-top:10px"><i class="las la-walking walk"></i>Meeting generico</div>
-        <div class="meta"><i class="las la-map-marker-alt"></i>Piazza Armando Diaz, 7 · 20123 · Milano</div>
-        <div class="ttl">Dils Living · Asia Morgante | Incontro esplorativo nuove opportunità</div>
-        <button class="btn-purple wide"><i class="las la-atom"></i>Brief <i class="las la-file-alt"></i></button>
-      </div>
-      <div class="divider"></div>
-      <div class="today-item">
-        <span class="time-pill grey">11:30 · 12:00</span>
-        <div class="meta" style="margin-top:10px"><i class="las la-calendar"></i>Appuntamento Outlook</div>
-        <div class="ttl" style="margin-bottom:0">KPI definition</div>
-      </div>
-      <div class="divider"></div>
-      <div class="today-item">
-        <div class="head"><span class="time-pill brass">14:00 · 15:30</span><button class="btn-ghost-sq"><i class="las la-ellipsis-v"></i></button></div>
-        <div class="meta" style="margin-top:10px"><i class="las la-walking walk"></i>Meeting generico</div>
-        <div class="meta"><a class="link-brass"><i class="las la-desktop"></i>Evento online</a></div>
-        <div class="ttl">Dils Living · Gianni Giannini | Presentazione nuove opportunità su Milano e Roma</div>
-        <button class="btn-purple wide"><i class="las la-atom"></i>Brief <i class="las la-file-alt"></i></button>
+      <h3 class="cal-title">Appuntamenti di oggi</h3>
+      <div class="appt-list">
+        <div class="appt-item">
+          <div class="arow">
+            <div class="acol">
+              <span class="tpill">09:00 - 09:30</span>
+              <div class="trow"><i class="las la-running"></i>Meeting generico</div>
+              <div class="lrow"><i class="las la-map-marker-alt"></i><span>Piazza Armando Diaz, 7 - 20123 - Milano</span></div>
+            </div>
+            <button class="psq ghost"><i class="las la-ellipsis-v"></i></button>
+          </div>
+          <div class="appt-title">Dils Living - Asia Morgante | Incontro esplorativo nuove opportunità</div>
+          <button class="brief-bar"><i class="las la-atom"></i>Brief <i class="las la-file-alt"></i></button>
+        </div>
+        <div class="appt-item">
+          <div class="arow"><div class="acol">
+            <span class="tpill grey">11:30 - 12:00</span>
+            <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>
+          </div></div>
+          <div class="appt-title">KPI definition</div>
+        </div>
+        <div class="appt-item">
+          <div class="arow">
+            <div class="acol">
+              <span class="tpill">14:00 - 15:30</span>
+              <div class="trow"><i class="las la-running"></i>Meeting generico</div>
+              <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
+            </div>
+            <button class="psq ghost"><i class="las la-ellipsis-v"></i></button>
+          </div>
+          <div class="appt-title">Dils Living - Gianni Giannini | Presentazione nuove opportunità su Milano e Roma</div>
+          <button class="brief-bar"><i class="las la-atom"></i>Brief <i class="las la-file-alt"></i></button>
+        </div>
       </div>
     </div>
 
@@ -431,7 +463,7 @@ img{display:block;}
       <div style="padding:0 var(--inset);margin-bottom:16px"><div class="ai-banner">
         <i class="las la-atom"></i><span>Clicca su Brief per farmi fare un riassunto di tutte le informazioni utili per l'appuntamento</span>
       </div></div>
-      <h3 class="cal-title ivy">Prossimi appuntamenti</h3>
+      <h3 class="cal-title">Prossimi appuntamenti</h3>
       <div class="rail daypick no-bar">
         <div class="day"><small>LUN</small><b>24</b></div>
         <div class="day"><small>MAR</small><b>25</b></div>
@@ -440,21 +472,22 @@ img{display:block;}
         <div class="day"><small>VEN</small><b>28</b></div>
         <div class="rail-end"></div>
       </div>
-      <div class="appt">
-        <div class="ttl">Dils Living · Marco Gargano | Questo è il titolo dell'appuntamento</div>
-        <div class="appt-row">
-          <div class="meta" style="margin:0"><i class="las la-walking walk"></i><span class="time-pill brass">10:30 · 11:00</span></div>
-          <div class="appt-actions">
-            <button class="btn-purple sq"><i class="las la-file-alt"></i></button>
-            <button class="btn-ghost-sq"><i class="las la-ellipsis-v"></i></button>
+      <div class="appt-list">
+        <div class="appt-item">
+          <div class="appt-title" style="padding-left:0">Dils Living - Marco Gargano | Questo è il titolo dell'appuntamento</div>
+          <div class="arow">
+            <div class="acol">
+              <div class="trow"><i class="las la-running"></i><span class="tpill">10:30 - 11:00</span></div>
+              <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
+            </div>
+            <button class="psq purple"><i class="las la-file-alt"></i></button>
+            <button class="psq ghost"><i class="las la-ellipsis-v"></i></button>
           </div>
         </div>
-        <div class="meta" style="margin-top:10px"><a class="link-brass"><i class="las la-desktop"></i>Evento online</a></div>
-      </div>
-      <div class="divider"></div>
-      <div class="appt">
-        <div class="ttl">KPI definition</div>
-        <div class="meta"><i class="las la-calendar"></i>Appuntamento Outlook <span class="time-pill grey">10:30 · 11:00</span></div>
+        <div class="appt-item">
+          <div class="appt-title" style="padding-left:0">KPI definition</div>
+          <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook <span class="tpill grey">10:30 - 11:00</span></div>
+        </div>
       </div>
     </div>
 
@@ -582,7 +615,7 @@ function contactCard(micro,name){
   return `<div class="contact">
     <div class="zone-a">
       <div class="main-col">
-        <div class="micro">${micro}</div><div class="name">${name}</div>
+        <div class="nameblock"><div class="micro">${micro}</div><div class="name">${name}</div></div>
         <div class="chips"><span class="chip">Vendita</span><span class="chip solid"><i class="las la-star"></i>Lead</span></div>
       </div>
       <div class="quick"><button class="sq-btn"><i class="las la-phone"></i></button><button class="sq-btn"><i class="lar la-envelope"></i></button></div>
