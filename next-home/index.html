@@ -200,8 +200,9 @@ img{display:block;}
   display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ink);background:#fff;}
 
 /* reminder cards */
-.remind{width:300px;background:#fff;border:1px solid var(--line);border-radius:10px;
+.remind{width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;
   padding:10px 10px 15px 15px;display:flex;flex-direction:column;gap:8px;}
+.remind .rtext{display:flex;flex-direction:column;gap:4px;}
 .remind .top{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
 .remind .tcol{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
 .remind .when{display:flex;align-items:center;gap:8px;}
@@ -219,7 +220,7 @@ img{display:block;}
   font-size:12px;font-weight:800;line-height:18px;color:var(--ink);}
 
 /* ===== Ultimi appuntamenti deal card ===== */
-.deal{width:300px;background:#fff;border:1px solid var(--line-d);border-radius:var(--r-card);min-height:124px;padding:16px;}
+.deal{width:340px;background:#fff;border:1px solid var(--line-d);border-radius:var(--r-card);min-height:124px;padding:16px;}
 .deal .gen{display:flex;flex-direction:column;gap:16px;}
 .deal .hrow{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
 .deal .lcol{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;}
@@ -312,10 +313,10 @@ img{display:block;}
 .appt-item .acol{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
 .tpill{display:inline-flex;align-items:center;border-radius:var(--pill);padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;background:var(--brass-soft);color:var(--brass);white-space:nowrap;}
 .tpill.grey{background:var(--line-d);color:var(--ink);}
-.trow{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;line-height:1.2;color:var(--brass);}
+.trow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--brass);}
 .trow .las{font-size:16px;}
 .trow.out{color:var(--ink-2);}
-.lrow{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;line-height:1.2;color:var(--ink-3);min-width:0;max-width:100%;}
+.lrow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--ink-3);min-width:0;max-width:100%;}
 .lrow .las{font-size:16px;flex:0 0 auto;}
 .lrow span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lrow.online{color:var(--ink-2);}
@@ -329,12 +330,19 @@ img{display:block;}
 
 /* ===== Appointment CARDS (Oggi / Prossimi) — bordered card rail ===== */
 .appt-rail{gap:6px;}
-.appt-card{width:340px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;}
+.appt-rail.pgap{gap:16px;}
+.appt-card{width:340px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;}
+.appt-card.oggi{gap:16px;}
+.appt-card.pross{gap:8px;}
 .appt-card.darker{border-color:var(--line-d);}
 .appt-card.sm .appt-title{font-size:14px;}
 .appt-card .titlerow{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;}
 .appt-card .titlerow .appt-title{flex:1;min-width:0;padding-left:0;}
 .appt-card .appt-title{padding-left:0;}
+.appt-body{display:flex;flex-direction:column;gap:8px;}
+.appt-content{display:flex;flex-direction:column;gap:4px;}
+.detailrow{display:flex;gap:16px;align-items:center;}
+.detailrow .lrow{flex:1;min-width:0;}
 
 /* ===== "Aggiungi nuovi prodotti" outline button (Ultimi card) ===== */
 .add-btn{width:100%;min-height:48px;background:#fff;border:1px solid var(--brass);border-radius:var(--r-sm);
@@ -440,23 +448,29 @@ img{display:block;}
       </div></div>
       <h3 class="cal-title">Appuntamenti di oggi</h3>
       <div class="rail appt-rail no-bar">
-        <div class="appt-card">
-          <span class="tpill">09:00 - 09:30</span>
-          <div class="titlerow"><div class="appt-title">Dils Living - Asia Morgante | Incontro esplorativo nuove opportunità</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-          <div class="trow"><i class="las la-running"></i>Meeting generico</div>
-          <div class="lrow"><i class="las la-map-marker-alt"></i><span>Piazza Armando Diaz, 7 - 20123 - Milano</span></div>
+        <div class="appt-card oggi">
+          <div class="appt-body">
+            <span class="tpill">09:00 - 09:30</span>
+            <div class="titlerow"><div class="appt-title">Dils Living - Asia Morgante | Incontro esplorativo nuove opportunità</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
+            <div class="trow"><i class="las la-running"></i>Meeting generico</div>
+            <div class="lrow"><i class="las la-map-marker-alt"></i><span>Piazza Armando Diaz, 7 - 20123 - Milano</span></div>
+          </div>
           <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
         </div>
-        <div class="appt-card darker">
-          <span class="tpill grey">11:30 - 12:00</span>
-          <div class="appt-title">KPI definition</div>
-          <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>
+        <div class="appt-card oggi darker">
+          <div class="appt-body">
+            <span class="tpill grey">11:30 - 12:00</span>
+            <div class="appt-title">KPI definition</div>
+            <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>
+          </div>
         </div>
-        <div class="appt-card">
-          <span class="tpill">14:00 - 15:30</span>
-          <div class="titlerow"><div class="appt-title">Dils Living - Gianni Giannini | Presentazione nuove opportunità su Milano e Roma</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-          <div class="trow"><i class="las la-running"></i>Meeting generico</div>
-          <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
+        <div class="appt-card oggi">
+          <div class="appt-body">
+            <span class="tpill">14:00 - 15:30</span>
+            <div class="titlerow"><div class="appt-title">Dils Living - Gianni Giannini | Presentazione nuove opportunità su Milano e Roma</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
+            <div class="trow"><i class="las la-running"></i>Meeting generico</div>
+            <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
+          </div>
           <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
         </div>
         <div class="rail-end"></div>
@@ -477,21 +491,34 @@ img{display:block;}
         <div class="day"><small>VEN</small><b>28</b></div>
         <div class="rail-end"></div>
       </div>
-      <div class="rail appt-rail no-bar">
-        <div class="appt-card sm darker">
-          <div class="titlerow"><div class="appt-title">Dils Living - Marco Gargano | Questo è il titolo dell'appuntamento</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-          <div class="trow"><i class="las la-running"></i><span class="tpill">10:30 - 11:00</span></div>
-          <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
+      <div class="rail appt-rail pgap no-bar">
+        <div class="appt-card pross sm darker">
+          <div class="appt-content">
+            <div class="titlerow"><div class="appt-title">Dils Living - Marco Gargano | Questo è il titolo dell'appuntamento</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
+            <div class="detailrow">
+              <div class="trow"><i class="las la-running"></i><span class="tpill">10:30 - 11:00</span></div>
+              <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
+            </div>
+          </div>
           <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
         </div>
-        <div class="appt-card sm">
-          <div class="appt-title">Definizione KPI prossimo semestre</div>
-          <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook <span class="tpill grey">11:00 - 12:00</span></div>
+        <div class="appt-card pross sm">
+          <div class="appt-content">
+            <div class="appt-title">Definizione KPI prossimo semestre</div>
+            <div class="detailrow">
+              <span class="tpill grey">11:00 - 12:00</span>
+              <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>
+            </div>
+          </div>
         </div>
-        <div class="appt-card sm darker">
-          <div class="titlerow"><div class="appt-title">Dils Living - Mariangela Rossi Brambilla | Questo è il titolo dell'appuntamento</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-          <div class="trow"><i class="las la-running"></i><span class="tpill">14:00 - 14:45</span></div>
-          <div class="lrow"><i class="las la-map-marker-alt"></i><span>Piazza Armando Diaz, 7 - 20123 - Milano</span></div>
+        <div class="appt-card pross sm darker">
+          <div class="appt-content">
+            <div class="titlerow"><div class="appt-title">Dils Living - Mariangela Rossi Brambilla | Questo è il titolo dell'appuntamento</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
+            <div class="detailrow">
+              <div class="trow"><i class="las la-running"></i><span class="tpill">14:00 - 14:45</span></div>
+              <div class="lrow"><i class="las la-map-marker-alt"></i><span>Piazza Armando Diaz, 7 - 20123 - Milano</span></div>
+            </div>
+          </div>
           <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
         </div>
         <div class="rail-end"></div>
@@ -645,8 +672,8 @@ const remindHTML = (title)=>`<div class="remind">
     <button class="kebab"><i class="las la-ellipsis-v"></i></button>
   </div>
   <div class="lower">
-    <h4>${title}</h4>
-    <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati che tutto proceda.</p>
+    <div class="rtext"><h4>${title}</h4>
+    <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati che tutto proceda.</p></div>
     <div class="foot"><i class="las la-user-check"></i><span class="author">LC</span></div>
   </div>
 </div>`;
@@ -656,7 +683,8 @@ document.getElementById('promem').innerHTML = remindHTML('Appunti vari da ricord
 const dealHTML = `<div class="deal"><div class="gen">
   <div class="hrow">
     <div class="lcol">
-      <div class="tg"><div class="name">Dils Living | Sara Rossi</div><span class="tag-brass">New Life 44</span></div>
+      <div class="name">Dils Living | Sara Rossi</div>
+      <span class="tag-brass">New Life 44</span>
       <div class="info">
         <div class="when"><i class="las la-eye"></i>04/06/2026<span class="sep"></span>9:00 - 10:00</div>
         <div class="loc"><i class="las la-map-marker-alt"></i><span>Via Generale Massimo Decimo Meridio</span></div>
@@ -664,10 +692,8 @@ const dealHTML = `<div class="deal"><div class="gen">
     </div>
     <button class="tool-btn"><i class="las la-ellipsis-v"></i></button>
   </div>
-  <div class="pl">
-    <div class="prod">Prodotti associati: <b>2</b><span class="warn"><i class="las la-exclamation-triangle"></i>1 senza feedback</span></div>
-    <button class="add-btn">Aggiungi nuovi prodotti <i class="las la-plus"></i></button>
-  </div>
+  <div class="prod">Prodotti associati: <b>2</b><span class="warn"><i class="las la-exclamation-triangle"></i>1 senza feedback</span></div>
+  <button class="add-btn">Aggiungi nuovi prodotti <i class="las la-plus"></i></button>
   <button class="btn-purple"><i class="las la-atom"></i>Feedback <i class="las la-microphone"></i></button>
 </div></div>`;
 document.getElementById('deals').innerHTML = dealHTML.repeat(3) + '<div class="rail-end"></div>';
