@@ -102,7 +102,7 @@ img{display:block;}
 .section.white{background:#fff;}
 .sec-head{padding:0 var(--inset);margin-bottom:24px;}
 .sec-head .row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;}
-.sec-eyebrow{display:flex;flex-direction:column;gap:8px;}
+.sec-eyebrow{display:flex;flex-direction:row;align-items:center;gap:4px;}
 .sec-eyebrow .las,.sec-eyebrow .lar{font-size:32px;color:var(--ink);width:32px;height:32px;line-height:32px;}
 .sec-title{font-size:24px;line-height:28px;color:var(--ink);}
 .head-tools{display:flex;gap:8px;flex:0 0 auto;}
@@ -112,6 +112,10 @@ img{display:block;}
 .grp{padding:0 var(--inset);margin:24px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .grp h3{font-size:20px;font-weight:800;color:var(--ink);line-height:1.1;}
 .grp p{font-size:16px;font-weight:600;color:var(--ink);margin-top:8px;}
+#followup .grp p{font-size:14px;font-weight:400;margin-top:0;}        /* follow-up subtitle: Regular 14, no gap */
+#recenti .sec-head{margin-bottom:32px;}                                /* Visti di recente: roomier rhythm */
+#recenti .grp{margin:0 0 24px;}
+#recenti .grp~.grp{margin-top:40px;}
 
 /* ===== Segmented control ===== */
 .seg{display:flex;gap:1px;background:#fff;border-radius:var(--r-sm);overflow:hidden;margin:0 var(--inset) 24px;}
@@ -171,7 +175,7 @@ img{display:block;}
 .appt-title{font-size:16px;font-weight:800;line-height:1.25;color:var(--ink);}
 .tpill{display:inline-flex;align-items:center;border-radius:var(--pill);padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;background:var(--brass-soft);color:var(--brass);white-space:nowrap;}
 .tpill.grey{background:var(--line-d);color:var(--ink);}
-.detailrow{display:flex;gap:16px;align-items:center;}
+.detailrow{display:flex;gap:8px;align-items:center;}
 .detailrow .lrow{flex:1;min-width:0;}
 .trow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--brass);}
 .trow .las{font-size:16px;}
@@ -487,7 +491,7 @@ img{display:block;}
   </section>
 
   <!-- ===== VISTI DI RECENTE ===== -->
-  <section class="section tint">
+  <section class="section tint" id="recenti">
     <div class="sec-head">
       <div class="sec-eyebrow"><i class="las la-history"></i><h2 class="sec-title ivy">Visti di recente</h2></div>
     </div>
@@ -576,7 +580,7 @@ const remindHTML = (title)=>`<div class="remind">
   </div>
   <div class="lower">
     <div class="rtext"><h4>${title}</h4>
-    <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati di non perdere nulla.</p></div>
+    <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati di non perdere nulla di importante!</p></div>
     <div class="foot"><i class="las la-user-check"></i><span class="author">LC</span></div>
   </div>
 </div>`;
@@ -618,7 +622,7 @@ document.getElementById('oppo').innerHTML = miniCards(8,true);
 const flags=(two)=>`<div class="flags">${two?'<span class="flag nl"></span>':''}<span class="flag it"></span></div>`;
 const estates=[
   ['prop1.jpg','LIVING','#d0a1ba','Vendita','VRS-216','Versus Milano','Ripamonti - Vigentino','Milano, Via Bernardino Verro, 62',true],
-  ['prop2.jpg','OFFICE','#8db9ca','Vendita','CRS-118','Crespi Corso Genova','Corso Genova','Milano, Corso Genova 7',true],
+  ['prop2.jpg','LIVING','#d0a1ba','Vendita','CRS-118','Crespi Corso Genova','Corso Genova','Milano, Corso Genova 7',true],
   ['prop3.jpg','LIVING','#d0a1ba','Vendita','ADM-010','Adamello 10','Fondazione Prada - Parco Romana','Milano, Via Adamello 10',false],
   ['prop4.jpg','OFFICE','#8db9ca','Vendita','TUP-180','Tupini Lake Building','','Roma, Viale Umberto Tupini 180',true],
   ['prop5.jpg','LIVING','#d0a1ba','Vendita','GRB-044','Garibaldi Tower','Porta Nuova','Milano, Piazza Gae Aulenti',true],
