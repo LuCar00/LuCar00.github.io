@@ -9,48 +9,40 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&display=swap" rel="stylesheet">
-<!-- Self-hosted Line Awesome (the Dils design-system icon set) -->
 <link rel="stylesheet" href="assets/la/css/line-awesome.min.css">
 
 <style>
-/* ===== Ivy Mode SemiBold — editorial section/listing titles ===== */
-@font-face{
-  font-family:"IvyMode";
-  src:url("assets/fonts/IvyMode-SemiBold.woff2") format("woff2");
-  font-weight:600; font-style:normal; font-display:swap;
-}
+@font-face{ font-family:"IvyMode"; src:url("assets/fonts/IvyMode-SemiBold.woff2") format("woff2"); font-weight:600; font-style:normal; font-display:swap; }
 
 /* ===== Tokens (Next Design Library) ===== */
 :root{
   --ink:#3f4254;            /* General/Black */
   --ink-2:#6d6d75;          /* Greyscale/Grey+2 */
   --ink-3:#b5b5c3;          /* Greyscale/Grey */
-  --grey-2:#d3d3db;         /* Greyscale/Grey-2 */
-  --bg:#f6f7fb;             /* Light/Light-4 (page / tinted sections) */
-  --line:#e4e7f4;           /* Light/Light-2 (contact card border) */
-  --line-d:#d2d7ed;         /* Light/Light (deal card border, author chip bg) */
-  --soft:#edeff8;           /* Light/Light-3 (inactive segment, kebab bg) */
-  --soft-ink:#54565f;       /* Light/Light+3 (inactive segment text) */
-  --soft-border:#a8acbe;    /* Light/Light+1 (promemoria header btn border) */
+  --grey-2:#d3d3db;
+  --bg:#f6f7fb;             /* Light/Light-4 */
+  --line:#e4e7f4;           /* Light/Light-2 */
+  --line-d:#d2d7ed;         /* Light/Light */
+  --soft:#edeff8;           /* Light/Light-3 */
+  --soft-ink:#54565f;       /* Light/Light+3 (perf dark, inactive seg text) */
   --ai:#8113aa; --ai-2:#b371cc; --ai-soft:#e6d0ee;
-  --brass:#ae9142; --brass-1:#bea768; --brass-up:#8b7435; --brass-soft:#efe9d9;
+  --brass:#ae9142;          /* Brass (links, pills) */
+  --brass-up:#8b7435;       /* Brass+1 (perf bars/legend/donut-vinti, see-all) */
+  --brass-1:#bea768; --brass-soft:#efe9d9;
   --green:#0bb783; --red:#e73838; --yellow:#FFA800;
+  --green-bn:#cef1e6; --green-bn-ink:#076e4f;   /* info banner */
   --office:#8db9ca; --living:#d0a1ba;
-  --pink:#A68195; --pink-bg:#F6ECF1;        /* Visti di recente cards */
+  --pink:#A68195; --pink-bg:#F6ECF1;
   --r:8px; --r-sm:4px; --r-card:6px; --pill:999px;
   --inset:24px;
-  --time-brass-bg:#f6efd8; --time-brass-ink:#7a6526;
-  --time-grey-bg:#e9e9ef;  --time-grey-ink:#6d6d75;
 }
 
 *{box-sizing:border-box;}
-[hidden]{display:none!important;}   /* beats .rail{display:flex} so tab panels truly hide */
+[hidden]{display:none!important;}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
-body{
-  margin:0;background:#dfe1ea;color:var(--ink);
+body{ margin:0;background:#dfe1ea;color:var(--ink);
   font-family:"Nunito Sans","nunito-sans","Trebuchet MS",Arial,Helvetica,sans-serif;
-  font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased;
-}
+  font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased; }
 .app{max-width:430px;margin:0 auto;background:var(--bg);position:relative;min-height:100vh;}
 @media(min-width:520px){
   body{padding:24px 0;}
@@ -65,143 +57,136 @@ img{display:block;}
 .no-bar{scrollbar-width:none;-ms-overflow-style:none;}
 .no-bar::-webkit-scrollbar{display:none;width:0;height:0;}
 
-/* ===== Horizontal snap rails ===== */
-.rail{
-  display:flex;gap:16px;align-items:stretch;overflow-x:auto;overflow-y:hidden;
+/* ===== Rails ===== */
+.rail{ display:flex;gap:16px;align-items:stretch;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;scroll-padding-left:var(--inset);
-  padding:0 var(--inset);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
-}
+  padding:0 var(--inset);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain; }
 .rail>*{scroll-snap-align:start;flex:0 0 auto;}
 .rail-end{flex:0 0 1px;width:1px;}
+#fu1,#fu2{gap:8px;}                 /* follow-up contact rails */
+#estates,#news{gap:24px;}           /* annunci + news rails */
 
 /* ===== Top bar ===== */
-.topbar{
-  position:sticky;top:0;z-index:30;background:#fff;height:80px;
+.topbar{ position:sticky;top:0;z-index:30;background:#fff;height:80px;
   display:flex;align-items:center;justify-content:space-between;
-  padding:16px 24px;border-bottom:1px solid var(--soft);
-}
+  padding:16px 24px;border-bottom:1px solid var(--soft); }
 .topbar .logo{width:32px;height:32px;flex:0 0 32px;}
 .topbar .logo img{width:32px;height:32px;}
 .topbar .actions{display:flex;align-items:center;gap:15px;}
-/* Button_icon: 48x48 square, transparent, 32px glyph #3f4254 */
-.btn-icon{width:48px;height:48px;border-radius:var(--r-sm);display:flex;align-items:center;
-  justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:none;}
-.avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;flex:0 0 48px;
-  background:linear-gradient(180deg,#d6189a,#7d1e9e);}
+.btn-icon{width:48px;height:48px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:none;}
+.avatar{width:48px;height:48px;border-radius:50%;overflow:hidden;flex:0 0 48px;background:linear-gradient(180deg,#d6189a,#7d1e9e);}
 .avatar img{width:100%;height:100%;object-fit:cover;}
 
 /* ===== Hero ===== */
-.hero{position:relative;height:176px;margin-bottom:28px;}
+.hero{position:relative;z-index:2;height:176px;}
 .hero .bg{position:absolute;inset:0;overflow:hidden;}
 .hero .bg img{width:100%;height:100%;object-fit:cover;}
-.hero .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,22,34,.18),rgba(20,22,34,.42));}
-.hero h1{position:absolute;top:42px;left:0;right:0;text-align:center;color:#fff;font-size:34px;text-shadow:0 2px 14px rgba(0,0,0,.35);}
-.search{position:absolute;left:var(--inset);right:var(--inset);bottom:-26px;height:52px;background:#fff;
-  border-radius:var(--r);display:flex;align-items:center;gap:10px;padding:0 18px;box-shadow:0 12px 28px rgba(31,33,46,.16);}
-.search input{border:none;outline:none;flex:1;font-size:14px;color:var(--ink);background:none;min-width:0;}
+.hero h1{position:absolute;top:0;left:0;right:0;height:176px;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:36px;line-height:48px;font-weight:600;text-shadow:0 2px 14px rgba(0,0,0,.35);}
+.hero-set{position:absolute;top:24px;right:24px;width:48px;height:48px;background:#fff;border:1px solid var(--ink);
+  border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);z-index:2;}
+.search{position:absolute;left:var(--inset);right:var(--inset);bottom:-28px;z-index:2;background:#fff;
+  border:1px solid var(--soft);border-radius:var(--r);display:flex;align-items:center;gap:24px;padding:16px;box-shadow:0 12px 28px rgba(31,33,46,.16);}
+.search input{border:none;outline:none;flex:1;font-size:16px;color:var(--ink);background:none;min-width:0;}
 .search input::placeholder{color:var(--ink-3);}
-.search .las{font-size:20px;color:var(--ink-2);}
+.search .las{font-size:24px;color:var(--ink-2);}
+
+/* ===== Info banner (under search) ===== */
+.info-banner{position:relative;z-index:1;background:var(--green-bn);display:flex;gap:8px;align-items:flex-start;padding:40px 24px 16px;}
+.info-banner .las{font-size:16px;color:var(--green-bn-ink);flex:0 0 16px;margin-top:2px;}
+.info-banner span{flex:1;min-width:0;font-size:14px;font-weight:400;line-height:normal;color:var(--green-bn-ink);text-align:center;}
 
 /* ===== Section scaffold ===== */
 .section{padding:40px 0;}
 .section.tint{background:var(--bg);}
 .section.white{background:#fff;}
-.sec-head{padding:0 var(--inset);margin-bottom:16px;}
+.sec-head{padding:0 var(--inset);margin-bottom:24px;}
 .sec-head .row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;}
 .sec-eyebrow{display:flex;flex-direction:column;gap:8px;}
 .sec-eyebrow .las,.sec-eyebrow .lar{font-size:32px;color:var(--ink);width:32px;height:32px;line-height:32px;}
 .sec-title{font-size:24px;line-height:28px;color:var(--ink);}
-.sec-sub{color:var(--ink);font-size:14px;font-weight:400;margin-top:2px;}
 .head-tools{display:flex;gap:8px;flex:0 0 auto;}
-/* tool button (Button_icon, bordered variant) 48x48 */
-.tool-btn{width:48px;height:48px;border:1px solid var(--ink);border-radius:var(--r-sm);
-  display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:#fff;}
+.tool-btn{width:48px;height:48px;border:1px solid var(--ink);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:#fff;}
 
 /* group sub-header */
 .grp{padding:0 var(--inset);margin:24px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .grp h3{font-size:20px;font-weight:800;color:var(--ink);line-height:1.1;}
-.grp p{font-size:14px;font-weight:400;color:var(--ink);margin-top:2px;}
+.grp p{font-size:16px;font-weight:600;color:var(--ink);margin-top:8px;}
 
-/* ===== Segmented control (Button_group) — flush, no track, no inner pill ===== */
-.seg{display:flex;gap:1px;background:#fff;border-radius:var(--r-sm);overflow:hidden;margin:0 var(--inset) 16px;}
+/* ===== Segmented control ===== */
+.seg{display:flex;gap:1px;background:#fff;border-radius:var(--r-sm);overflow:hidden;margin:0 var(--inset) 24px;}
 .seg-btn{flex:1;min-width:0;min-height:40px;display:flex;align-items:center;justify-content:center;
   padding:8px 16px;font-size:14px;font-weight:700;line-height:1.05;text-align:center;
   background:var(--soft);color:var(--soft-ink);border:1px solid var(--soft);}
 .seg-btn.is-active{background:var(--ink);color:#fff;border-color:var(--ink);}
 
-/* ===== Applicativi app cards (120x120: icon top-left, label bottom-center) ===== */
-.app-card{width:120px;height:120px;border-radius:var(--r-card);padding:8px;color:#fff;
-  display:flex;flex-direction:column;justify-content:space-between;}
+/* ===== Applicativi tiles ===== */
+.app-card{width:120px;height:120px;border-radius:var(--r-card);padding:8px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;}
 .app-card .las,.app-card .lar{font-size:24px;line-height:1;align-self:flex-start;}
 .app-card span{font-size:16px;font-weight:700;line-height:normal;text-align:center;width:100%;}
 .app-card.light{background:#fff;color:var(--ink-2);}
 
-/* ===== AI banner (Chip) ===== */
+/* ===== AI banner ===== */
 .ai-banner{background:var(--ai-soft);border-radius:var(--r);padding:8px 16px;display:flex;gap:8px;align-items:center;}
 .ai-banner .las{font-size:24px;color:var(--ai-2);flex:0 0 24px;}
 .ai-banner span{flex:1;min-width:0;font-size:14px;font-weight:700;line-height:18px;color:var(--ai);}
 
-/* ===== Follow-up: contact + see-all cards ===== */
-.contact{width:340px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);
-  min-height:124px;padding:16px;display:flex;flex-direction:column;gap:16px;}
+/* ===== Follow-up cards ===== */
+.contact{width:340px;background:#fff;border:1px solid var(--line);border-radius:var(--r-card);min-height:124px;padding:24px 16px;display:flex;flex-direction:column;gap:32px;}
 .contact .zone-a{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
-.contact .main-col{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;}
-.contact .nameblock{display:flex;flex-direction:column;gap:4px;}
+.contact .main-col{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;}
+.contact .nameblock{display:flex;flex-direction:column;gap:8px;}
 .contact .micro{font-size:12px;font-weight:700;color:var(--brass);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .contact .name{font-size:20px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .contact .chips{display:flex;flex-wrap:wrap;gap:8px;}
 .contact .quick{display:flex;gap:8px;align-items:flex-start;}
-/* in-card phone/email Button_icon 48x48 */
-.sq-btn{width:48px;height:48px;border:1px solid var(--ink);border-radius:var(--r-sm);
-  display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:#fff;flex:0 0 48px;}
+.sq-btn{width:48px;height:48px;border:1px solid var(--ink);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);background:#fff;flex:0 0 48px;}
 .contact .foot{margin-top:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .contact .foot .line{display:flex;flex-direction:row;align-items:center;gap:4px;height:18px;white-space:nowrap;font-size:12px;color:var(--ink);}
 .contact .foot .line b{font-weight:700;}
-.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--ink);border-radius:var(--pill);
-  padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;color:var(--ink);background:#fff;}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--ink);border-radius:var(--pill);padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;color:var(--ink);background:#fff;}
 .chip.solid{background:var(--ink);color:#fff;}
 .chip .las{font-size:16px;}
-.more-card{width:340px;background:var(--soft);border:1px solid var(--line);border-radius:var(--r-card);
-  display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 24px;}
+.more-card{width:340px;background:var(--soft);border:1px solid var(--line);border-radius:var(--r-card);display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 24px;}
 .more-card .lab{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--brass-up);font-weight:700;font-size:16px;}
 .more-card .lab .las{font-size:24px;}
 
 /* ===== Calendar ===== */
 .cal-title{padding:0 var(--inset);font-size:20px;font-weight:800;line-height:1.2;margin-bottom:16px;color:var(--ink);}
 .daypick{padding:4px var(--inset) 16px;}
-.day{width:56px;height:56px;border:1px solid #e1e1e7;border-radius:var(--r);padding:8px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;background:#fff;position:relative;}
-.day small{font-size:8px;color:var(--ink);font-weight:600;text-transform:uppercase;line-height:10px;letter-spacing:.3px;}
-.day b{font-size:18px;line-height:18px;color:var(--ink);}
+.day{width:56px;height:56px;border:1px solid #e1e1e7;border-radius:var(--r);padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#fff;position:relative;}
+.day small{font-size:8px;color:var(--ink);font-weight:600;text-transform:uppercase;line-height:10px;}
+.day b{font-size:18px;line-height:18px;font-weight:800;color:var(--ink);}
 .day.is-sel{background:#f0f0f3;border-color:#e1e1e7;}
-.day.has-dot::after{content:"";position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);}
-.appt{padding:0 var(--inset);}
-.appt .ttl{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px;}
-.appt .meta{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);margin-bottom:8px;}
-.appt .meta .las{font-size:16px;}
-.appt .meta .walk{color:var(--brass);}
-.time-pill{border-radius:var(--pill);padding:5px 12px;font-size:13px;font-weight:700;}
-.time-pill.brass{background:var(--time-brass-bg);color:var(--time-brass-ink);}
-.time-pill.grey{background:var(--time-grey-bg);color:var(--time-grey-ink);}
-.link-brass{color:var(--brass);font-weight:700;display:inline-flex;align-items:center;gap:7px;}
-.appt-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;}
-.appt-actions{display:flex;gap:10px;}
-.divider{height:1px;background:var(--line);margin:18px var(--inset);}
-.today-item{padding:0 var(--inset);}
-.today-item .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
-.today-item .ttl{font-size:15px;font-weight:700;color:var(--ink);margin:8px 0 12px;}
-/* purple AI buttons */
-.btn-purple{background:var(--ai);border:1px solid var(--ai);border-radius:var(--r-sm);min-height:48px;
-  display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-weight:700;font-size:16px;padding:8px 24px;}
-.btn-purple .las{font-size:24px;}
-.btn-purple.sq{width:56px;padding:8px;min-height:56px;}
-.btn-purple.wide{width:100%;}
-.btn-ghost-sq{width:56px;height:56px;border:1px solid var(--grey-2);border-radius:var(--r-sm);
-  display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ink);background:#fff;}
+.day.has-dot::after{content:"";position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:var(--green);}
+
+/* appointment cards (Oggi + Prossimi share this) */
+.appt-rail{gap:6px;}
+.appt-card{width:340px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:16px;}
+.appt-card.darker{border-color:var(--line-d);}
+.appt-card .appt-body{display:flex;flex-direction:column;gap:8px;}
+.appt-card .appt-body>.tpill{align-self:flex-start;}
+.appt-card .titlerow{display:flex;gap:16px;align-items:center;justify-content:space-between;}
+.appt-card .titlerow .appt-title{flex:1;min-width:0;}
+.appt-title{font-size:16px;font-weight:800;line-height:1.25;color:var(--ink);}
+.tpill{display:inline-flex;align-items:center;border-radius:var(--pill);padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;background:var(--brass-soft);color:var(--brass);white-space:nowrap;}
+.tpill.grey{background:var(--line-d);color:var(--ink);}
+.detailrow{display:flex;gap:16px;align-items:center;}
+.detailrow .lrow{flex:1;min-width:0;}
+.trow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--brass);}
+.trow .las{font-size:16px;}
+.trow.out{gap:8px;color:var(--ink-2);}
+.lrow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--ink-3);min-width:0;}
+.lrow .las{font-size:16px;flex:0 0 auto;}
+.lrow span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kebab-slot{width:48px;height:48px;flex:0 0 48px;}
+.psq{width:48px;height:48px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;flex:0 0 48px;}
+.psq.ghost{background:#fff;color:var(--ink);border:1px solid var(--ink);}
+.brief-bar{width:100%;min-height:48px;background:var(--ai);border:1px solid var(--ai);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-weight:700;font-size:16px;padding:8px 24px;}
+.brief-bar .las{font-size:24px;}
 
 /* reminder cards */
-.remind{width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;
-  padding:10px 10px 15px 15px;display:flex;flex-direction:column;gap:8px;}
+.remind{width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 10px 15px 15px;display:flex;flex-direction:column;gap:8px;}
 .remind .rtext{display:flex;flex-direction:column;gap:4px;}
 .remind .top{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
 .remind .tcol{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
@@ -209,22 +194,19 @@ img{display:block;}
 .remind .when .lar{font-size:24px;color:var(--yellow);}
 .remind .when b{font-size:14px;font-weight:600;line-height:18px;color:var(--yellow);white-space:nowrap;}
 .remind .by{font-size:12px;font-style:italic;color:var(--ink-2);}
-.kebab{width:48px;height:48px;background:var(--soft);border:1px solid var(--soft);border-radius:var(--r-sm);
-  display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);flex:0 0 48px;}
+.kebab{width:48px;height:48px;background:var(--soft);border:1px solid var(--soft);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;color:var(--ink);flex:0 0 48px;}
 .remind .lower{display:flex;flex-direction:column;gap:8px;}
 .remind h4{font-size:16px;font-weight:700;line-height:18px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .remind p{font-size:14px;font-weight:400;line-height:15px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .remind .foot{display:flex;align-items:center;gap:4px;}
 .remind .foot .las{font-size:12px;color:var(--ink-2);}
-.author{background:var(--line-d);border:1px solid var(--line-d);border-radius:var(--pill);padding:4px 8px;
-  font-size:12px;font-weight:800;line-height:18px;color:var(--ink);}
+.author{background:var(--line-d);border:1px solid var(--line-d);border-radius:var(--pill);padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;color:var(--ink);}
 
-/* ===== Ultimi appuntamenti deal card ===== */
+/* ===== Ultimi deal card ===== */
 .deal{width:340px;background:#fff;border:1px solid var(--line-d);border-radius:var(--r-card);min-height:124px;padding:16px;}
 .deal .gen{display:flex;flex-direction:column;gap:16px;}
 .deal .hrow{display:flex;flex-direction:row;gap:16px;align-items:flex-start;}
 .deal .lcol{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;}
-.deal .tg{display:flex;flex-direction:column;gap:8px;}   /* title + pill (small gap) */
 .deal .name{font-size:20px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .tag-brass{align-self:flex-start;background:var(--brass);color:#fff;border-radius:var(--pill);padding:8px 16px;font-size:14px;font-weight:800;line-height:18px;}
 .deal .info{display:flex;flex-direction:column;gap:8px;}
@@ -234,130 +216,72 @@ img{display:block;}
 .deal .loc{display:flex;align-items:center;gap:2px;color:var(--ink-3);font-size:14px;font-weight:700;line-height:18px;}
 .deal .loc .las{font-size:18px;}
 .deal .loc span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.deal .pl{display:flex;flex-direction:column;gap:0;}
-.deal .prod{display:flex;align-items:center;gap:8px;font-size:14px;line-height:24px;color:var(--ink);}
+.deal .prod{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;line-height:24px;color:var(--ink);}
 .deal .prod b{font-weight:700;}
-.deal .warn{display:inline-flex;align-items:center;gap:2px;margin-left:auto;color:var(--red);font-weight:700;font-size:12px;}
+.deal .warn{display:inline-flex;align-items:center;gap:2px;color:var(--red);font-weight:700;font-size:14px;}
 .deal .warn .las{font-size:18px;}
-.deal .addbox{height:48px;display:flex;align-items:center;justify-content:flex-start;}
-.deal .addlink{color:var(--brass);font-weight:600;text-decoration:underline;font-size:16px;line-height:24px;}
+.add-btn{width:100%;min-height:48px;background:#fff;border:1px solid var(--brass);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;gap:8px;color:var(--brass);font-weight:700;font-size:16px;padding:8px 24px;}
+.add-btn .las{font-size:24px;}
 
 /* ===== Performance ===== */
 .legend{display:flex;flex-direction:column;gap:8px;padding:0 var(--inset);margin-bottom:16px;}
-.legend div{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-2);}
-.dot{width:13px;height:13px;border-radius:3px;flex:0 0 13px;}
-.dot.brass{background:var(--brass);} .dot.dark{background:var(--ink);} .dot.brass-1{background:var(--brass-1);}
+.legend div{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--ink-2);}
+.dot{width:16px;height:16px;border-radius:0;flex:0 0 16px;}
+.dot.brass{background:var(--brass-up);} .dot.dark{background:var(--soft-ink);} .dot.brass-1{background:var(--brass-1);}
 .metric{padding:0 var(--inset);margin-bottom:16px;}
-.metric .lab{font-size:13px;color:var(--ink);margin-bottom:7px;}
-.bar{height:26px;border-radius:var(--pill);background:var(--ink);overflow:hidden;display:flex;}
-.bar i{display:block;height:100%;background:var(--brass);}
+.metric .lab{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:7px;}
+.bar{height:26px;border-radius:var(--pill);background:var(--soft-ink);overflow:hidden;display:flex;}
+.bar i{display:block;height:100%;background:var(--brass-up);}
 .metric .ends{display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:var(--ink);margin-top:6px;}
 .charts{padding:8px var(--inset) 0;}
-.chart-card{width:330px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 16px;}
-.chart-card h4{font-size:15px;font-weight:700;margin-bottom:14px;}
+.chart-card{width:330px;background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 24px;}
+.chart-card h4{font-size:16px;font-weight:600;margin-bottom:14px;}
 .donut-wrap{position:relative;width:190px;height:190px;margin:0 auto 14px;}
 .donut{width:100%;height:100%;border-radius:50%;}
 .donut::after{content:"";position:absolute;inset:30%;background:#fff;border-radius:50%;}
-.donut-wrap .pct{position:absolute;color:#fff;font-size:13px;font-weight:800;transform:translate(-50%,-50%);}
+.donut-wrap .pct{position:absolute;color:#fff;font-size:12px;font-weight:800;transform:translate(-50%,-50%);}
 .clegend{display:flex;flex-direction:column;gap:7px;}
-.clegend div{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink);}
+.clegend div{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink);}
 .clegend b{margin-left:auto;font-weight:800;}
 
-/* ===== Visti di recente mini cards ===== */
-.mini{width:auto;min-width:150px;background:var(--pink-bg);border-radius:var(--r-sm);padding:16px;
-  display:flex;flex-direction:row;gap:16px;align-items:flex-start;justify-content:space-between;}
+/* ===== Visti di recente ===== */
+.mini{width:auto;min-width:150px;background:var(--pink-bg);border-radius:var(--r-sm);padding:16px;display:flex;flex-direction:row;gap:16px;align-items:flex-start;justify-content:space-between;}
 .mini .lcol{display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
 .mini .home{font-size:18px;color:var(--pink);}
 .mini .heart{font-size:16px;color:var(--pink);}
-.mini .lp{font-size:14px;font-weight:800;line-height:18px;color:var(--pink);white-space:nowrap;}
-.mini .ls{font-size:12px;font-weight:400;line-height:18px;color:var(--pink);white-space:nowrap;}
+.mini .lp{font-size:14px;font-weight:800;line-height:18px;color:var(--pink);white-space:nowrap;text-align:center;width:100%;}
+.mini .ls{font-size:12px;font-weight:400;line-height:18px;color:var(--pink);white-space:nowrap;text-align:center;width:100%;}
 
-/* ===== Annunci & News ===== */
-/* property card */
+/* ===== Annunci & news ===== */
+#news-sec .sec-head{margin-bottom:16px;}
+#news-sec .grp{margin:16px 0 16px;}
+#news-sec .grp h3{font-weight:700;}
 .estate{width:256px;height:384px;background:#fff;border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;}
 .estate .ph{flex:1 0 0;position:relative;}
 .estate .ph img{width:100%;height:100%;object-fit:cover;}
 .estate .ph .flags{position:absolute;top:16px;right:16px;display:flex;}
 .estate .body{flex:1 0 0;padding:16px;display:flex;flex-direction:column;gap:16px;}
 .estate .meta{display:flex;flex-direction:row;gap:5px;align-items:flex-start;}
-.cat-chip{flex:0 0 auto;height:20px;border-radius:50px;padding:1px 10px 0;display:flex;align-items:center;
-  font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;}
+.cat-chip{flex:0 0 auto;height:20px;border-radius:50px;padding:1px 10px 0;display:flex;align-items:center;font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;}
 .estate .meta .ref{flex:1;min-width:0;display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:700;line-height:18px;color:var(--ink-3);}
 .estate .meta .ref span:last-child{text-align:right;}
 .estate .et{font-family:"IvyMode",Georgia,serif;font-weight:600;font-size:22px;line-height:28px;color:var(--ink);}
 .estate .addr{display:flex;flex-direction:column;gap:4px;color:var(--ink);}
-.estate .addr .zone{font-size:16px;font-weight:700;line-height:1.15;}
+.estate .addr .zone{font-size:16px;font-weight:700;line-height:normal;}
 .estate .addr .full{font-size:14px;font-weight:400;line-height:18px;}
-/* flag circles */
 .flags{display:flex;}
 .flag{width:18px;height:18px;border-radius:50%;flex:0 0 18px;box-shadow:0 0 0 1.5px rgba(255,255,255,.85);}
 .flag.it{background:linear-gradient(90deg,#008C45 0 33.33%,#fff 33.33% 66.66%,#CD212A 66.66%);}
 .flag.nl{background:linear-gradient(180deg,#AE1C28 0 33.33%,#fff 33.33% 66.66%,#21468B 66.66%);margin-right:-2px;}
-/* news card */
 .news-card{width:255px;height:384px;border-radius:var(--r);overflow:hidden;position:relative;}
 .news-card>img{width:100%;height:100%;object-fit:cover;}
 .news-card .toprow{position:absolute;top:14px;left:14.5px;right:14.5px;display:flex;align-items:center;justify-content:space-between;}
-.label-chip{height:20px;border-radius:100px;padding:1px 10px 0;display:flex;align-items:center;background:#fff;
-  font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;}
-.news-card .scrim{position:absolute;left:0;right:0;bottom:0;background:rgba(34,34,34,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
-  border-radius:0 0 var(--r) var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;}
+.label-chip{height:20px;border-radius:100px;padding:1px 10px 0;display:flex;align-items:center;background:#fff;font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;}
+.news-card .scrim{position:absolute;left:0;right:0;bottom:0;background:rgba(34,34,34,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);border-radius:0 0 var(--r) var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;}
+.news-card .ntgroup{display:flex;flex-direction:column;gap:4px;}
 .news-card .date{font-size:14px;font-weight:700;line-height:18px;color:var(--ink-3);}
 .news-card .nt{font-size:16px;font-weight:600;line-height:24px;color:#fff;}
 .news-card .tag{font-size:14px;font-weight:700;line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-/* ===== Appointment items (Oggi / Prossimi) — compact, divider only, no card box ===== */
-.appt-list{padding:0 var(--inset);}
-.appt-item{padding:16px 0;border-bottom:1px solid var(--line-d);display:flex;flex-direction:column;gap:8px;}
-.appt-item:last-child{border-bottom:none;}
-.appt-item .arow{display:flex;gap:4px;align-items:flex-start;}
-.appt-item .acol{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
-.tpill{display:inline-flex;align-items:center;border-radius:var(--pill);padding:4px 8px;font-size:12px;font-weight:800;line-height:18px;background:var(--brass-soft);color:var(--brass);white-space:nowrap;}
-.tpill.grey{background:var(--line-d);color:var(--ink);}
-.trow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--brass);}
-.trow .las{font-size:16px;}
-.trow.out{color:var(--ink-2);gap:8px;}
-.lrow{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;line-height:1.2;color:var(--ink-3);min-width:0;max-width:100%;}
-.lrow .las{font-size:16px;flex:0 0 auto;}
-.lrow span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lrow.online{color:var(--ink-2);}
-.lrow.online span{text-decoration:underline;}
-.appt-title{font-size:16px;font-weight:800;line-height:1.25;color:var(--ink);padding-left:4px;}
-.psq{width:48px;height:48px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;padding:4px;font-size:32px;flex:0 0 48px;}
-.psq.ghost{background:#fff;color:var(--ink);border:1px solid var(--ink);}
-.psq.purple{background:var(--ai);color:#fff;border:1px solid var(--ai);}
-.brief-bar{width:100%;min-height:48px;background:var(--ai);border:1px solid var(--ai);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-weight:700;font-size:16px;padding:8px 24px;}
-.brief-bar .las{font-size:24px;}
-
-/* ===== Appointment CARDS (Oggi / Prossimi) — bordered card rail ===== */
-.appt-rail{gap:6px;}
-.appt-rail.pgap{gap:16px;}
-.appt-card{width:340px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;}
-.appt-card.oggi{gap:16px;}
-.appt-card.pross{gap:8px;}
-.appt-card.darker{border-color:var(--line-d);}
-.appt-card.sm .appt-title{font-size:14px;}
-.appt-card .titlerow{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;}
-.appt-card .titlerow .appt-title{flex:1;min-width:0;padding-left:0;}
-.appt-card .appt-title{padding-left:0;}
-.appt-body{display:flex;flex-direction:column;gap:8px;}
-.appt-body>.tpill,.kpi-detail>.tpill{align-self:flex-start;}  /* pill hugs its text; don't let the flex column stretch it full-width */
-.appt-content{display:flex;flex-direction:column;gap:4px;}
-.detailrow{display:flex;gap:16px;align-items:center;}
-.detailrow .lrow{flex:1;min-width:0;}
-/* KPI / Outlook ("less data") card specifics */
-.kebab-slot{width:48px;height:48px;flex:0 0 48px;}            /* reserves the hidden kebab box */
-.appt-card.kpi .titlerow{align-items:center;}                 /* title vertically centered in the 48px row */
-.appt-card.kpi.pross{justify-content:center;}                 /* Prossimi KPI content vertically centered */
-.kpi-detail{display:flex;flex-direction:column;gap:16px;}     /* Prossimi: pill stacked above Outlook */
-.lrow.kpilink span{text-decoration:underline;}               /* Prossimi Outlook is an underlined link */
-
-/* ===== "Aggiungi nuovi prodotti" outline button (Ultimi card) ===== */
-.add-btn{width:100%;min-height:48px;background:#fff;border:1px solid var(--brass);border-radius:var(--r-sm);
-  display:flex;align-items:center;justify-content:center;gap:8px;color:var(--brass);font-weight:700;font-size:16px;padding:8px 24px;}
-.add-btn .las{font-size:24px;}
-
-/* Follow-up: 32px between section-level groups */
-#followup .grp{margin-top:32px;}
 
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
@@ -382,11 +306,18 @@ img{display:block;}
   <section class="hero">
     <div class="bg"><img src="assets/hero.jpg" alt=""></div>
     <h1 class="ivy">Ciao Luca</h1>
+    <button class="hero-set" aria-label="Impostazioni"><i class="las la-cog"></i></button>
     <div class="search">
-      <input type="text" placeholder="Inserisci almeno 3 caratteri e premi invio…">
+      <input type="text" placeholder="Inserisci almeno 3 caratteri e premi invio...">
       <i class="las la-search"></i>
     </div>
   </section>
+
+  <!-- ===== INFO BANNER (under search) ===== -->
+  <div class="info-banner">
+    <i class="las la-star"></i>
+    <span>Scopri le novità dell'ultimo rilascio o consulta la storia degli aggiornamenti!</span>
+  </div>
 
   <!-- ===== APP SELECTOR ===== -->
   <section class="section tint">
@@ -398,13 +329,13 @@ img{display:block;}
       <button class="seg-btn" data-tab="support">Business support</button>
     </div>
     <div class="rail no-bar" data-group="apps" data-panel="business">
-      <div class="app-card center" style="background:#8db9ca"><i class="las la-building"></i><span>Office</span></div>
-      <div class="app-card center" style="background:#ae9142"><i class="las la-store"></i><span>Retail</span></div>
-      <div class="app-card center" style="background:#789f90"><i class="las la-truck"></i><span>Logistics</span></div>
-      <div class="app-card center" style="background:#d0a1ba"><i class="las la-home"></i><span>Living</span></div>
-      <div class="app-card center" style="background:#7e666d"><i class="las la-file-invoice-dollar"></i><span>Capital Markets</span></div>
-      <div class="app-card center" style="background:#000"><i class="las la-award"></i><span>Corporate</span></div>
-      <div class="app-card center light"><i class="las la-concierge-bell"></i><span>Hospitality</span></div>
+      <div class="app-card" style="background:#8db9ca"><i class="las la-building"></i><span>Office</span></div>
+      <div class="app-card" style="background:#ae9142"><i class="las la-store"></i><span>Retail</span></div>
+      <div class="app-card" style="background:#789f90"><i class="las la-truck"></i><span>Logistics</span></div>
+      <div class="app-card" style="background:#d0a1ba"><i class="las la-home"></i><span>Living</span></div>
+      <div class="app-card" style="background:#7e666d"><i class="las la-file-invoice-dollar"></i><span>Capital Markets</span></div>
+      <div class="app-card" style="background:#000"><i class="las la-award"></i><span>Corporate</span></div>
+      <div class="app-card light"><i class="las la-hotel"></i><span>Hospitality</span></div>
       <div class="rail-end"></div>
     </div>
     <div class="rail no-bar" data-group="apps" data-panel="support" hidden>
@@ -424,15 +355,11 @@ img{display:block;}
     <div class="sec-head">
       <div class="row">
         <div class="sec-eyebrow"><i class="las la-share"></i><h2 class="sec-title ivy">Follow-up in sospeso</h2></div>
-        <div class="head-tools">
-          <button class="tool-btn"><i class="las la-ellipsis-v"></i></button>
-        </div>
+        <div class="head-tools"><button class="tool-btn"><i class="las la-ellipsis-v"></i></button></div>
       </div>
     </div>
-
     <div class="grp"><div><h3>Da non dimenticare</h3><p>Le opportunità senza follow-up da più tempo</p></div></div>
     <div class="rail no-bar" id="fu1"></div>
-
     <div class="grp"><div><h3>Le più recenti</h3><p>Nuove opportunità senza follow-up</p></div></div>
     <div class="rail no-bar" id="fu2"></div>
   </section>
@@ -448,43 +375,16 @@ img{display:block;}
       <button class="seg-btn" data-tab="promem">Promemoria</button>
     </div>
 
-    <!-- panel: OGGI (default) -->
+    <!-- OGGI -->
     <div data-group="cal" data-panel="oggi">
       <div style="padding:0 var(--inset);margin-bottom:16px"><div class="ai-banner">
         <i class="las la-atom"></i><span>Clicca su Brief per farmi fare un riassunto di tutte le informazioni utili per l'appuntamento</span>
       </div></div>
       <h3 class="cal-title">Appuntamenti di oggi</h3>
-      <div class="rail appt-rail no-bar">
-        <div class="appt-card oggi">
-          <div class="appt-body">
-            <span class="tpill">09:00 - 09:30</span>
-            <div class="titlerow"><div class="appt-title">Dils Living - Asia Morgante | Incontro esplorativo nuove opportunità</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-            <div class="trow"><i class="las la-running"></i>Meeting generico</div>
-            <div class="lrow"><i class="las la-map-marker-alt"></i><span>Piazza Armando Diaz, 7 - 20123 - Milano</span></div>
-          </div>
-          <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
-        </div>
-        <div class="appt-card oggi darker kpi">
-          <div class="appt-body">
-            <span class="tpill grey">12:00 - 12:30</span>
-            <div class="titlerow"><div class="appt-title">KPI definition</div><span class="kebab-slot"></span></div>
-            <div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>
-          </div>
-        </div>
-        <div class="appt-card oggi">
-          <div class="appt-body">
-            <span class="tpill">14:00 - 15:30</span>
-            <div class="titlerow"><div class="appt-title">Dils Living - Gianni Giannini | Presentazione nuove opportunità su Milano e Roma</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-            <div class="trow"><i class="las la-running"></i>Meeting generico</div>
-            <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
-          </div>
-          <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
-        </div>
-        <div class="rail-end"></div>
-      </div>
+      <div class="rail appt-rail no-bar" id="oggiCards"></div>
     </div>
 
-    <!-- panel: PROSSIMI -->
+    <!-- PROSSIMI -->
     <div data-group="cal" data-panel="prossimi" hidden>
       <div style="padding:0 var(--inset);margin-bottom:16px"><div class="ai-banner">
         <i class="las la-atom"></i><span>Clicca su Brief per farmi fare un riassunto di tutte le informazioni utili per l'appuntamento</span>
@@ -498,41 +398,10 @@ img{display:block;}
         <div class="day"><small>VEN</small><b>28</b></div>
         <div class="rail-end"></div>
       </div>
-      <div class="rail appt-rail pgap no-bar">
-        <div class="appt-card pross sm darker">
-          <div class="appt-content">
-            <div class="titlerow"><div class="appt-title">Dils Living - Marco Gargano | Questo è il titolo dell'appuntamento</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-            <div class="detailrow">
-              <div class="trow"><i class="las la-running"></i><span class="tpill">10:30 - 11:00</span></div>
-              <div class="lrow online"><i class="las la-video"></i><span>Evento online</span></div>
-            </div>
-          </div>
-          <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
-        </div>
-        <div class="appt-card pross sm kpi">
-          <div class="appt-content">
-            <div class="titlerow"><div class="appt-title">Definizione KPI prossimo semestre</div><span class="kebab-slot"></span></div>
-            <div class="kpi-detail">
-              <span class="tpill grey">11:00 - 12:00</span>
-              <div class="lrow kpilink"><i class="las la-calendar"></i><span>Appuntamento Outlook</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="appt-card pross sm darker">
-          <div class="appt-content">
-            <div class="titlerow"><div class="appt-title">Dils Living - Mariangela Rossi Brambilla | Questo è il titolo dell'appuntamento</div><button class="psq ghost"><i class="las la-ellipsis-v"></i></button></div>
-            <div class="detailrow">
-              <div class="trow"><i class="las la-running"></i><span class="tpill">14:00 - 14:45</span></div>
-              <div class="lrow"><i class="las la-map-marker-alt"></i><span>Piazza Armando Diaz, 7 - 20123 - Milano</span></div>
-            </div>
-          </div>
-          <button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>
-        </div>
-        <div class="rail-end"></div>
-      </div>
+      <div class="rail appt-rail no-bar" id="prossimiCards"></div>
     </div>
 
-    <!-- panel: PROMEMORIA (no AI banner) -->
+    <!-- PROMEMORIA -->
     <div data-group="cal" data-panel="promem" hidden>
       <div class="grp"><h3>Promemoria</h3>
         <div class="head-tools"><button class="tool-btn"><i class="las la-ellipsis-v"></i></button></div>
@@ -541,7 +410,7 @@ img{display:block;}
     </div>
   </section>
 
-  <!-- ===== ULTIMI APPUNTAMENTI ===== -->
+  <!-- ===== ULTIMI ===== -->
   <section class="section white">
     <div class="sec-head">
       <div class="row">
@@ -565,8 +434,8 @@ img{display:block;}
       <div><span class="dot brass"></span>Opportunità con follow up</div>
       <div><span class="dot dark"></span>Opportunità senza follow up</div>
     </div>
-    <div class="metric"><div class="lab">Numeriche generali</div><div class="bar"><i style="width:25%"></i></div><div class="ends"><span>4</span><span>12</span></div></div>
-    <div class="metric"><div class="lab">Volume d'affari</div><div class="bar"><i style="width:15%"></i></div><div class="ends"><span>1.2mil</span><span>6.8mil</span></div></div>
+    <div class="metric"><div class="lab">Numeriche generali</div><div class="bar"><i style="width:21%"></i></div><div class="ends"><span>4</span><span>12</span></div></div>
+    <div class="metric"><div class="lab">Volume d'affari</div><div class="bar"><i style="width:13%"></i></div><div class="ends"><span>1.2mil</span><span>6.8mil</span></div></div>
 
     <div class="grp"><h3>Deals &amp; trattative</h3></div>
     <div class="seg" data-group="perf">
@@ -578,7 +447,7 @@ img{display:block;}
         <div class="chart-card">
           <h4>Numeriche generali</h4>
           <div class="donut-wrap">
-            <div class="donut" style="background:conic-gradient(var(--brass) 0 48%,var(--brass-1) 48% 82%,var(--ink) 82% 100%)"></div>
+            <div class="donut" style="background:conic-gradient(var(--brass-up) 0 48%,var(--brass-1) 48% 82%,var(--soft-ink) 82% 100%)"></div>
             <span class="pct" style="left:74%;top:42%">48%</span><span class="pct" style="left:30%;top:34%">34%</span><span class="pct" style="left:44%;top:84%">18%</span>
           </div>
           <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>32</b></div><div><span class="dot brass-1"></span>Trattative <b>23</b></div><div><span class="dot dark"></span>Deal persi <b>12</b></div></div>
@@ -586,7 +455,7 @@ img{display:block;}
         <div class="chart-card">
           <h4>Volume d'affari</h4>
           <div class="donut-wrap">
-            <div class="donut" style="background:conic-gradient(var(--brass) 0 33.4%,var(--ink) 33.4% 93.7%,var(--brass-1) 93.7% 100%)"></div>
+            <div class="donut" style="background:conic-gradient(var(--brass-up) 0 33.4%,var(--soft-ink) 33.4% 93.7%,var(--brass-1) 93.7% 100%)"></div>
             <span class="pct" style="left:78%;top:40%">33.4%</span><span class="pct" style="left:45%;top:85%">60.3%</span><span class="pct" style="left:33%;top:24%">6.3%</span>
           </div>
           <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>4,43mil</b></div><div><span class="dot brass-1"></span>Trattative <b>835k</b></div><div><span class="dot dark"></span>Deal persi <b>8mil</b></div></div>
@@ -599,7 +468,7 @@ img{display:block;}
         <div class="chart-card">
           <h4>Numeriche generali</h4>
           <div class="donut-wrap">
-            <div class="donut" style="background:conic-gradient(var(--brass) 0 52%,var(--brass-1) 52% 80%,var(--ink) 80% 100%)"></div>
+            <div class="donut" style="background:conic-gradient(var(--brass-up) 0 52%,var(--brass-1) 52% 80%,var(--soft-ink) 80% 100%)"></div>
             <span class="pct" style="left:74%;top:42%">52%</span><span class="pct" style="left:30%;top:34%">28%</span><span class="pct" style="left:44%;top:84%">20%</span>
           </div>
           <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>148</b></div><div><span class="dot brass-1"></span>Trattative <b>79</b></div><div><span class="dot dark"></span>Deal persi <b>57</b></div></div>
@@ -607,7 +476,7 @@ img{display:block;}
         <div class="chart-card">
           <h4>Volume d'affari</h4>
           <div class="donut-wrap">
-            <div class="donut" style="background:conic-gradient(var(--brass) 0 41%,var(--ink) 41% 95%,var(--brass-1) 95% 100%)"></div>
+            <div class="donut" style="background:conic-gradient(var(--brass-up) 0 41%,var(--soft-ink) 41% 95%,var(--brass-1) 95% 100%)"></div>
             <span class="pct" style="left:78%;top:38%">41%</span><span class="pct" style="left:45%;top:85%">54%</span><span class="pct" style="left:33%;top:24%">5%</span>
           </div>
           <div class="clegend"><div><span class="dot brass"></span>Deal vinti <b>21,7mil</b></div><div><span class="dot brass-1"></span>Trattative <b>2,6mil</b></div><div><span class="dot dark"></span>Deal persi <b>28,4mil</b></div></div>
@@ -618,7 +487,7 @@ img{display:block;}
   </section>
 
   <!-- ===== VISTI DI RECENTE ===== -->
-  <section class="section white">
+  <section class="section tint">
     <div class="sec-head">
       <div class="sec-eyebrow"><i class="las la-history"></i><h2 class="sec-title ivy">Visti di recente</h2></div>
     </div>
@@ -629,11 +498,11 @@ img{display:block;}
   </section>
 
   <!-- ===== ANNUNCI & NEWS ===== -->
-  <section class="section white">
+  <section class="section white" id="news-sec">
     <div class="sec-head">
       <div class="sec-eyebrow"><i class="las la-rss"></i><h2 class="sec-title ivy">Annunci &amp; news</h2></div>
-      <p class="sec-sub">Ultimi annunci pubblicati</p>
     </div>
+    <div class="grp"><h3>Ultimi annunci pubblicati</h3></div>
     <div class="rail no-bar" id="estates"></div>
     <div class="grp"><h3>News da dils.com</h3></div>
     <div class="rail no-bar" id="news"></div>
@@ -642,7 +511,7 @@ img{display:block;}
 </div>
 
 <script>
-/* generic tab-swap */
+/* tab-swap */
 document.querySelectorAll('.seg .seg-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const seg=btn.closest('.seg'), group=seg.dataset.group, tab=btn.dataset.tab;
@@ -651,7 +520,7 @@ document.querySelectorAll('.seg .seg-btn').forEach(btn=>{
   });
 });
 
-/* ---- Follow-up contact cards ---- */
+/* ---- Follow-up ---- */
 function contactCard(micro,name){
   return `<div class="contact">
     <div class="zone-a">
@@ -664,14 +533,41 @@ function contactCard(micro,name){
     <div class="foot"><div class="line">Ultimo contatto <b>12/03/2026</b></div></div>
   </div>`;
 }
-function seeAll(txt){ return `<a class="more-card"><span class="lab">${txt} <i class="las la-arrow-right"></i></span></a>`; }
+const seeAll = txt => `<a class="more-card"><span class="lab">${txt} <i class="las la-arrow-right"></i></span></a>`;
 document.getElementById('fu1').innerHTML =
-  contactCard('Porta Bella 15','Marica Marcelli') + contactCard('Living agency · Milan','Antonio Antonelli')
-  + seeAll('Altre opportunità<br>da non dimenticare') + '<div class="rail-end"></div>';
+  contactCard('Porta Bella 15','Marica Marcelli') + contactCard('Living agency - Milan','Antonio Antonelli')
+  + seeAll('Altre opportunità da non dimenticare') + '<div class="rail-end"></div>';
 document.getElementById('fu2').innerHTML =
-  contactCard('Porta Bella 15','Marisa Ferrero') + seeAll('Altre opportunità<br>recenti') + '<div class="rail-end"></div>';
+  contactCard('Porta Bella 15','Marisa Ferrero') + seeAll('Altre opportunità recenti') + '<div class="rail-end"></div>';
 
-/* ---- Promemoria reminder cards ---- */
+/* ---- Appointment cards (shared by Oggi + Prossimi) ---- */
+function apptCard(o){
+  const head = `<div class="titlerow"><div class="appt-title">${o.title}</div>`
+    + (o.outlook ? '<span class="kebab-slot"></span>' : '<button class="psq ghost"><i class="las la-ellipsis-v"></i></button>') + '</div>';
+  const meta = o.outlook
+    ? `<div class="trow out"><i class="las la-calendar"></i>Appuntamento Outlook</div>`
+    : `<div class="detailrow"><div class="trow"><i class="las la-running"></i>Meeting generico</div>
+         <div class="lrow"><i class="las la-map-marker-alt"></i><span>${o.loc}</span></div></div>`;
+  return `<div class="appt-card${o.outlook?' darker':''}">
+    <div class="appt-body"><span class="tpill${o.outlook?' grey':''}">${o.time}</span>${head}${meta}</div>
+    ${o.outlook?'':'<button class="brief-bar"><i class="las la-atom"></i>Genera briefing <i class="las la-file-alt"></i></button>'}
+  </div>`;
+}
+const ADDR='Piazza Armando Diaz, 7 - 20123 - Milano';
+const oggi=[
+  apptCard({time:'09:00 - 09:30',title:'Dils Living - Asia Morgante | Incontro esplorativo nuove opportunità',loc:ADDR}),
+  apptCard({time:'12:00 - 12:30',title:'KPI definition',outlook:true}),
+  apptCard({time:'14:00 - 15:30',title:'Dils Living - Gianni Giannini | Presentazione nuove opportunità su Milano e roma',loc:ADDR}),
+];
+const prossimi=[
+  apptCard({time:'10:30 - 11:00',title:'Dils Living - Asia Morgante | Incontro esplorativo nuove opportunità',loc:ADDR}),
+  apptCard({time:'12:00 - 12:30',title:'KPI definition',outlook:true}),
+  apptCard({time:'16:00 - 16:45',title:'Dils Living - Gianni Giannini | Presentazione nuove opportunità su Milano e roma',loc:ADDR}),
+];
+document.getElementById('oggiCards').innerHTML = oggi.join('') + '<div class="rail-end"></div>';
+document.getElementById('prossimiCards').innerHTML = prossimi.join('') + '<div class="rail-end"></div>';
+
+/* ---- Promemoria ---- */
 const remindHTML = (title)=>`<div class="remind">
   <div class="top">
     <div class="tcol"><div class="when"><i class="lar la-bell"></i><b>Oggi - 14:30</b></div>
@@ -680,13 +576,13 @@ const remindHTML = (title)=>`<div class="remind">
   </div>
   <div class="lower">
     <div class="rtext"><h4>${title}</h4>
-    <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati che tutto proceda.</p></div>
+    <p>Promemoria: Non dimenticare di seguire i tuoi contatti e le opportunità in sospeso. Rivedi le tue attività e assicurati di non perdere nulla.</p></div>
     <div class="foot"><i class="las la-user-check"></i><span class="author">LC</span></div>
   </div>
 </div>`;
 document.getElementById('promem').innerHTML = remindHTML('Appunti vari da ricordare') + remindHTML('Chiamare il tecnico') + '<div class="rail-end"></div>';
 
-/* ---- Ultimi appuntamenti deal cards ---- */
+/* ---- Ultimi deal cards ---- */
 const dealHTML = `<div class="deal"><div class="gen">
   <div class="hrow">
     <div class="lcol">
@@ -701,11 +597,11 @@ const dealHTML = `<div class="deal"><div class="gen">
   </div>
   <div class="prod">Prodotti associati: <b>2</b><span class="warn"><i class="las la-exclamation-triangle"></i>1 senza feedback</span></div>
   <button class="add-btn">Aggiungi nuovi prodotti <i class="las la-plus"></i></button>
-  <button class="btn-purple"><i class="las la-atom"></i>Feedback <i class="las la-microphone"></i></button>
+  <button class="brief-bar"><i class="las la-atom"></i>Feedback <i class="las la-microphone"></i></button>
 </div></div>`;
 document.getElementById('deals').innerHTML = dealHTML.repeat(3) + '<div class="rail-end"></div>';
 
-/* ---- Visti di recente mini cards ---- */
+/* ---- Visti di recente ---- */
 function miniCards(n,two){
   let h='';
   for(let i=0;i<n;i++){
@@ -721,9 +617,9 @@ document.getElementById('oppo').innerHTML = miniCards(8,true);
 /* ---- Annunci property cards ---- */
 const flags=(two)=>`<div class="flags">${two?'<span class="flag nl"></span>':''}<span class="flag it"></span></div>`;
 const estates=[
-  ['prop1.jpg','LIVING','#d0a1ba','Vendita','VRS-216','Versus Milano','Ripamonti · Vigentino','Milano, Via Bernardino Verro, 62',true],
+  ['prop1.jpg','LIVING','#d0a1ba','Vendita','VRS-216','Versus Milano','Ripamonti - Vigentino','Milano, Via Bernardino Verro, 62',true],
   ['prop2.jpg','OFFICE','#8db9ca','Vendita','CRS-118','Crespi Corso Genova','Corso Genova','Milano, Corso Genova 7',true],
-  ['prop3.jpg','LIVING','#d0a1ba','Vendita','ADM-010','Adamello 10','Fondazione Prada · Parco Romana','Milano, Via Adamello 10',false],
+  ['prop3.jpg','LIVING','#d0a1ba','Vendita','ADM-010','Adamello 10','Fondazione Prada - Parco Romana','Milano, Via Adamello 10',false],
   ['prop4.jpg','OFFICE','#8db9ca','Vendita','TUP-180','Tupini Lake Building','','Roma, Viale Umberto Tupini 180',true],
   ['prop5.jpg','LIVING','#d0a1ba','Vendita','GRB-044','Garibaldi Tower','Porta Nuova','Milano, Piazza Gae Aulenti',true],
   ['prop6.jpg','OFFICE','#8db9ca','Affitto','BRE-022','Brera Loft 22','Brera','Milano, Via Brera 22',false],
@@ -752,7 +648,7 @@ document.getElementById('news').innerHTML = news.map(([img,label,date,title,tag,
   <div class="news-card"><img src="assets/${img}" alt="">
     <div class="toprow"><span class="label-chip">${label}</span>${flags(two)}</div>
     <div class="scrim"><div class="date">${date}</div>
-      <div class="nt">${title}</div><div class="tag">${tag}</div></div>
+      <div class="ntgroup"><div class="nt">${title}</div><div class="tag">${tag}</div></div></div>
   </div>`).join('') + '<div class="rail-end"></div>';
 </script>
 </body>
