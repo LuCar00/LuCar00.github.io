@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorkTime: mail/notifiche</title>
+<style>
+  :root{
+    --bg:#faf9f7;
+    --surface:#ffffff;
+    --ink:#111111;
+    --ink-soft:#5a5a5a;
+    --ink-faint:#8d8d8d;
+    --line:#e3e0da;
+    --line-strong:#c9c5bd;
+    --accent:#d0021b;
+
+    --employee:#8ec7ec;
+    --employee-bg:#e6f2fa;
+    --employee-ink:#0d4f75;
+
+    --approver:#f2e07a;
+    --approver-bg:#fbf6da;
+    --approver-ink:#6b5900;
+
+    --hr:#eaa9d2;
+    --hr-bg:#fbeaf4;
+    --hr-ink:#7c1f59;
+
+    --sistema:#f79a8a;
+    --sistema-bg:#fdeae6;
+    --sistema-ink:#8f2412;
+
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#16150f;
+      --surface:#1e1d17;
+      --ink:#f3f1ec;
+      --ink-soft:#b4b0a7;
+      --ink-faint:#8a867d;
+      --line:#33312a;
+      --line-strong:#4a473e;
+
+      --employee-bg:#132b3a;
+      --employee-ink:#9ed3f2;
+      --approver-bg:#332d0f;
+      --approver-ink:#f0e08a;
+      --hr-bg:#361a2b;
+      --hr-ink:#f0a8d2;
+      --sistema-bg:#3a1a13;
+      --sistema-ink:#f7a596;
+    }
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Nunito Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 20px 80px}
+
+  header.page{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
+  h1{
+    font-family:"Ivy Mode",Georgia,"Times New Roman",serif;
+    font-weight:400;
+    font-size:clamp(26px,4vw,38px);
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+
+  /* ---------- controls ---------- */
+  .controls{
+    position:sticky;top:0;z-index:20;
+    background:var(--bg);
+    padding:14px 0 12px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:18px;
+  }
+  .legend{
+    display:flex;flex-wrap:wrap;gap:5px 16px;align-items:center;
+    font-size:12.5px;color:var(--ink-faint);margin-bottom:16px;
+  }
+  .legenditem{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:11px;height:11px;border-radius:3px;flex:none}
+  .actionrow{display:flex;justify-content:flex-end;margin-top:12px}
+  button:focus-visible,.chip:focus-visible{
+    outline:2px solid var(--accent);outline-offset:2px;
+  }
+  .btn{
+    font:inherit;font-size:13px;
+    background:var(--surface);color:var(--ink);
+    border:1px solid var(--line-strong);
+    border-radius:var(--radius);
+    padding:9px 14px;cursor:pointer;
+    min-height:40px;
+  }
+  .btn:hover{border-color:var(--ink-soft)}
+
+  .filters{display:grid;gap:12px}
+  @media(min-width:760px){.filters{grid-template-columns:repeat(2,1fr)}}
+  fieldset{border:0;margin:0;padding:0}
+  legend{
+    font-size:11px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--ink-faint);padding:0;margin-bottom:7px;
+  }
+  .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    font:inherit;font-size:13px;
+    background:var(--surface);color:var(--ink-soft);
+    border:1px solid var(--line-strong);
+    border-radius:999px;
+    padding:6px 13px;cursor:pointer;
+    min-height:34px;
+  }
+  .chip:hover{border-color:var(--ink-soft);color:var(--ink)}
+  .chip .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  /* "nessuno" non è un ruolo e non ha colore: pallino vuoto.
+     NB: non chiamarla .empty — collide con l'empty state, che ha del padding. */
+  .chip .dot-none{background:transparent;border:1px solid var(--ink-faint)}
+  .chip[aria-pressed="true"]{
+    border-color:var(--ink);color:var(--ink);
+    box-shadow:inset 0 0 0 1px var(--ink);
+    font-weight:600;
+  }
+  .chip[data-role=employee][aria-pressed=true]{background:var(--employee-bg);color:var(--employee-ink);border-color:var(--employee-ink);box-shadow:inset 0 0 0 1px var(--employee-ink)}
+  .chip[data-role=approver][aria-pressed=true]{background:var(--approver-bg);color:var(--approver-ink);border-color:var(--approver-ink);box-shadow:inset 0 0 0 1px var(--approver-ink)}
+  .chip[data-role=hr][aria-pressed=true]{background:var(--hr-bg);color:var(--hr-ink);border-color:var(--hr-ink);box-shadow:inset 0 0 0 1px var(--hr-ink)}
+  .chip[data-role=sistema][aria-pressed=true]{background:var(--sistema-bg);color:var(--sistema-ink);border-color:var(--sistema-ink);box-shadow:inset 0 0 0 1px var(--sistema-ink)}
+
+  .count{font-size:13px;color:var(--ink-faint);margin:0 0 14px}
+
+  /* ---------- cards ---------- */
+  .list{display:grid;gap:12px;padding:0;margin:0;list-style:none}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:4px solid var(--line-strong);
+    border-radius:var(--radius);
+    padding:14px 16px;
+  }
+  .card[data-actor=employee]{border-left-color:var(--employee)}
+  .card[data-actor=approver]{border-left-color:var(--approver)}
+  .card[data-actor=hr]{border-left-color:var(--hr)}
+  .card[data-actor=sistema]{border-left-color:var(--sistema)}
+
+  .card-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .title{
+    font-weight:700;font-size:15px;letter-spacing:.02em;
+    text-transform:uppercase;margin:0;flex:1 1 auto;
+  }
+  .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .metaitem{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+  .lbl{font-size:12px;color:var(--ink-faint)}
+  .sep{color:var(--line-strong);font-size:13px}
+  .tag{
+    font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+    padding:3px 9px;border-radius:999px;white-space:nowrap;font-weight:600;
+  }
+  .tag.employee{background:var(--employee-bg);color:var(--employee-ink)}
+  .tag.approver{background:var(--approver-bg);color:var(--approver-ink)}
+  .tag.hr{background:var(--hr-bg);color:var(--hr-ink)}
+  .tag.sistema{background:var(--sistema-bg);color:var(--sistema-ink)}
+
+  dl{margin:12px 0 0;display:grid;gap:8px}
+  @media(min-width:620px){dl{grid-template-columns:max-content 1fr;gap:8px 12px}}
+  dt{
+    font-size:13px;color:var(--ink-faint);padding-top:2px;
+  }
+  dd{margin:0;color:var(--ink)}
+  .mails{display:flex;gap:6px;flex-wrap:wrap}
+  .note{color:var(--ink-soft);font-size:13px;font-style:italic}
+  .empty{
+    border:1px dashed var(--line-strong);border-radius:var(--radius);
+    padding:36px 20px;text-align:center;color:var(--ink-faint);
+  }
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <h1>WorkTime: mail/notifiche</h1>
+</header>
+
+<div class="controls">
+  <div class="legend">
+    <span class="legenditem"><span class="swatch" style="background:var(--employee)"></span>employee</span>
+    <span class="legenditem"><span class="swatch" style="background:var(--approver)"></span>approver</span>
+    <span class="legenditem"><span class="swatch" style="background:var(--hr)"></span>HR</span>
+    <span class="legenditem"><span class="swatch" style="background:var(--sistema)"></span>sistema — trigger automatico, senza azione umana</span>
+  </div>
+
+  <div class="filters">
+    <fieldset>
+      <legend>Chi compie l'azione</legend>
+      <div class="chips" id="f-actor">
+        <button class="chip" data-role="employee"  data-f="actor" data-v="employee" aria-pressed="false" type="button"><span class="dot" style="background:var(--employee)"></span>employee</button>
+        <button class="chip" data-role="approver"  data-f="actor" data-v="approver" aria-pressed="false" type="button"><span class="dot" style="background:var(--approver)"></span>approver</button>
+        <button class="chip" data-role="hr"        data-f="actor" data-v="hr"       aria-pressed="false" type="button"><span class="dot" style="background:var(--hr)"></span>HR</button>
+        <button class="chip" data-role="sistema"   data-f="actor" data-v="sistema"  aria-pressed="false" type="button"><span class="dot" style="background:var(--sistema)"></span>sistema</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Mail inviata a</legend>
+      <div class="chips" id="f-mail">
+        <button class="chip" data-role="employee" data-f="mail" data-v="employee" aria-pressed="false" type="button"><span class="dot" style="background:var(--employee)"></span>employee</button>
+        <button class="chip" data-role="approver" data-f="mail" data-v="approver" aria-pressed="false" type="button"><span class="dot" style="background:var(--approver)"></span>approver</button>
+        <button class="chip" data-role="hr"       data-f="mail" data-v="hr"       aria-pressed="false" type="button"><span class="dot" style="background:var(--hr)"></span>HR</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Approvatore</legend>
+      <div class="chips" id="f-appr">
+        <button class="chip" data-role="approver" data-f="appr" data-v="approver" aria-pressed="false" type="button"><span class="dot" style="background:var(--approver)"></span>approver</button>
+        <button class="chip" data-role="hr"       data-f="appr" data-v="hr"       aria-pressed="false" type="button"><span class="dot" style="background:var(--hr)"></span>HR</button>
+        <button class="chip"                      data-f="appr" data-v="none"     aria-pressed="false" type="button"><span class="dot dot-none"></span>nessuno</button>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="actionrow hidden" id="actions">
+    <button class="btn" id="reset" type="button">Azzera filtri</button>
+  </div>
+</div>
+
+<p class="count" id="count"></p>
+<ul class="list" id="list"></ul>
+<div class="empty hidden" id="empty">Nessun trigger corrisponde ai filtri attivi.</div>
+
+</div>
+
+<script>
+// `n` è il numero d'origine nel quaderno: non è mostrato, ma ordina le voci
+// dentro ogni gruppo e identifica la card nel DOM.
+const DATA = [
+  { n:1,  title:"Inserire nuova richiesta",              actor:"employee", appr:"approver", mail:["approver"] },
+  { n:2,  title:"Modificare qualsiasi richiesta",        actor:"employee", appr:"hr",   mail:["approver","hr"] },
+  { n:3,  title:"Inserire nuova richiesta HR",           actor:"employee", appr:"hr",   mail:["approver","hr"],
+    apprNote:"In questa categoria rientrano anche le richieste sotto il preavviso minimo." },
+  { n:4,  title:"Cancellare qualsiasi richiesta",        actor:"employee", appr:"hr",   mail:["approver","hr"] },
+  { n:5,  title:"Caricare un allegato",                  actor:"employee", appr:"hr",   mail:["hr"] },
+  { n:13, title:"Inserire richiesta senza approvazione", actor:"employee", appr:"none", mail:["approver","hr"] },
+
+  { n:8,  title:"Accettare una richiesta",               actor:"approver", appr:"none", mail:["employee"] },
+  { n:9,  title:"Rifiutare una richiesta",               actor:"approver", appr:"none", mail:["employee"] },
+  { n:10, title:"Modificare una risposta",               actor:"approver", appr:"none", mail:["employee","hr"] },
+
+  { n:14, title:"Accettare una richiesta",               actor:"hr", appr:"none", mail:["approver","employee"] },
+  { n:15, title:"Rifiutare una richiesta",               actor:"hr", appr:"none", mail:["approver","employee"] },
+  { n:16, title:"Modificare una risposta",               actor:"hr", appr:"none", mail:["approver","employee"] },
+  { n:17, title:"Inserire nuova richiesta conto terzi",  actor:"hr", appr:"none", mail:["approver","employee"] },
+  { n:18, title:"Accettare allegato",                    actor:"hr", appr:"none", mail:["employee"] },
+  { n:19, title:"Rifiutare allegato",                    actor:"hr", appr:"none", mail:["employee"] },
+
+  { n:6,  title:"Avvisare per caricamento allegato in scadenza",        actor:"sistema", appr:"none", mail:["employee"] },
+  { n:7,  title:"Avvisare per caricamento allegato scaduto",            actor:"sistema", appr:"none", mail:["employee","hr"] },
+  { n:11, title:"Avvisare per tempo massimo di risposta in scadenza",   actor:"sistema", appr:"none", mail:["approver"] },
+  { n:12, title:"Avvisare per tempo massimo di risposta scaduto",       actor:"sistema", appr:"none", mail:["approver","hr"] },
+];
+
+const LABEL = {employee:"employee", approver:"approver", hr:"HR", sistema:"sistema"};
+const APPRLABEL = {approver:"Approver", hr:"HR"};
+
+const listEl = document.getElementById("list");
+const emptyEl = document.getElementById("empty");
+const countEl = document.getElementById("count");
+const actionsEl = document.getElementById("actions");
+
+// L'elenco è ordinato per chi compie l'azione, poi per numero d'origine.
+const ACTOR_ORDER = {employee:0, approver:1, hr:2, sistema:3};
+const SORTED = [...DATA].sort((a,b) =>
+  ACTOR_ORDER[a.actor] - ACTOR_ORDER[b.actor] || a.n - b.n);
+
+function render(){
+  listEl.innerHTML = SORTED.map(d => {
+    const mails = d.mail.map(m => `<span class="tag ${m}">${LABEL[m]}</span>`).join("");
+    return `
+    <li class="card" data-n="${d.n}" data-actor="${d.actor}">
+      <div class="card-head">
+        <h2 class="title">${d.title}</h2>
+        <div class="meta">
+          <span class="metaitem"><span class="lbl">Da:</span><span class="tag ${d.actor}">${LABEL[d.actor]}</span></span>
+          ${d.appr!=="none"?`<span class="sep">/</span><span class="metaitem"><span class="lbl">Approvata da:</span><span class="tag ${d.appr}">${APPRLABEL[d.appr]}</span></span>`:""}
+        </div>
+      </div>
+      <dl>
+        <dt>Mail a</dt>
+        <dd><div class="mails">${mails}</div></dd>
+        ${d.apprNote?`<dt>Nota</dt><dd class="note">${d.apprNote}</dd>`:""}
+      </dl>
+    </li>`;
+  }).join("");
+}
+
+const active = {actor:new Set(), mail:new Set(), appr:new Set()};
+
+function matches(d){
+  if(active.actor.size && !active.actor.has(d.actor)) return false;
+  if(active.mail.size && ![...active.mail].some(m => d.mail.includes(m))) return false;
+  if(active.appr.size && !active.appr.has(d.appr)) return false;
+  return true;
+}
+
+function apply(){
+  let shown = 0;
+  DATA.forEach(d => {
+    const el = listEl.querySelector(`[data-n="${d.n}"]`);
+    const ok = matches(d);
+    el.classList.toggle("hidden", !ok);
+    if(ok) shown++;
+  });
+  emptyEl.classList.toggle("hidden", shown !== 0);
+  // "Azzera filtri" compare solo quando c'è qualcosa da azzerare.
+  const filtered = Object.values(active).some(s => s.size > 0);
+  actionsEl.classList.toggle("hidden", !filtered);
+  countEl.textContent = shown === DATA.length
+    ? `${DATA.length} trigger`
+    : `${shown} di ${DATA.length} trigger`;
+}
+
+document.querySelectorAll(".chip").forEach(c => {
+  c.addEventListener("click", () => {
+    const f = c.dataset.f, v = c.dataset.v;
+    const on = c.getAttribute("aria-pressed") === "true";
+    c.setAttribute("aria-pressed", String(!on));
+    on ? active[f].delete(v) : active[f].add(v);
+    apply();
+  });
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  Object.values(active).forEach(s => s.clear());
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed","false"));
+  apply();
+});
+
+render();
+apply();
+</script>
+</body>
+</html>
