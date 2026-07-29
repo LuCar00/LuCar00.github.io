@@ -169,13 +169,9 @@
   .tag.hr{background:var(--hr-bg);color:var(--hr-ink)}
   .tag.sistema{background:var(--sistema-bg);color:var(--sistema-ink)}
 
-  dl{margin:12px 0 0;display:grid;gap:8px}
-  @media(min-width:620px){dl{grid-template-columns:max-content 1fr;gap:8px 12px}}
-  dt{
-    font-size:13px;color:var(--ink-faint);padding-top:2px;
-  }
-  dd{margin:0;color:var(--ink)}
-  .mails{display:flex;gap:6px;flex-wrap:wrap}
+  .cardmeta{margin-top:10px}
+  /* baseline, non center: etichetta e testo poggiano sulla stessa linea. */
+  .notarow{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin:8px 0 0}
   .note{color:var(--ink-soft);font-size:13px;font-style:italic}
   .empty{
     border:1px dashed var(--line-strong);border-radius:var(--radius);
@@ -291,14 +287,13 @@ function render(){
         <h2 class="title">${d.title}</h2>
         <div class="meta">
           <span class="metaitem"><span class="lbl">Da:</span><span class="tag ${d.actor}">${LABEL[d.actor]}</span></span>
-          ${d.appr!=="none"?`<span class="sep">/</span><span class="metaitem"><span class="lbl">Approvata da:</span><span class="tag ${d.appr}">${APPRLABEL[d.appr]}</span></span>`:""}
         </div>
       </div>
-      <dl>
-        <dt>Mail a</dt>
-        <dd><div class="mails">${mails}</div></dd>
-        ${d.apprNote?`<dt>Nota</dt><dd class="note">${d.apprNote}</dd>`:""}
-      </dl>
+      <div class="meta cardmeta">
+        <span class="metaitem"><span class="lbl">Mail a:</span>${mails}</span>
+        ${d.appr!=="none"?`<span class="sep">/</span><span class="metaitem"><span class="lbl">Approvato da:</span><span class="tag ${d.appr}">${APPRLABEL[d.appr]}</span></span>`:""}
+      </div>
+      ${d.apprNote?`<p class="notarow"><span class="lbl">Nota</span><span class="note">${d.apprNote}</span></p>`:""}
     </li>`;
   }).join("");
 }
