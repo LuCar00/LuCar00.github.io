@@ -151,7 +151,7 @@
   .card[data-actor=hr]{border-left-color:var(--hr)}
   .card[data-actor=sistema]{border-left-color:var(--sistema)}
 
-  .card-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .card-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .title{
     font-weight:700;font-size:15px;letter-spacing:.02em;
     text-transform:uppercase;margin:0;flex:1 1 auto;
@@ -173,6 +173,56 @@
   /* baseline, non center: etichetta e testo poggiano sulla stessa linea. */
   .notarow{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin:8px 0 0}
   .note{color:var(--ink-soft);font-size:13px;font-style:italic}
+
+  /* ---------- riordino e attivazione ---------- */
+  .handle{
+    flex:none;width:26px;height:26px;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;border:0;border-radius:6px;
+    color:var(--ink-faint);font-size:13px;line-height:1;letter-spacing:-1px;
+    cursor:grab;padding:0;
+  }
+  .handle:hover{background:var(--line);color:var(--ink)}
+  .handle:active{cursor:grabbing}
+  /* con i filtri attivi il riordino è disattivato: l'ordine di un elenco parziale è ambiguo */
+  .nodrag .handle{visibility:hidden}
+  .card.dragging{opacity:.4}
+
+  .switch{
+    flex:none;width:36px;height:20px;border-radius:999px;
+    border:1px solid var(--line-strong);background:transparent;
+    cursor:pointer;position:relative;padding:0;
+  }
+  .switch::before{
+    content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;
+    border-radius:50%;background:var(--ink-faint);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .switch[aria-checked="true"]{background:var(--ink);border-color:var(--ink)}
+  .switch[aria-checked="true"]::before{transform:translateX(16px);background:var(--bg)}
+
+  .card.off{opacity:.5;filter:grayscale(.75)}
+
+  .banner{
+    background:var(--surface);
+    border:1px solid var(--line-strong);border-left:4px solid var(--accent);
+    border-radius:var(--radius);padding:12px 16px;margin:0 0 14px;
+    font-size:13.5px;
+  }
+  .banner p{margin:0 0 10px}
+  .banner .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+
+  .hint{font-size:12.5px;color:var(--ink-faint);margin:14px 0 0}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    background:var(--ink);color:var(--bg);
+    padding:9px 16px;border-radius:8px;font-size:13px;
+    opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;
+    max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1}
+
   .empty{
     border:1px dashed var(--line-strong);border-radius:var(--radius);
     padding:36px 20px;text-align:center;color:var(--ink-faint);
@@ -225,14 +275,27 @@
     </fieldset>
   </div>
 
+  <p class="hint">Trascina una card dal manico ⣿ per riordinarla (o frecce ↑ ↓ da tastiera); l'interruttore la disattiva. Le modifiche restano su questo browser: con “Copia configurazione” le invii a Luca, che pubblica la versione condivisa.</p>
+
   <div class="actionrow hidden" id="actions">
-    <button class="btn" id="reset" type="button">Azzera filtri</button>
+    <button class="btn hidden" id="export" type="button">Copia configurazione</button>
+    <button class="btn hidden" id="discard" type="button">Ripristina versione pubblicata</button>
+    <button class="btn hidden" id="reset" type="button">Azzera filtri</button>
+  </div>
+</div>
+
+<div class="banner hidden" id="verbanner">
+  <p>La dashboard è stata aggiornata: le tue modifiche locali si riferiscono a una versione precedente. Stai vedendo la versione pubblicata.</p>
+  <div class="btnrow">
+    <button class="btn" id="ver-new" type="button">Usa la versione aggiornata</button>
+    <button class="btn" id="ver-keep" type="button">Riapplica le mie modifiche</button>
   </div>
 </div>
 
 <p class="count" id="count"></p>
 <ul class="list" id="list"></ul>
 <div class="empty hidden" id="empty">Nessun trigger corrisponde ai filtri attivi.</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 </div>
 
@@ -268,26 +331,86 @@ const DATA = [
 const LABEL = {employee:"employee", approver:"approver", hr:"HR", sistema:"sistema"};
 const APPRLABEL = {approver:"Approver", hr:"HR"};
 
+// ---------- stato locale (local-first, baseline versionata) ----------
+// La versione pubblicata su GitHub è la "baseline". Ordine e disattivazioni
+// vivono nel localStorage di ogni browser, legati alla versione su cui sono
+// nati: se la baseline cambia, all'apertura compare l'avviso di aggiornamento.
+// BUMP: incrementare a ogni pubblicazione di una nuova configurazione.
+const BASE_VERSION = "2026-07-30.1";
+const LS_KEY = "worktime-trigger-state";
+
+const byN = new Map(DATA.map(d => [d.n, d]));
+const BASELINE = DATA.map(d => d.n);   // l'ordine dell'array DATA è l'ordine pubblicato
+
+let order = [...BASELINE];
+let off = new Set();
+let dirty = false;          // lo stato locale differisce dalla baseline
+let pendingLocal = null;    // stato salvato su una versione precedente, in attesa di decisione
+
 const listEl = document.getElementById("list");
 const emptyEl = document.getElementById("empty");
 const countEl = document.getElementById("count");
 const actionsEl = document.getElementById("actions");
+const toastEl = document.getElementById("toast");
 
-// L'elenco è ordinato per chi compie l'azione, poi per numero d'origine.
-const ACTOR_ORDER = {employee:0, approver:1, hr:2, sistema:3};
-const SORTED = [...DATA].sort((a,b) =>
-  ACTOR_ORDER[a.actor] - ACTOR_ORDER[b.actor] || a.n - b.n);
+function filtersActive(){ return Object.values(active).some(s => s.size > 0); }
 
+function updateDirty(){
+  dirty = off.size > 0 || order.join() !== BASELINE.join();
+}
+
+function saveState(){
+  updateDirty();
+  if(dirty) localStorage.setItem(LS_KEY, JSON.stringify({v:BASE_VERSION, order, off:[...off]}));
+  else localStorage.removeItem(LS_KEY);
+  refreshActions();
+}
+
+// Applica uno stato salvato: le card sconosciute spariscono, quelle nuove
+// (assenti nello stato) vanno in fondo.
+function applyState(s){
+  const valid = new Set(BASELINE);
+  const kept = (s.order||[]).filter(n => valid.has(n));
+  const missing = BASELINE.filter(n => !kept.includes(n));
+  order = [...kept, ...missing];
+  off = new Set((s.off||[]).filter(n => valid.has(n)));
+}
+
+function loadState(){
+  let s = null;
+  try{ s = JSON.parse(localStorage.getItem(LS_KEY)); }catch(e){}
+  if(!s || !Array.isArray(s.order)) return;
+  if(s.v !== BASE_VERSION){
+    pendingLocal = s;
+    document.getElementById("verbanner").classList.remove("hidden");
+    return;
+  }
+  applyState(s);
+  updateDirty();
+}
+
+let toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3500);
+}
+
+// ---------- rendering ----------
 function render(){
-  listEl.innerHTML = SORTED.map(d => {
+  listEl.innerHTML = order.map(n => {
+    const d = byN.get(n);
     const mails = d.mail.map(m => `<span class="tag ${m}">${LABEL[m]}</span>`).join("");
     return `
-    <li class="card" data-n="${d.n}" data-actor="${d.actor}">
+    <li class="card${off.has(n)?" off":""}" data-n="${n}" data-actor="${d.actor}">
       <div class="card-head">
+        <button class="handle" type="button" title="Trascina per riordinare (o frecce ↑ ↓)" aria-label="Riordina «${d.title}»: trascina o usa le frecce su e giù">⣿</button>
         <h2 class="title">${d.title}</h2>
         <div class="meta">
           <span class="metaitem"><span class="lbl">Da:</span><span class="tag ${d.actor}">${LABEL[d.actor]}</span></span>
         </div>
+        <button class="switch" type="button" role="switch" aria-checked="${!off.has(n)}" title="Attiva/disattiva" aria-label="Trigger «${d.title}» attivo"></button>
       </div>
       <div class="meta cardmeta">
         <span class="metaitem"><span class="lbl">Mail a:</span>${mails}</span>
@@ -296,8 +419,76 @@ function render(){
       ${d.apprNote?`<p class="notarow"><span class="lbl">Nota</span><span class="note">${d.apprNote}</span></p>`:""}
     </li>`;
   }).join("");
+  bindCardEvents();
 }
 
+function bindCardEvents(){
+  listEl.querySelectorAll(".card").forEach(card => {
+    const n = +card.dataset.n;
+    const handle = card.querySelector(".handle");
+    const sw = card.querySelector(".switch");
+
+    sw.addEventListener("click", () => {
+      off.has(n) ? off.delete(n) : off.add(n);
+      card.classList.toggle("off", off.has(n));
+      sw.setAttribute("aria-checked", String(!off.has(n)));
+      saveState();
+      apply();
+    });
+
+    // draggable solo mentre si afferra il manico: il testo della card resta selezionabile
+    handle.addEventListener("mousedown", () => { if(!filtersActive()) card.draggable = true; });
+    handle.addEventListener("keydown", e => {
+      if(filtersActive()) return;
+      if(e.key === "ArrowUp" || e.key === "ArrowDown"){
+        e.preventDefault();
+        moveCard(n, e.key === "ArrowUp" ? -1 : 1);
+      }
+    });
+
+    card.addEventListener("dragstart", e => {
+      if(filtersActive()){ e.preventDefault(); return; }
+      card.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      try{ e.dataTransfer.setData("text/plain", String(n)); }catch(_){}
+    });
+    card.addEventListener("dragend", () => {
+      card.classList.remove("dragging");
+      card.draggable = false;
+      commitDomOrder();
+    });
+  });
+}
+
+listEl.addEventListener("dragover", e => {
+  const dragging = listEl.querySelector(".card.dragging");
+  if(!dragging) return;
+  e.preventDefault();
+  const target = e.target.closest(".card");
+  if(!target || target === dragging) return;
+  const r = target.getBoundingClientRect();
+  const before = e.clientY < r.top + r.height/2;
+  listEl.insertBefore(dragging, before ? target : target.nextSibling);
+});
+listEl.addEventListener("drop", e => e.preventDefault());
+
+function commitDomOrder(){
+  order = [...listEl.querySelectorAll(".card")].map(c => +c.dataset.n);
+  saveState();
+}
+
+function moveCard(n, delta){
+  const i = order.indexOf(n);
+  const j = i + delta;
+  if(j < 0 || j >= order.length) return;
+  [order[i], order[j]] = [order[j], order[i]];
+  saveState();
+  render();
+  apply();
+  listEl.querySelector(`[data-n="${n}"] .handle`).focus();
+}
+
+// ---------- filtri ----------
 const active = {actor:new Set(), mail:new Set(), appr:new Set()};
 
 function matches(d){
@@ -305,6 +496,14 @@ function matches(d){
   if(active.mail.size && ![...active.mail].some(m => d.mail.includes(m))) return false;
   if(active.appr.size && !active.appr.has(d.appr)) return false;
   return true;
+}
+
+function refreshActions(){
+  const f = filtersActive();
+  document.getElementById("reset").classList.toggle("hidden", !f);
+  document.getElementById("export").classList.toggle("hidden", !dirty);
+  document.getElementById("discard").classList.toggle("hidden", !dirty);
+  actionsEl.classList.toggle("hidden", !(f || dirty));
 }
 
 function apply(){
@@ -316,12 +515,11 @@ function apply(){
     if(ok) shown++;
   });
   emptyEl.classList.toggle("hidden", shown !== 0);
-  // "Azzera filtri" compare solo quando c'è qualcosa da azzerare.
-  const filtered = Object.values(active).some(s => s.size > 0);
-  actionsEl.classList.toggle("hidden", !filtered);
-  countEl.textContent = shown === DATA.length
-    ? `${DATA.length} trigger`
-    : `${shown} di ${DATA.length} trigger`;
+  listEl.classList.toggle("nodrag", filtersActive());
+  refreshActions();
+  const base = shown === DATA.length ? `${DATA.length} trigger` : `${shown} di ${DATA.length} trigger`;
+  const offNote = off.size ? ` · ${off.size} ${off.size === 1 ? "disattivata" : "disattivate"}` : "";
+  countEl.textContent = base + offNote;
 }
 
 document.querySelectorAll(".chip").forEach(c => {
@@ -340,6 +538,51 @@ document.getElementById("reset").addEventListener("click", () => {
   apply();
 });
 
+// ---------- export / ripristino / versioni ----------
+document.getElementById("export").addEventListener("click", () => {
+  const text = JSON.stringify({version:BASE_VERSION, order:[...order], off:[...off].sort((a,b)=>a-b)});
+  navigator.clipboard.writeText(text).then(
+    () => toast("Configurazione copiata: incollala in un messaggio a Luca"),
+    () => {
+      // clipboard non disponibile: si scarica un file con lo stesso contenuto
+      const a = document.createElement("a");
+      a.href = "data:application/json;charset=utf-8," + encodeURIComponent(text);
+      a.download = "worktime-trigger-config.json";
+      a.click();
+      toast("Copia non riuscita: scaricato il file di configurazione, invialo a Luca");
+    }
+  );
+});
+
+document.getElementById("discard").addEventListener("click", () => {
+  if(!confirm("Scartare le modifiche locali e tornare alla versione pubblicata?")) return;
+  localStorage.removeItem(LS_KEY);
+  order = [...BASELINE];
+  off = new Set();
+  dirty = false;
+  render();
+  apply();
+  toast("Ripristinata la versione pubblicata");
+});
+
+document.getElementById("ver-new").addEventListener("click", () => {
+  localStorage.removeItem(LS_KEY);
+  pendingLocal = null;
+  document.getElementById("verbanner").classList.add("hidden");
+});
+
+document.getElementById("ver-keep").addEventListener("click", () => {
+  if(!pendingLocal) return;
+  applyState(pendingLocal);
+  pendingLocal = null;
+  saveState();
+  render();
+  apply();
+  document.getElementById("verbanner").classList.add("hidden");
+  toast("Modifiche riapplicate alla nuova versione: le voci nuove sono in fondo all'elenco");
+});
+
+loadState();
 render();
 apply();
 </script>
