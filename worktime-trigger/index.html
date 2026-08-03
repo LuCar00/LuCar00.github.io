@@ -304,23 +304,23 @@
 // dentro ogni gruppo e identifica la card nel DOM.
 const DATA = [
   { n:1,  title:"Inserire nuova richiesta",              actor:"employee", appr:"approver", mail:["approver"] },
-  { n:2,  title:"Modificare qualsiasi richiesta",        actor:"employee", appr:"hr",   mail:["approver","hr"] },
+  { n:2,  title:"Modificare qualsiasi richiesta",        actor:"employee", appr:"hr",   mail:["approver","hr"], off:true },
   { n:3,  title:"Inserire nuova richiesta HR",           actor:"employee", appr:"hr",   mail:["approver","hr"],
     apprNote:"In questa categoria rientrano anche le richieste sotto il preavviso minimo." },
   { n:4,  title:"Cancellare qualsiasi richiesta",        actor:"employee", appr:"hr",   mail:["approver","hr"] },
-  { n:5,  title:"Caricare un allegato",                  actor:"employee", appr:"hr",   mail:["hr"] },
+  { n:5,  title:"Caricare un allegato",                  actor:"employee", appr:"hr",   mail:["hr"], off:true },
   { n:13, title:"Inserire richiesta senza approvazione", actor:"employee", appr:"none", mail:["approver","hr"] },
 
   { n:8,  title:"Accettare una richiesta",               actor:"approver", appr:"none", mail:["employee"] },
   { n:9,  title:"Rifiutare una richiesta",               actor:"approver", appr:"none", mail:["employee"] },
-  { n:10, title:"Modificare una risposta",               actor:"approver", appr:"none", mail:["employee","hr"] },
+  { n:10, title:"Modificare una risposta",               actor:"approver", appr:"none", mail:["employee","hr"], off:true },
 
   { n:14, title:"Accettare una richiesta",               actor:"hr", appr:"none", mail:["approver","employee"] },
   { n:15, title:"Rifiutare una richiesta",               actor:"hr", appr:"none", mail:["approver","employee"] },
   { n:16, title:"Modificare una risposta",               actor:"hr", appr:"none", mail:["approver","employee"] },
   { n:17, title:"Inserire nuova richiesta conto terzi",  actor:"hr", appr:"none", mail:["approver","employee"] },
-  { n:18, title:"Accettare allegato",                    actor:"hr", appr:"none", mail:["employee"] },
-  { n:19, title:"Rifiutare allegato",                    actor:"hr", appr:"none", mail:["employee"] },
+  { n:18, title:"Accettare allegato",                    actor:"hr", appr:"none", mail:["employee"], off:true },
+  { n:19, title:"Rifiutare allegato",                    actor:"hr", appr:"none", mail:["employee"], off:true },
 
   { n:6,  title:"Avvisare per caricamento allegato in scadenza",        actor:"sistema", appr:"none", mail:["employee"] },
   { n:7,  title:"Avvisare per caricamento allegato scaduto",            actor:"sistema", appr:"none", mail:["employee","hr"] },
@@ -336,14 +336,16 @@ const APPRLABEL = {approver:"Approver", hr:"HR"};
 // vivono nel localStorage di ogni browser, legati alla versione su cui sono
 // nati: se la baseline cambia, all'apertura compare l'avviso di aggiornamento.
 // BUMP: incrementare a ogni pubblicazione di una nuova configurazione.
-const BASE_VERSION = "2026-07-30.1";
+const BASE_VERSION = "2026-07-30.2";
 const LS_KEY = "worktime-trigger-state";
 
 const byN = new Map(DATA.map(d => [d.n, d]));
 const BASELINE = DATA.map(d => d.n);   // l'ordine dell'array DATA è l'ordine pubblicato
+// le voci con off:true nascono disattivate nella versione pubblicata
+const BASELINE_OFF = new Set(DATA.filter(d => d.off).map(d => d.n));
 
 let order = [...BASELINE];
-let off = new Set();
+let off = new Set(BASELINE_OFF);
 let dirty = false;          // lo stato locale differisce dalla baseline
 let pendingLocal = null;    // stato salvato su una versione precedente, in attesa di decisione
 
@@ -356,7 +358,8 @@ const toastEl = document.getElementById("toast");
 function filtersActive(){ return Object.values(active).some(s => s.size > 0); }
 
 function updateDirty(){
-  dirty = off.size > 0 || order.join() !== BASELINE.join();
+  const offChanged = off.size !== BASELINE_OFF.size || [...off].some(n => !BASELINE_OFF.has(n));
+  dirty = offChanged || order.join() !== BASELINE.join();
 }
 
 function saveState(){
@@ -558,7 +561,7 @@ document.getElementById("discard").addEventListener("click", () => {
   if(!confirm("Scartare le modifiche locali e tornare alla versione pubblicata?")) return;
   localStorage.removeItem(LS_KEY);
   order = [...BASELINE];
-  off = new Set();
+  off = new Set(BASELINE_OFF);
   dirty = false;
   render();
   apply();
