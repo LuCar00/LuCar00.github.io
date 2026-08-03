@@ -203,6 +203,30 @@
 
   .card.off{opacity:.5;filter:grayscale(.75)}
 
+  .editbtn{
+    flex:none;width:26px;height:26px;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;border:0;border-radius:6px;
+    color:var(--ink-faint);font-size:13px;line-height:1;
+    cursor:pointer;padding:0;
+  }
+  .editbtn:hover{background:var(--line);color:var(--ink)}
+  .editbtn[aria-expanded="true"]{background:var(--line);color:var(--ink)}
+  /* matita evidenziata = la card ha destinatari/approvatore modificati localmente */
+  .editbtn.mod{color:var(--accent)}
+
+  .optbtn{
+    font:inherit;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+    padding:3px 9px;border-radius:999px;font-weight:600;cursor:pointer;
+    background:transparent;border:1px dashed var(--line-strong);color:var(--ink-faint);
+  }
+  .optbtn:hover{border-color:var(--ink-soft);color:var(--ink-soft)}
+  .optbtn.on{border:1px solid transparent}
+  .optbtn.on.employee{background:var(--employee-bg);color:var(--employee-ink)}
+  .optbtn.on.approver{background:var(--approver-bg);color:var(--approver-ink)}
+  .optbtn.on.hr{background:var(--hr-bg);color:var(--hr-ink)}
+  .optbtn.on.none{background:var(--line);color:var(--ink)}
+
   .banner{
     background:var(--surface);
     border:1px solid var(--line-strong);border-left:4px solid var(--accent);
@@ -275,7 +299,7 @@
     </fieldset>
   </div>
 
-  <p class="hint">Trascina una card dal manico ⣿ per riordinarla (o frecce ↑ ↓ da tastiera); l'interruttore la disattiva. Le modifiche restano su questo browser: con “Copia configurazione” le invii a Luca, che pubblica la versione condivisa.</p>
+  <p class="hint">Trascina una card dal manico ⣿ per riordinarla (o frecce ↑ ↓ da tastiera); l'interruttore la disattiva; la matita ✎ modifica destinatari mail e approvatore. Le modifiche restano su questo browser: con “Copia configurazione” le invii a Luca, che pubblica la versione condivisa.</p>
 
   <div class="actionrow hidden" id="actions">
     <button class="btn hidden" id="export" type="button">Copia configurazione</button>
@@ -344,10 +368,21 @@ const BASELINE = DATA.map(d => d.n);   // l'ordine dell'array DATA è l'ordine p
 // le voci con off:true nascono disattivate nella versione pubblicata
 const BASELINE_OFF = new Set(DATA.filter(d => d.off).map(d => d.n));
 
+const ROLES = ["employee","approver","hr"];        // destinatari mail possibili
+const APPR_OPTS = ["none","approver","hr"];        // opzioni approvatore
+const APPR_LABELS = {none:"nessuno", approver:"approver", hr:"HR"};
+
 let order = [...BASELINE];
 let off = new Set(BASELINE_OFF);
+let mailOv = new Map();     // override locali dei destinatari mail: n → [ruoli]
+let apprOv = new Map();     // override locali dell'approvatore: n → "none"|"approver"|"hr"
+let editing = new Set();    // card in modalità modifica (solo UI, non persiste)
 let dirty = false;          // lo stato locale differisce dalla baseline
 let pendingLocal = null;    // stato salvato su una versione precedente, in attesa di decisione
+
+function effMail(n){ return mailOv.get(n) || byN.get(n).mail; }
+function effAppr(n){ return apprOv.has(n) ? apprOv.get(n) : byN.get(n).appr; }
+function sameMembers(a, b){ return a.length === b.length && a.every(x => b.includes(x)); }
 
 const listEl = document.getElementById("list");
 const emptyEl = document.getElementById("empty");
@@ -359,24 +394,40 @@ function filtersActive(){ return Object.values(active).some(s => s.size > 0); }
 
 function updateDirty(){
   const offChanged = off.size !== BASELINE_OFF.size || [...off].some(n => !BASELINE_OFF.has(n));
-  dirty = offChanged || order.join() !== BASELINE.join();
+  dirty = offChanged || order.join() !== BASELINE.join() || mailOv.size > 0 || apprOv.size > 0;
 }
 
 function saveState(){
   updateDirty();
-  if(dirty) localStorage.setItem(LS_KEY, JSON.stringify({v:BASE_VERSION, order, off:[...off]}));
+  if(dirty) localStorage.setItem(LS_KEY, JSON.stringify({
+    v:BASE_VERSION, order, off:[...off],
+    mail:Object.fromEntries(mailOv), appr:Object.fromEntries(apprOv)
+  }));
   else localStorage.removeItem(LS_KEY);
   refreshActions();
 }
 
 // Applica uno stato salvato: le card sconosciute spariscono, quelle nuove
-// (assenti nello stato) vanno in fondo.
+// (assenti nello stato) vanno in fondo; gli override di mail/approvatore
+// vengono validati e scartati se uguali alla baseline o malformati.
 function applyState(s){
   const valid = new Set(BASELINE);
   const kept = (s.order||[]).filter(n => valid.has(n));
   const missing = BASELINE.filter(n => !kept.includes(n));
   order = [...kept, ...missing];
   off = new Set((s.off||[]).filter(n => valid.has(n)));
+  mailOv = new Map();
+  for(const [k, v] of Object.entries(s.mail || {})){
+    const n = +k;
+    if(!valid.has(n) || !Array.isArray(v)) continue;
+    const clean = v.filter(r => ROLES.includes(r));
+    if(clean.length && !sameMembers(clean, byN.get(n).mail)) mailOv.set(n, clean);
+  }
+  apprOv = new Map();
+  for(const [k, v] of Object.entries(s.appr || {})){
+    const n = +k;
+    if(valid.has(n) && APPR_OPTS.includes(v) && v !== byN.get(n).appr) apprOv.set(n, v);
+  }
 }
 
 function loadState(){
@@ -404,7 +455,20 @@ function toast(msg){
 function render(){
   listEl.innerHTML = order.map(n => {
     const d = byN.get(n);
-    const mails = d.mail.map(m => `<span class="tag ${m}">${LABEL[m]}</span>`).join("");
+    const em = effMail(n), ea = effAppr(n);
+    const inEdit = editing.has(n);
+    const modified = mailOv.has(n) || apprOv.has(n);
+
+    const metaRow = inEdit
+      ? `<span class="metaitem"><span class="lbl">Mail a:</span>${
+           ROLES.map(r => `<button type="button" class="optbtn${em.includes(r)?` on ${r}`:""}" data-edit="mail" data-opt="${r}" aria-pressed="${em.includes(r)}">${LABEL[r]}</button>`).join("")
+         }</span><span class="sep">/</span><span class="metaitem"><span class="lbl">Approvato da:</span>${
+           APPR_OPTS.map(o => `<button type="button" class="optbtn${ea===o?` on ${o}`:""}" data-edit="appr" data-opt="${o}" aria-pressed="${ea===o}">${APPR_LABELS[o]}</button>`).join("")
+         }</span>`
+      : `<span class="metaitem"><span class="lbl">Mail a:</span>${
+           em.map(m => `<span class="tag ${m}">${LABEL[m]}</span>`).join("")
+         }</span>${ea!=="none"?`<span class="sep">/</span><span class="metaitem"><span class="lbl">Approvato da:</span><span class="tag ${ea}">${APPRLABEL[ea]}</span></span>`:""}`;
+
     return `
     <li class="card${off.has(n)?" off":""}" data-n="${n}" data-actor="${d.actor}">
       <div class="card-head">
@@ -413,12 +477,10 @@ function render(){
         <div class="meta">
           <span class="metaitem"><span class="lbl">Da:</span><span class="tag ${d.actor}">${LABEL[d.actor]}</span></span>
         </div>
+        <button class="editbtn${modified?" mod":""}" type="button" aria-expanded="${inEdit}" title="Modifica destinatari e approvatore" aria-label="Modifica destinatari e approvatore di «${d.title}»">✎</button>
         <button class="switch" type="button" role="switch" aria-checked="${!off.has(n)}" title="Attiva/disattiva" aria-label="Trigger «${d.title}» attivo"></button>
       </div>
-      <div class="meta cardmeta">
-        <span class="metaitem"><span class="lbl">Mail a:</span>${mails}</span>
-        ${d.appr!=="none"?`<span class="sep">/</span><span class="metaitem"><span class="lbl">Approvato da:</span><span class="tag ${d.appr}">${APPRLABEL[d.appr]}</span></span>`:""}
-      </div>
+      <div class="meta cardmeta">${metaRow}</div>
       ${d.apprNote?`<p class="notarow"><span class="lbl">Nota</span><span class="note">${d.apprNote}</span></p>`:""}
     </li>`;
   }).join("");
@@ -437,6 +499,32 @@ function bindCardEvents(){
       sw.setAttribute("aria-checked", String(!off.has(n)));
       saveState();
       apply();
+    });
+
+    card.querySelector(".editbtn").addEventListener("click", () => {
+      editing.has(n) ? editing.delete(n) : editing.add(n);
+      render();
+      apply();
+      listEl.querySelector(`[data-n="${n}"] .editbtn`).focus();
+    });
+
+    card.querySelectorAll(".optbtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const opt = btn.dataset.opt;
+        if(btn.dataset.edit === "mail"){
+          const cur = [...effMail(n)];
+          const next = cur.includes(opt) ? cur.filter(r => r !== opt) : [...cur, opt];
+          if(!next.length){ toast("Serve almeno un destinatario"); return; }
+          // l'override sparisce se si torna ai destinatari pubblicati
+          sameMembers(next, byN.get(n).mail) ? mailOv.delete(n) : mailOv.set(n, next);
+        } else {
+          opt === byN.get(n).appr ? apprOv.delete(n) : apprOv.set(n, opt);
+        }
+        saveState();
+        render();
+        apply();
+        listEl.querySelector(`[data-n="${n}"] [data-edit="${btn.dataset.edit}"][data-opt="${opt}"]`).focus();
+      });
     });
 
     // draggable solo mentre si afferra il manico: il testo della card resta selezionabile
@@ -494,10 +582,11 @@ function moveCard(n, delta){
 // ---------- filtri ----------
 const active = {actor:new Set(), mail:new Set(), appr:new Set()};
 
+// I filtri lavorano sui valori effettivi (baseline + override locali).
 function matches(d){
   if(active.actor.size && !active.actor.has(d.actor)) return false;
-  if(active.mail.size && ![...active.mail].some(m => d.mail.includes(m))) return false;
-  if(active.appr.size && !active.appr.has(d.appr)) return false;
+  if(active.mail.size && ![...active.mail].some(m => effMail(d.n).includes(m))) return false;
+  if(active.appr.size && !active.appr.has(effAppr(d.n))) return false;
   return true;
 }
 
@@ -543,7 +632,10 @@ document.getElementById("reset").addEventListener("click", () => {
 
 // ---------- export / ripristino / versioni ----------
 document.getElementById("export").addEventListener("click", () => {
-  const text = JSON.stringify({version:BASE_VERSION, order:[...order], off:[...off].sort((a,b)=>a-b)});
+  const text = JSON.stringify({
+    version:BASE_VERSION, order:[...order], off:[...off].sort((a,b)=>a-b),
+    mail:Object.fromEntries(mailOv), appr:Object.fromEntries(apprOv)
+  });
   navigator.clipboard.writeText(text).then(
     () => toast("Configurazione copiata: incollala in un messaggio a Luca"),
     () => {
@@ -562,6 +654,9 @@ document.getElementById("discard").addEventListener("click", () => {
   localStorage.removeItem(LS_KEY);
   order = [...BASELINE];
   off = new Set(BASELINE_OFF);
+  mailOv = new Map();
+  apprOv = new Map();
+  editing = new Set();
   dirty = false;
   render();
   apply();
