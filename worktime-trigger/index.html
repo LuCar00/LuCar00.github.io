@@ -227,6 +227,15 @@
   .optbtn.on.hr{background:var(--hr-bg);color:var(--hr-ink)}
   .optbtn.on.none{background:var(--line);color:var(--ink)}
 
+  .noteinput{
+    flex:1 1 200px;min-width:0;
+    font:inherit;font-size:13px;color:var(--ink);
+    background:var(--bg);
+    border:1px solid var(--line-strong);border-radius:6px;
+    padding:5px 9px;
+  }
+  .noteinput:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
   .banner{
     background:var(--surface);
     border:1px solid var(--line-strong);border-left:4px solid var(--accent);
@@ -299,7 +308,7 @@
     </fieldset>
   </div>
 
-  <p class="hint">Trascina una card dal manico ⣿ per riordinarla (o frecce ↑ ↓ da tastiera); l'interruttore la disattiva; la matita ✎ modifica destinatari mail e approvatore. Le modifiche restano su questo browser: con “Copia configurazione” le invii a Luca, che pubblica la versione condivisa.</p>
+  <p class="hint">Trascina una card dal manico ⣿ per riordinarla (o frecce ↑ ↓ da tastiera); l'interruttore la disattiva; la matita ✎ modifica destinatari mail, approvatore e nota. Le modifiche restano su questo browser: con “Copia configurazione” le invii a Luca, che pubblica la versione condivisa.</p>
 
   <div class="actionrow hidden" id="actions">
     <button class="btn hidden" id="export" type="button">Copia configurazione</button>
@@ -376,13 +385,18 @@ let order = [...BASELINE];
 let off = new Set(BASELINE_OFF);
 let mailOv = new Map();     // override locali dei destinatari mail: n → [ruoli]
 let apprOv = new Map();     // override locali dell'approvatore: n → "none"|"approver"|"hr"
+let noteOv = new Map();     // override locali della nota: n → testo ("" = nota rimossa)
 let editing = new Set();    // card in modalità modifica (solo UI, non persiste)
 let dirty = false;          // lo stato locale differisce dalla baseline
 let pendingLocal = null;    // stato salvato su una versione precedente, in attesa di decisione
 
 function effMail(n){ return mailOv.get(n) || byN.get(n).mail; }
 function effAppr(n){ return apprOv.has(n) ? apprOv.get(n) : byN.get(n).appr; }
+function baseNote(n){ return byN.get(n).apprNote || ""; }
+function effNote(n){ return noteOv.has(n) ? noteOv.get(n) : baseNote(n); }
 function sameMembers(a, b){ return a.length === b.length && a.every(x => b.includes(x)); }
+// il testo delle note è input utente: va neutralizzato prima di finire nell'HTML
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
 const listEl = document.getElementById("list");
 const emptyEl = document.getElementById("empty");
@@ -394,14 +408,16 @@ function filtersActive(){ return Object.values(active).some(s => s.size > 0); }
 
 function updateDirty(){
   const offChanged = off.size !== BASELINE_OFF.size || [...off].some(n => !BASELINE_OFF.has(n));
-  dirty = offChanged || order.join() !== BASELINE.join() || mailOv.size > 0 || apprOv.size > 0;
+  dirty = offChanged || order.join() !== BASELINE.join()
+       || mailOv.size > 0 || apprOv.size > 0 || noteOv.size > 0;
 }
 
 function saveState(){
   updateDirty();
   if(dirty) localStorage.setItem(LS_KEY, JSON.stringify({
     v:BASE_VERSION, order, off:[...off],
-    mail:Object.fromEntries(mailOv), appr:Object.fromEntries(apprOv)
+    mail:Object.fromEntries(mailOv), appr:Object.fromEntries(apprOv),
+    note:Object.fromEntries(noteOv)
   }));
   else localStorage.removeItem(LS_KEY);
   refreshActions();
@@ -427,6 +443,11 @@ function applyState(s){
   for(const [k, v] of Object.entries(s.appr || {})){
     const n = +k;
     if(valid.has(n) && APPR_OPTS.includes(v) && v !== byN.get(n).appr) apprOv.set(n, v);
+  }
+  noteOv = new Map();
+  for(const [k, v] of Object.entries(s.note || {})){
+    const n = +k;
+    if(valid.has(n) && typeof v === "string" && v.trim() !== baseNote(n).trim()) noteOv.set(n, v);
   }
 }
 
@@ -455,9 +476,9 @@ function toast(msg){
 function render(){
   listEl.innerHTML = order.map(n => {
     const d = byN.get(n);
-    const em = effMail(n), ea = effAppr(n);
+    const em = effMail(n), ea = effAppr(n), enote = effNote(n);
     const inEdit = editing.has(n);
-    const modified = mailOv.has(n) || apprOv.has(n);
+    const modified = mailOv.has(n) || apprOv.has(n) || noteOv.has(n);
 
     const metaRow = inEdit
       ? `<span class="metaitem"><span class="lbl">Mail a:</span>${
@@ -481,7 +502,9 @@ function render(){
         <button class="switch" type="button" role="switch" aria-checked="${!off.has(n)}" title="Attiva/disattiva" aria-label="Trigger «${d.title}» attivo"></button>
       </div>
       <div class="meta cardmeta">${metaRow}</div>
-      ${d.apprNote?`<p class="notarow"><span class="lbl">Nota</span><span class="note">${d.apprNote}</span></p>`:""}
+      ${inEdit
+        ? `<p class="notarow"><span class="lbl">Nota</span><input class="noteinput" type="text" value="${esc(enote)}" placeholder="Aggiungi una nota…" aria-label="Nota per «${d.title}»"></p>`
+        : (enote.trim()?`<p class="notarow"><span class="lbl">Nota</span><span class="note">${esc(enote)}</span></p>`:"")}
     </li>`;
   }).join("");
   bindCardEvents();
@@ -526,6 +549,17 @@ function bindCardEvents(){
         listEl.querySelector(`[data-n="${n}"] [data-edit="${btn.dataset.edit}"][data-opt="${opt}"]`).focus();
       });
     });
+
+    const noteInput = card.querySelector(".noteinput");
+    if(noteInput){
+      // niente re-render mentre si digita (perderebbe il focus): si aggiorna solo lo stato
+      noteInput.addEventListener("input", () => {
+        const v = noteInput.value;
+        v.trim() === baseNote(n).trim() ? noteOv.delete(n) : noteOv.set(n, v.trim());
+        saveState();
+        card.querySelector(".editbtn").classList.toggle("mod", mailOv.has(n) || apprOv.has(n) || noteOv.has(n));
+      });
+    }
 
     // draggable solo mentre si afferra il manico: il testo della card resta selezionabile
     handle.addEventListener("mousedown", () => { if(!filtersActive()) card.draggable = true; });
@@ -634,7 +668,8 @@ document.getElementById("reset").addEventListener("click", () => {
 document.getElementById("export").addEventListener("click", () => {
   const text = JSON.stringify({
     version:BASE_VERSION, order:[...order], off:[...off].sort((a,b)=>a-b),
-    mail:Object.fromEntries(mailOv), appr:Object.fromEntries(apprOv)
+    mail:Object.fromEntries(mailOv), appr:Object.fromEntries(apprOv),
+    note:Object.fromEntries(noteOv)
   });
   navigator.clipboard.writeText(text).then(
     () => toast("Configurazione copiata: incollala in un messaggio a Luca"),
@@ -656,6 +691,7 @@ document.getElementById("discard").addEventListener("click", () => {
   off = new Set(BASELINE_OFF);
   mailOv = new Map();
   apprOv = new Map();
+  noteOv = new Map();
   editing = new Set();
   dirty = false;
   render();
