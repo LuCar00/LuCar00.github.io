@@ -338,11 +338,11 @@
 const DATA = [
   { n:1,  title:"Inserire nuova richiesta",              actor:"employee", appr:"approver", mail:["approver"] },
   { n:2,  title:"Modificare qualsiasi richiesta",        actor:"employee", appr:"hr",   mail:["approver","hr"], off:true },
-  { n:3,  title:"Inserire nuova richiesta HR",           actor:"employee", appr:"hr",   mail:["approver","hr"],
-    apprNote:"In questa categoria rientrano anche le richieste sotto il preavviso minimo." },
-  { n:4,  title:"Cancellare qualsiasi richiesta",        actor:"employee", appr:"hr",   mail:["approver","hr"] },
-  { n:5,  title:"Caricare un allegato",                  actor:"employee", appr:"hr",   mail:["hr"], off:true },
-  { n:13, title:"Inserire richiesta senza approvazione", actor:"employee", appr:"none", mail:["approver","hr"] },
+  { n:3,  title:"Inserire nuova richiesta HR",           actor:"employee", appr:"none", mail:["approver","hr"], off:true },
+  { n:4,  title:"Cancellare qualsiasi richiesta",        actor:"employee", appr:"none", mail:["approver","hr"] },
+  { n:5,  title:"Caricare un allegato",                  actor:"employee", appr:"none", mail:["hr"] },
+  { n:13, title:"Inserire richiesta senza approvazione", actor:"employee", appr:"none", mail:["approver","hr"],
+    apprNote:"HR si occupa solo di controllare che la documentazione necessaria (allegati, protocollo, ecc) sia corretta. Se non è corretta o non rispetta i tempi, annulla la richiesta e inserisce ferie/permessi" },
 
   { n:8,  title:"Accettare una richiesta",               actor:"approver", appr:"none", mail:["employee"] },
   { n:9,  title:"Rifiutare una richiesta",               actor:"approver", appr:"none", mail:["employee"] },
@@ -357,8 +357,8 @@ const DATA = [
 
   { n:6,  title:"Avvisare per caricamento allegato in scadenza",        actor:"sistema", appr:"none", mail:["employee"] },
   { n:7,  title:"Avvisare per caricamento allegato scaduto",            actor:"sistema", appr:"none", mail:["employee","hr"] },
-  { n:11, title:"Avvisare per tempo massimo di risposta in scadenza",   actor:"sistema", appr:"none", mail:["approver"] },
-  { n:12, title:"Avvisare per tempo massimo di risposta scaduto",       actor:"sistema", appr:"none", mail:["approver","hr"] },
+  { n:11, title:"Avvisare per tempo massimo di risposta in scadenza",   actor:"sistema", appr:"none", mail:["approver"], off:true },
+  { n:12, title:"Avvisare per tempo massimo di risposta scaduto",       actor:"sistema", appr:"none", mail:["approver","hr"], off:true },
 ];
 
 const LABEL = {employee:"employee", approver:"approver", hr:"HR", sistema:"sistema"};
@@ -369,7 +369,7 @@ const APPRLABEL = {approver:"Approver", hr:"HR"};
 // vivono nel localStorage di ogni browser, legati alla versione su cui sono
 // nati: se la baseline cambia, all'apertura compare l'avviso di aggiornamento.
 // BUMP: incrementare a ogni pubblicazione di una nuova configurazione.
-const BASE_VERSION = "2026-07-30.2";
+const BASE_VERSION = "2026-08-04.1";
 const LS_KEY = "worktime-trigger-state";
 
 const byN = new Map(DATA.map(d => [d.n, d]));
