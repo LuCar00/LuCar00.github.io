@@ -89,6 +89,8 @@
   }
   .legenditem{display:inline-flex;align-items:center;gap:6px}
   .swatch{width:11px;height:11px;border-radius:3px;flex:none}
+  .viewrow{display:flex;align-items:center;gap:8px;min-height:34px}
+  .viewlbl{font-size:13px;color:var(--ink-soft);cursor:pointer;user-select:none}
   .actionrow{display:flex;justify-content:flex-end;margin-top:12px}
   button:focus-visible,.chip:focus-visible{
     outline:2px solid var(--accent);outline-offset:2px;
@@ -304,6 +306,14 @@
         <button class="chip" data-role="approver" data-f="appr" data-v="approver" aria-pressed="false" type="button"><span class="dot" style="background:var(--approver)"></span>approver</button>
         <button class="chip" data-role="hr"       data-f="appr" data-v="hr"       aria-pressed="false" type="button"><span class="dot" style="background:var(--hr)"></span>HR</button>
         <button class="chip"                      data-f="appr" data-v="none"     aria-pressed="false" type="button"><span class="dot dot-none"></span>nessuno</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Vista</legend>
+      <div class="viewrow">
+        <button class="switch" id="hideoff" type="button" role="switch" aria-checked="false" aria-label="Nascondi disattivate"></button>
+        <span class="viewlbl" id="hideoff-lbl">Nascondi disattivate</span>
       </div>
     </fieldset>
   </div>
@@ -636,21 +646,26 @@ function apply(){
   let shown = 0;
   DATA.forEach(d => {
     const el = listEl.querySelector(`[data-n="${d.n}"]`);
-    const ok = matches(d);
+    const ok = matches(d) && !(hideOff && off.has(d.n));
     el.classList.toggle("hidden", !ok);
     if(ok) shown++;
   });
   emptyEl.classList.toggle("hidden", shown !== 0);
-  listEl.classList.toggle("nodrag", filtersActive());
+  // riordinare un elenco parziale è ambiguo: niente drag anche quando
+  // le disattivate sono nascoste
+  listEl.classList.toggle("nodrag", filtersActive() || (hideOff && off.size > 0));
   refreshActions();
   const base = shown === DATA.length ? `${DATA.length} trigger` : `${shown} di ${DATA.length} trigger`;
-  const offNote = off.size ? ` · ${off.size} ${off.size === 1 ? "disattivata" : "disattivate"}` : "";
+  const offNote = off.size
+    ? ` · ${off.size} ${off.size === 1 ? "disattivata" : "disattivate"}${hideOff ? (off.size === 1 ? " (nascosta)" : " (nascoste)") : ""}`
+    : "";
   countEl.textContent = base + offNote;
 }
 
 document.querySelectorAll(".chip").forEach(c => {
   c.addEventListener("click", () => {
     const f = c.dataset.f, v = c.dataset.v;
+    if(!f) return; // chip senza data-f (es. "Nascondi disattivate"): ha un gestore suo
     const on = c.getAttribute("aria-pressed") === "true";
     c.setAttribute("aria-pressed", String(!on));
     on ? active[f].delete(v) : active[f].add(v);
@@ -658,9 +673,25 @@ document.querySelectorAll(".chip").forEach(c => {
   });
 });
 
+// "Nascondi disattivate" è una preferenza di vista personale: persiste nel
+// browser con una chiave sua, NON entra nell'export né nello stato condiviso.
+const HIDE_KEY = "worktime-trigger-hideoff";
+let hideOff = localStorage.getItem(HIDE_KEY) === "1";
+const hideBtn = document.getElementById("hideoff");
+hideBtn.setAttribute("aria-checked", String(hideOff));
+hideBtn.addEventListener("click", () => {
+  hideOff = !hideOff;
+  hideOff ? localStorage.setItem(HIDE_KEY, "1") : localStorage.removeItem(HIDE_KEY);
+  hideBtn.setAttribute("aria-checked", String(hideOff));
+  apply();
+});
+// anche il testo accanto all'interruttore è cliccabile
+document.getElementById("hideoff-lbl").addEventListener("click", () => hideBtn.click());
+
 document.getElementById("reset").addEventListener("click", () => {
   Object.values(active).forEach(s => s.clear());
-  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed","false"));
+  // solo le chip dei filtri: "Nascondi disattivate" è una preferenza di vista
+  document.querySelectorAll(".chip[data-f]").forEach(c => c.setAttribute("aria-pressed","false"));
   apply();
 });
 
