@@ -614,9 +614,12 @@ function commitDomOrder(){
 
 function moveCard(n, delta){
   const i = order.indexOf(n);
-  const j = i + delta;
+  let j = i + delta;
+  // con le disattivate nascoste, le frecce saltano le card invisibili
+  while(j >= 0 && j < order.length && hideOff && off.has(order[j])) j += delta;
   if(j < 0 || j >= order.length) return;
-  [order[i], order[j]] = [order[j], order[i]];
+  order.splice(i, 1);
+  order.splice(j, 0, n);
   saveState();
   render();
   apply();
@@ -651,9 +654,9 @@ function apply(){
     if(ok) shown++;
   });
   emptyEl.classList.toggle("hidden", shown !== 0);
-  // riordinare un elenco parziale è ambiguo: niente drag anche quando
-  // le disattivate sono nascoste
-  listEl.classList.toggle("nodrag", filtersActive() || (hideOff && off.size > 0));
+  // il riordino resta possibile con le disattivate nascoste: restano ancorate
+  // ai loro vicini e ricompaiono lì. Solo i filtri lo disabilitano.
+  listEl.classList.toggle("nodrag", filtersActive());
   refreshActions();
   const base = shown === DATA.length ? `${DATA.length} trigger` : `${shown} di ${DATA.length} trigger`;
   const offNote = off.size
