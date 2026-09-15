@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS Next · Design System Italia coverage — decide what to build</title>
+<style>
+  :root{--bg:#ffffff;--ink:#3f4254;--muted:#656876;--line:#d3d3db;--soft:#f6f7fb;--brass:#ae9142;--brass-soft:#fbf7ea;
+    --have:#cef1e6;--have-ink:#076e4f;--near:#d2deec;--near-ink:#113760;--comp:#e4e7f4;--comp-ink:#2a2b2f;--behav:#f1f1f4;--behav-ink:#656876;
+    --gap:#f8d7da;--gap-ink:#842029;--scope:#ffeecc;--scope-ink:#664300}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  header .tot{color:var(--muted);font-size:13px}
+  header .tot b{color:var(--ink)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;white-space:nowrap}
+  .chip.have{background:var(--have);color:var(--have-ink)}
+  .chip.near{background:var(--near);color:var(--near-ink)}
+  .chip.comp{background:var(--comp);color:var(--comp-ink)}
+  .chip.behav{background:var(--behav);color:var(--behav-ink);border:1px dashed #c3c5cf}
+  .chip.gap{background:var(--gap);color:var(--gap-ink)}
+  .chip.scope{background:var(--scope);color:var(--scope-ink)}
+  nav.top{padding:10px 24px;border-bottom:1px solid var(--line);background:var(--soft);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  nav.top a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:15px;margin:36px 0 8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  h2:first-child{margin-top:8px}
+  h3{font-size:15px;margin:0}
+  .intro{color:var(--muted);font-size:13px;max-width:900px;margin:0 0 12px}
+  .card{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;margin:0 0 16px}
+  .card-h{display:flex;align-items:baseline;gap:14px;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .card-h .n{color:var(--muted);font-size:12px}
+  .card-b{padding:14px}
+  code,.id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--muted);background:var(--soft);padding:0 4px;border-radius:3px}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  /* overview */
+  .bar{display:flex;height:28px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin:8px 0 6px}
+  .bar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.2px}
+  .bar .have{background:var(--have);color:var(--have-ink)} .bar .near{background:var(--near);color:var(--near-ink)} .bar .comp{background:var(--comp);color:var(--comp-ink)}
+  .bar .behav{background:var(--behav);color:var(--behav-ink)} .bar .gap{background:var(--gap);color:var(--gap-ink)} .bar .scope{background:var(--scope);color:var(--scope-ink)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 0}
+  .kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
+  .kpi b{display:block;font-size:22px;line-height:1.1}
+  .kpi span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:7px 12px;border-bottom:1px solid #eef0f4;vertical-align:top;font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .grp td:first-child{white-space:nowrap;font-weight:600}
+  .mini{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line);min-width:160px}
+  .mini div{height:100%}
+  /* quadrants */
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .q{border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:110px;background:#fff}
+  .q h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .q .qi{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;font-size:12px;margin:0 6px 6px 0;background:#fff}
+  .q .qi .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .q.first{background:#f3fbf8;border-color:#b7e4d4}
+  .axis{font-size:11px;color:var(--muted);margin:6px 0 0}
+  /* planner */
+  .planner{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .summary{position:sticky;top:76px;border:1px solid var(--line);border-radius:8px;background:var(--soft);padding:14px}
+  .summary h3{margin:0 0 10px;font-size:14px}
+  .summary .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .summary .row:last-of-type{border-bottom:0}
+  .summary ol{margin:6px 0 10px;padding-left:20px;font-size:12.5px}
+  .summary textarea{width:100%;height:190px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical;background:#fff;color:var(--ink)}
+  .summary input[type=text]{width:100%;font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .btn{font:12.5px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer}
+  .btn:hover{background:var(--soft)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:#2a2b2f}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding:10px 14px;border-bottom:1px solid #eef0f4;align-items:center}
+  .prow:last-child{border-bottom:0}
+  .prow .t{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+  .prow .t b{font-size:13.5px}
+  .prow .why{grid-column:1 / -1;font-size:12.5px;color:var(--muted)}
+  .prow .meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);align-items:center}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--muted);background:#fff;white-space:nowrap}
+  .tag.ev3{border-color:#b7e4d4;background:#f3fbf8;color:var(--have-ink)} .tag.ev2{border-color:#c9d6e6;background:#f4f8fc;color:var(--near-ink)} .tag.ev1{border-color:#f0d9a6;background:#fff8ea;color:var(--scope-ink)} .tag.ev0{border-color:#e4c8cb;background:#fdf3f4;color:var(--gap-ink)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .seg button{font:12px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:0;background:#fff;color:var(--muted);padding:7px 10px;cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button:hover{background:var(--soft)}
+  .seg button.on.build{background:var(--have);color:var(--have-ink)}
+  .seg button.on.later{background:var(--near);color:var(--near-ink)}
+  .seg button.on.skip{background:var(--comp);color:var(--comp-ink)}
+  .prow details{grid-column:1 / -1;font-size:12.5px}
+  .prow summary{cursor:pointer;color:var(--muted);font-size:12px}
+  .prow .rn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 2px}
+  .prow .rn div{border-radius:6px;padding:8px 10px;font-size:12.5px}
+  .prow .rn .re{background:var(--comp)}
+  .prow .rn .ne{background:var(--brass-soft);border:1px dashed var(--brass)}
+  .prow .rn b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:3px}
+  .sug{font-size:11px;color:var(--muted)}
+  /* gap cards + mocks */
+  .gaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+  .gap-card .card-b{display:grid;gap:12px}
+  .mock{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;justify-content:center;align-items:center;min-height:130px;background-image:radial-gradient(#eceef3 1px,transparent 1px);background-size:12px 12px}
+  .m-reuse{background:#e4e7f4;border:1px solid #c9cde0}
+  .m-new{border:1.5px dashed var(--brass);background:var(--brass-soft)}
+  .mlegend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+  .mlegend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  .ico{width:22px;height:22px;border-radius:6px;background:#c9cde0;display:inline-block;position:relative}
+  .ico:after{content:"";position:absolute;inset:6px;border:2px solid #fff;border-radius:50%}
+  .lbl{height:9px;border-radius:5px;background:#b9bdd0;display:inline-block}
+  /* radio mock */
+  .rm{display:grid;gap:12px}
+  .rm .r{display:flex;align-items:center;gap:10px}
+  .rm .c{width:16px;height:16px;border-radius:50%;position:relative}
+  .rm .c.on:after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--brass)}
+  .rm .dis{opacity:.45}
+  /* pagination mock */
+  .pm{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:8px}
+  .pm .b{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ink)}
+  .pm .b.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pm .sel-in{margin-left:14px;height:30px;border-radius:6px;padding:0 10px;display:flex;align-items:center;gap:8px;font-size:12px}
+  /* accordion mock */
+  .am{width:320px;display:grid;gap:8px}
+  .am .sc{border-radius:8px;background:#fff;border:1px solid #c9cde0;overflow:hidden}
+  .am .hd{display:flex;align-items:center;gap:10px;padding:8px 10px}
+  .am .hd .ch{margin-left:auto;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+  .am .ct{padding:8px 10px 12px;display:grid;gap:6px;border-top:1px solid #eef0f4}
+  /* bottom nav mock */
+  .bm{width:320px;height:60px;border-radius:10px;display:flex;align-items:stretch;justify-content:space-around;padding:6px 8px}
+  .bm .it{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:64px;border-radius:8px;position:relative}
+  .bm .it.sel .ico{background:var(--brass)}
+  .bm .it.sel .lbl{background:var(--brass)}
+  .bm .badge{position:absolute;top:2px;right:10px;background:#c0392b;color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;line-height:1.2}
+  /* timeline mock */
+  .tm{display:grid;gap:0}
+  .tm .ev{display:grid;grid-template-columns:20px 1fr;gap:10px;padding:6px 8px;border-radius:6px}
+  .tm .mk{display:flex;flex-direction:column;align-items:center}
+  .tm .mk .d{width:10px;height:10px;border-radius:50%;background:#2e9e6f;border:2px solid #fff;box-shadow:0 0 0 1px #c9cde0}
+  .tm .mk .d.w{background:#d9a441} .tm .mk .d.g{background:#b9bdd0}
+  .tm .mk .ln{flex:1;width:2px;background:#c9cde0;margin-top:2px}
+  .tm .tx{display:grid;gap:4px;padding-bottom:8px}
+  /* near deep-dive */
+  .nsum td.nm a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .nsum .mini{margin-bottom:4px}
+  .nears{display:grid;grid-template-columns:1fr;gap:16px}
+  .near-card .card-h h3{font-size:14.5px}
+  .near-card .card-h .id{font-size:11.5px}
+  .near-b{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:14px}
+  .near-b .mock{min-height:150px}
+  table.feat th{padding:6px 8px}
+  table.feat td{font-size:12.5px;padding:5px 8px;vertical-align:middle}
+  table.feat td:first-child{font-weight:600}
+  .nbar{min-width:120px;width:140px}
+  .sug a{color:var(--ink)}
+  .mtx{display:grid;gap:6px;flex:1;min-width:0}
+  .ico.sm{width:14px;height:14px;border-radius:4px}
+  .ico.sm:after{inset:4px;border-width:1.5px}
+  .mbtns{display:flex;gap:6px;margin-top:2px}
+  .mbtn{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;color:var(--ink)}
+  .mx{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);flex:0 0 auto}
+  .pb{height:10px;border-radius:5px;overflow:hidden;position:relative}
+  .fill{height:100%;width:55%;background:var(--brass);border-radius:5px}
+  .fill.ind{width:30%;margin-left:35%;background:repeating-linear-gradient(45deg,var(--brass) 0 6px,#e5d7a8 6px 12px)}
+  .li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  .li.sel{box-shadow:inset 3px 0 0 var(--brass)}
+  .li.sub{margin-left:28px}
+  .chev{font-size:12px;width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink)}
+  .mk-alert{display:flex;gap:10px;padding:10px 12px;border-radius:8px;width:300px;align-items:flex-start;border-left:4px solid #8f93a8!important}
+  .mk-crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+  .crumb{display:inline-flex;align-items:center;gap:5px;padding:4px 6px;border-radius:5px}
+  .sep{color:var(--muted);font-size:12px}
+  .mk-callout{position:relative;padding:12px 14px;border-radius:8px;width:300px;border-left:4px dashed var(--brass)!important}
+  .tagx{position:absolute;top:-9px;right:10px;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;color:var(--scope-ink)}
+  .cb{width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 auto}
+  .cb.on{background:var(--ink);border-color:var(--ink)}
+  .cb.mixed{color:var(--brass)}
+  .cb.err{border-color:#c0392b!important;border-style:solid!important}
+  .mk-hdr{width:300px;display:grid;gap:4px}
+  .band{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;min-height:26px}
+  .band.tall{min-height:40px}
+  .mk-hero{width:300px;padding:16px;border-radius:8px;display:grid;gap:8px;background:#c9cde0!important;justify-items:start}
+  .mk-list{width:270px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .av{width:24px;height:24px;border-radius:50%;flex:0 0 auto}
+  .mk-pop{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  .bub{position:relative;padding:10px 28px 10px 12px;border-radius:8px;display:grid;gap:6px;width:150px}
+  .bub.dark{background:#3f4254!important;border-color:#3f4254!important}
+  .bub:after{content:"";position:absolute;left:18px;bottom:-7px;width:12px;height:12px;transform:rotate(45deg);background:#3f4254}
+  .bub.m-new:after{background:var(--brass-soft);border-right:1.5px dashed var(--brass);border-bottom:1.5px dashed var(--brass)}
+  .mk-prog{width:280px;display:grid;gap:10px}
+  .pbs{display:grid;gap:6px}
+  .mk-side{width:220px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .mk-step{display:grid;gap:12px;width:300px}
+  .steps{display:flex;gap:8px}
+  .st{flex:1;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px}
+  .num{width:18px;height:18px;border-radius:50%;background:#fff;border:1px solid #8f93a8;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;color:var(--ink);flex:0 0 auto}
+  .num.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .mob{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;padding:8px 10px;border-radius:8px}
+  .mk-tabs{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  .tg{display:flex;gap:4px;padding:6px;border-radius:8px;align-items:flex-end}
+  .tab{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-bottom:2px solid transparent}
+  .tab.on{border-bottom-color:var(--brass)}
+  .tab.cardt{border:1px solid #c9cde0;border-radius:6px 6px 0 0;background:#fff}
+  .vt{display:grid;gap:10px;padding:10px;border-radius:8px}
+  .mk-tb{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;background:#3f4254!important;border-color:#3f4254!important}
+  .ti{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;padding:4px 6px}
+  .ti .ico{background:#fff} .ti .ico:after{border-color:#3f4254}
+  .vdiv{width:1px;height:28px}
+  .mk-tb .badge{position:absolute;top:0;right:0;background:#c0392b;color:#fff;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px;line-height:1.2}
+  .mk-up{width:300px;display:grid;gap:6px}
+  .dz{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px;border-radius:8px;border-style:dashed!important}
+  .fr{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  @media (max-width:900px){.nears{grid-template-columns:1fr}.near-b{grid-template-columns:1fr}}
+  /* walk table */
+  .walk td:first-child{white-space:nowrap;font-weight:600}
+  /* filters */
+  .filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);font-size:12.5px}
+  .filters input[type=search]{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:200px;background:#fff;color:var(--ink)}
+  .filters select{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .fchip{cursor:pointer;opacity:.45;border:1px solid transparent}
+  .fchip.on{opacity:1;border-color:rgba(0,0,0,.15)}
+  .tablewrap{overflow-x:auto}
+  #all th{cursor:pointer;user-select:none}
+  #all th.sorted:after{content:" ▾";color:var(--brass)}
+  #all td.dsc{font-size:12.5px}
+  #all td.nm{font-weight:600;white-space:nowrap}
+  .count{font-size:12px;color:var(--muted);margin-left:auto}
+  footer{padding:24px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:32px}
+  @media (max-width:900px){.planner{grid-template-columns:1fr}.summary{position:static}.quad{grid-template-columns:1fr}.gaps{grid-template-columns:1fr}.prow .rn{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>DS Next · Design System Italia coverage — decide what to build</h1>
+  <div class="tot" id="totals"></div>
+  <div class="legend">
+    <span class="chip have">have 1:1</span><span class="chip near">have, near</span><span class="chip comp">composable</span><span class="chip behav">behaviour</span><span class="chip gap">gap</span><span class="chip scope">out of scope</span>
+  </div>
+</header>
+<nav class="top">
+  <a href="#overview">Overview</a><a href="#matrix">Evidence × effort</a><a href="#decide">Decide: the planner</a><a href="#gaps">The five gaps, drawn</a><a href="#near">Near: what exactly is missing</a><a href="#bottomnav">Bottom nav walk-through</a><a href="#all">All 55 components</a><a href="#method">Method</a>
+</nav>
+<main>
+
+<h2 id="overview">Overview</h2>
+<p class="intro">55 Design System Italia components against a live census of every DS Next Claude master (2026-09-15). Three of the 55 are scroll behaviours, not components, so the real denominator is 52. Marks: <b>have</b> = same role and functions today · <b>near</b> = one small extension on an existing master · <b>composable</b> = assembled from DS masters at usage, no new master · <b>gap</b> = missing and plausible for the CRM · <b>out of scope</b> = institutional-website pattern.</p>
+<div class="card"><div class="card-b">
+  <div class="bar" id="bar"></div>
+  <div class="kpis" id="kpis"></div>
+  <h3 style="margin:18px 0 6px">Coverage by role group <span class="muted small">(grouping is mine, by role; DSI does not expose its own category mapping)</span></h3>
+  <div class="tablewrap"><table class="grp" id="grp"></table></div>
+</div></div>
+
+<h2 id="matrix">Evidence × effort — where each candidate sits</h2>
+<p class="intro">The 25 candidates (5 gaps, 14 near extensions, 6 out-of-scope items) placed by how strong the evidence of need is and how much they cost. Effort is in waves, our usual unit; one wave is a mockup passage plus a master plus QA and records. Top-left is the natural starting point.</p>
+<div class="quad" id="quad"></div>
+<p class="axis">Evidence: <b>proven</b> = already used in the working file · <b>basic</b> = a standard control or a pattern the CRM screens hit constantly · <b>conditional</b> = depends on a roadmap decision · <b>none</b> = no CRM evidence. Effort: ⅛ = props-only extension · ¼ = small master or variant axis · ½ = master + sub-component or a published-master restructure · 1 = a family.</p>
+
+<h2 id="decide">Decide — mark each candidate Build now · Later · Skip</h2>
+<p class="intro">My suggestion is shown under each row; <b>Apply suggestions</b> pre-fills it, or decide row by row. Choices stay in this browser. The summary on the right turns into a message you can paste back to me as the "Vai".</p>
+<div class="planner">
+  <div>
+    <div class="btns"><button class="btn primary" id="apply">Apply suggestions</button><button class="btn" id="reset">Reset all</button></div>
+    <div class="card"><div class="card-h"><h3>Gaps</h3><span class="n">missing today · a new master or a published-master extension</span></div><div id="p-gap"></div></div>
+    <div class="card"><div class="card-h"><h3>Near — small extensions</h3><span class="n">the master exists · one axis or a couple of props close the difference</span></div><div id="p-near"></div></div>
+    <div class="card"><div class="card-h"><h3>Out of scope</h3><span class="n">institutional-website patterns · listed so the decision is explicit</span></div><div id="p-scope"></div></div>
+  </div>
+  <aside class="summary">
+    <h3>Your plan</h3>
+    <div id="sum-rows"></div>
+    <div style="margin-top:12px"><b class="small">Build now, in order</b><ol id="ol-build"></ol></div>
+    <div><b class="small">Later</b><ol id="ol-later"></ol></div>
+    <label class="small muted" for="notes">Notes for the message</label>
+    <input type="text" id="notes" placeholder="e.g. mobile shell confirmed for Q1 → move Bottom nav up">
+    <div class="btns"><button class="btn primary" id="copy">Copy message</button><span class="small muted" id="copied"></span></div>
+    <textarea id="msg" readonly></textarea>
+  </aside>
+</div>
+
+<h2 id="gaps">The five gaps, drawn</h2>
+<p class="intro">Schematic only, not a design. Solid gray parts are existing DS masters we would reuse as sub-components; brass dashed parts are what would be new or extended. None of the five needs new tokens, styles or icons.</p>
+<div class="mlegend" style="margin:0 0 12px"><span><i class="m-reuse"></i>existing DS master, reused</span><span><i class="m-new"></i>new master or extension</span></div>
+<div class="gaps">
+
+  <div class="card gap-card"><div class="card-h"><h3>Radio button</h3><span class="n">¼ wave · new master</span></div><div class="card-b">
+    <div class="mock"><div class="rm">
+      <div class="r"><span class="c m-new on"></span><span class="lbl m-reuse" style="width:110px"></span></div>
+      <div class="r"><span class="c m-new"></span><span class="lbl m-reuse" style="width:80px"></span></div>
+      <div class="r dis"><span class="c m-new"></span><span class="lbl m-reuse" style="width:95px"></span></div>
+    </div></div>
+    <div class="small"><b>Reuse:</b> the anatomy of Checkbox <code>389:17</code> (16px control, label styles, Show label + Label props, disabled triad). <b>New:</b> the <code>Radio</code> master, State On/Off/Disabled. Group = layout, exactly like checkbox groups today. <b>Why it is missing:</b> no Radio was ever minted; the only radio-like affordance is AI option button <code>545:84</code> Type=Single, which is AI-tinted and lives in the assistant panel.</div>
+  </div></div>
+
+  <div class="card gap-card"><div class="card-h"><h3>Pagination</h3><span class="n">½ wave · new shell, reused buttons · evidence: 31 uses</span></div><div class="card-b">
+    <div class="mock"><div class="pm m-new">
+      <span class="b m-reuse">‹</span><span class="b m-reuse">1</span><span class="b m-reuse sel">2</span><span class="b m-reuse">3</span><span class="b" style="color:var(--muted)">…</span><span class="b m-reuse">12</span><span class="b m-reuse">›</span>
+      <span class="sel-in m-reuse"><span class="lbl" style="width:46px;background:#8f93a8"></span>▾</span>
+    </div></div>
+    <div class="small"><b>Reuse:</b> Button icon <code>363:1417</code> Ghost for prev/next, Button <code>362:338</code> Ghost with the Selected state for page numbers, Input <code>394:5591</code> select-mode for the page size. <b>New:</b> a <code>Pagination</code> shell with an Items slot (Button group pattern). <b>Evidence:</b> your working file already carries a local <code>Pagination 13964:178789</code> master, 31 instances, assembled from old NDL buttons. <b>Interim without a master:</b> Button group <code>364:219</code> with numbered Segments.</div>
+  </div></div>
+
+  <div class="card gap-card"><div class="card-h"><h3>Accordion</h3><span class="n">½ wave · extension of Section card</span></div><div class="card-b">
+    <div class="mock"><div class="am">
+      <div class="sc"><div class="hd m-new" style="border-radius:0"><span class="ico"></span><span class="lbl" style="width:120px"></span><span class="ch m-reuse">⌃</span></div><div class="ct"><span class="lbl m-reuse" style="width:100%"></span><span class="lbl m-reuse" style="width:78%"></span><span class="lbl m-reuse" style="width:60%"></span></div></div>
+      <div class="sc"><div class="hd m-new" style="border-radius:0"><span class="ico"></span><span class="lbl" style="width:90px"></span><span class="ch m-reuse">⌄</span></div></div>
+    </div></div>
+    <div class="small"><b>Reuse:</b> Section card <code>923:752</code> as is (icon + title header, Content slot, Actions slot) and Button icon Neutral Ghost S for the chevron. <b>Extension, not a new master:</b> <code>State=Expanded|Collapsed</code> plus <code>Show chevron</code> on Section card; a stack of them is the accordion. DSI Collapse is the same behaviour. It touches a published master, so the pre-build mockup passage applies.</div>
+  </div></div>
+
+  <div class="card gap-card"><div class="card-h"><h3>Bottom nav</h3><span class="n">½ wave · new item + container · only with a mobile shell</span></div><div class="card-b">
+    <div class="mock"><div class="bm m-new">
+      <div class="it m-new sel"><span class="ico"></span><span class="lbl" style="width:34px"></span></div>
+      <div class="it m-new"><span class="ico"></span><span class="lbl" style="width:40px"></span><span class="badge">3</span></div>
+      <div class="it m-new"><span class="ico"></span><span class="lbl" style="width:30px"></span></div>
+      <div class="it m-new"><span class="ico"></span><span class="lbl" style="width:38px"></span></div>
+    </div></div>
+    <div class="small"><b>Reuse:</b> the Items-slot container pattern (Button group, Tab group), Badge <code>391:9</code> for counters through the same Show badge + Badge swap Tab already has, Line Awesome icons, Body_Xs, Surface-base tokens, Shadow_Raised. <b>New:</b> <code>Bottom nav/Item</code> (icon over a one-word label; State Default/Selected/Disabled; props Icon, Label, Show badge, Badge) and the <code>Bottom nav</code> container, five items maximum as DSI recommends. <b>Bonus:</b> the same item gives Toolbar <code>407:29</code> the labeled, badged variant DSI's Toolbar has.</div>
+  </div></div>
+
+  <div class="card gap-card"><div class="card-h"><h3>Timeline</h3><span class="n">½ wave · new event item · evidence to verify</span></div><div class="card-b">
+    <div class="mock"><div class="tm">
+      <div class="ev m-new"><div class="mk"><span class="d"></span><span class="ln"></span></div><div class="tx"><span class="lbl" style="width:52px;height:7px"></span><span class="lbl" style="width:140px;background:#8f93a8"></span><span class="lbl" style="width:190px"></span></div></div>
+      <div class="ev m-new"><div class="mk"><span class="d w"></span><span class="ln"></span></div><div class="tx"><span class="lbl" style="width:52px;height:7px"></span><span class="lbl" style="width:120px;background:#8f93a8"></span><span class="lbl" style="width:170px"></span></div></div>
+      <div class="ev m-new"><div class="mk"><span class="d g"></span></div><div class="tx"><span class="lbl" style="width:52px;height:7px"></span><span class="lbl" style="width:130px;background:#8f93a8"></span></div></div>
+    </div></div>
+    <div class="small"><b>Reuse:</b> Status dot <code>537:14</code> or an icon as the marker, Border-1 for the rail, Body styles for date, title and text. <b>New:</b> <code>Timeline/Event</code> with State Past/Current/Upcoming; nothing vertical exists today, Stepper/Step <code>562:27</code> is a horizontal label-over-bar. <b>Before building:</b> check the product for a real chronological view (activity history on deals or requests). Without one it stays on the shelf.</div>
+  </div></div>
+
+</div>
+
+<h2 id="near">Have, near — what exactly is missing</h2>
+<p class="intro">The 14 DSI components we cover by role but not feature by feature. Each DSI page's official variants and anatomy were turned into feature rows and checked one by one against our master: <b>have</b> = the prop or variant exists · <b>composable</b> = done at usage with other masters or a behaviour · <b>missing</b> = nothing in the DS does it · <b>not for us</b> = a DSI feature we would deliberately not adopt. The schematic draws the missing pieces in brass on the existing master in gray. Sorted by how much is missing.</p>
+<div class="card"><div class="tablewrap"><table id="near-sum" class="nsum"></table></div></div>
+<div class="mlegend" style="margin:0 0 12px"><span><span class="chip have">have</span></span><span><span class="chip comp">composable</span></span><span><span class="chip gap">missing</span></span><span><span class="chip scope">not for us</span></span><span style="margin-left:auto"><i class="m-reuse"></i>existing master</span><span><i class="m-new"></i>missing piece</span></div>
+<div class="nears" id="near-cards"></div>
+
+<h2 id="bottomnav">Bottom nav — the walk through the Navigation page</h2>
+<p class="intro">Your example, answered in full. We do not have a bottom navigation. Every navigation master was checked for two things: could it be the container, could its item be the stacked icon-over-label item DSI uses. Absent by evidence, not by decision: the DS was harvested from a desktop CRM navigated by rail and top bar; mobile exists only as a content breakpoint on cards and the AI family.</p>
+<div class="card"><div class="tablewrap"><table class="walk">
+  <thead><tr><th>Master</th><th>What it is</th><th>As container?</th><th>Its item as the stacked nav item?</th></tr></thead>
+  <tbody>
+    <tr><td>Navigation <code>428:344</code></td><td>App top bar: logo, title, search, Actions slot</td><td>No, it is a top bar</td><td>No item concept</td></tr>
+    <tr><td>Navigation rail <code>429:1191</code></td><td>Per-sector sidebar, Collapsed and Expanded</td><td>No, vertical sidebar that overlays the top bar</td><td>No: Collapsed items are Button icon Neutral Ghost S 32px, icon only; Expanded is a List section of Menu items</td></tr>
+    <tr><td>Tab <code>398:326</code> + Tab group <code>632:443</code></td><td>View switcher, 80 variants, Items slot</td><td>The Items-slot pattern is reusable</td><td>No: icon left · label · icon right · badge on one horizontal row; restyling would touch 80 variants. Its badge mechanism (Show badge + swap) is the one to copy</td></tr>
+    <tr><td>Menu item <code>404:110</code></td><td>List and menu row, State only</td><td>No</td><td>No, horizontal row with drag handle, icon, label, number, actions</td></tr>
+    <tr><td>List section <code>1090:5381</code></td><td>Titled list of Menu items</td><td>No</td><td>No</td></tr>
+    <tr><td>Breadcrumb <code>580:432</code></td><td>Two-level detail crumb</td><td>No</td><td>No</td></tr>
+    <tr><td>Toolbar <code>407:29</code> (Actions)</td><td>Floating inverse action bar, Items slot of Buttons</td><td>Closest relative, but floating and inverse, not docked</td><td>No, icon-only actions. Would gain the labeled variant from the new item</td></tr>
+    <tr><td>Button group <code>364:219</code></td><td>Segmented control, Items slot of Segments</td><td>The slot pattern to copy</td><td>No, horizontal segments</td></tr>
+  </tbody>
+</table></div></div>
+<p class="intro">Conclusion: container and badge come from the DS, the item is the one genuinely new piece. Half a wave including the mockup passage, worth spending only if a mobile shell is on the roadmap; a content breakpoint alone does not justify it.</p>
+
+<h2 id="all">All 55 components</h2>
+<div class="card">
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search DSI component, DS master or id…">
+    <select id="gsel"><option value="">All groups</option></select>
+    <span id="fchips"></span>
+    <label class="small"><input type="checkbox" id="hidecovered"> hide have / composable / behaviour</label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="tablewrap"><table id="all">
+    <thead><tr><th data-k="n" class="sorted">DSI component</th><th data-k="g">Group</th><th data-k="v">Verdict</th><th>DS Next equivalent (page · id)</th><th>What differs · how to build</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+</div>
+
+<h2 id="method">Method and sources</h2>
+<div class="card"><div class="card-b small">
+  <p style="margin:0 0 8px"><b>DSI side:</b> the 55 components of the official index (designers.italia.it/design-system/componenti, read 2026-09-15) plus the detail pages of the 16 whose scope is not obvious from the name (bottomnav, back, forward, dimmer, thumbnav, transfer, navscroll, sticky, affix, toolbar, sections, notifications, callout, timeline, steppers, rating). Bootstrap Italia semantics for the rest. For the 14 "near" components, the official variants and anatomy lists of each DSI page were read the same day and turned one-to-one into the feature rows of the deep-dive.</p>
+  <p style="margin:0 0 8px"><b>DS side:</b> live census of every component set and standalone component per page: Actions 7 sets + 3 · Forms 10 + 3 · Navigation 6 + 1 · Feedback &amp; status 9 + 1 · Cards &amp; patterns 8 + 6 · AI 10 + 2 · Data display 16 + 14 · Utilities 1 + 3; icon pages counted only (1,545 Line Awesome, 24 Property). WIP - Marco holds two local <code>_Preview/*</code> sets mirroring published masters; WIP - Luca holds no masters. Variant axes and property names were read from the masters, not from the registry.</p>
+  <p style="margin:0 0 8px"><b>Evidence check:</b> the CE and NDL censuses of the working file were searched for the missing components. Only Pagination appears, as the local master <code>13964:178789</code> with 31 instances. No radio, accordion, bottom nav, tab bar, timeline or rating came from the old libraries.</p>
+  <p style="margin:0"><b>Limits:</b> the comparison is by role and function, not variant by variant; DSI variant sets (for example ~20 Card variants) were mapped to the DS master that covers the role. Role groups are mine. Effort figures are estimates in waves under the standard pipeline (mockup → Vai → master → QA strip → records). Companion document: <code>ds-next-claude/DSI-COMPARISON.md</code>.</p>
+</div></div>
+
+</main>
+<footer>DS Next Claude · analysis of 2026-09-15 · read-only, nothing built. The variables diff companion page lives at lucar00.github.io/ds-next-variables/.</footer>
+
+<script>
+const V = {have:'have 1:1', near:'have, near', comp:'composable', behav:'behaviour', gap:'gap', scope:'out of scope'};
+const ORDER = ['have','near','comp','behav','gap','scope'];
+const ROWS = [
+ ['Accordion','Content & layout','gap','—','No collapsible master. Extend Section card 923:752 with State Expanded/Collapsed + Show chevron; a stack of them is the accordion.'],
+ ['Affix','Behaviour','behav','—','Element pinned while a section scrolls. Prototype-level, nothing to build.'],
+ ['Alert','Feedback','near','Alert 561:54 · Feedback & status','4 variants × Banner/Inline/Mini banner × M/S with title, content, icon. Missing: a dismiss × and a Neutral/Primary colour.'],
+ ['Autocomplete','Forms','comp','Input 394:5591 · Dropdown 400:56 · Menu item 404:110','Field + floating menu + items with icon left. Avatar suggestions: verify the 16px Icon left swap with Avatar S.'],
+ ['Avatar','Data display','have','Avatar 512:979 · Avatar group 607:2251 · Data display','Photo/Icon/Illustration/Initials × S24–XL48, badge swap (Status dot for presence). DSI has 6 sizes: XXS/XXL only on demand.'],
+ ['Back','Navigation','comp','Button 362:338 Ghost + Show icon left · Link 568:2','Link, button and icon-only forms all exist via props.'],
+ ['Back to top','Navigation','have','FAB 570:36 · Button icon 363:1417 · Actions','Appear-on-scroll is app behaviour. FAB is a 44px square radius 8, DSI is round: style only.'],
+ ['Badge','Feedback','have','Badge 391:9 (counts) · Status chip 402:140 (text pills)','DSI Badge covers both counts and coloured text pills; two DS masters split the roles. Brand pill = Chip 379:2205 Primary Solid XXS.'],
+ ['Bottomnav','Navigation','gap','—','No bottom bar anywhere; every DS nav item is horizontal. New Bottom nav/Item (icon over label + Badge) + container with Items slot. See the walk-through.'],
+ ['Breadcrumbs','Navigation','near','Breadcrumb 580:432 · Navigation','Two-level detail crumb (entity icon · Parent › Current · chevron). DSI: N levels, separators, dark. Extension: Items slot of a Breadcrumb/Item.'],
+ ['Buttons','Actions & overlays','have','Button 362:338 · Button icon 363:1417 · Button group 364:219 · Actions','Superset: 8 colours × Solid/Muted/Outline/Ghost × XS–XL × 4 states, icons both sides. Block = FILL at usage.'],
+ ['Callout','Feedback','near','Alert 561:54 Layout=Inline','Semantic types covered. Editorial Note/Important/Highlight/Approfondimento need Alert Variant Neutral + Brand; the folded corner is not worth carrying.'],
+ ['Card','Content & layout','have','Section card 923:752 · News card 570:29 · Opportunity 478:4993 · Property 506:4808 · Appointment 516:738 · Reminder 538:120 · Cards & patterns','DSI ~20 editorial variants collapse to container + image teaser; the domain cards go further than DSI.'],
+ ['Carousel','Media','comp','Carousel dots 406:25 · Indicator 405:50 · Carousel arrows 406:35 · Data display · Property card Show carousel','Controls exist; the slide row is a layout at usage.'],
+ ['Checkbox','Forms','near','Checkbox 389:17 · Forms','On/Off/Disabled + label. Missing Indeterminate (group parent) and an Error state.'],
+ ['Chips','Data display','have','Chip 379:2205 · Data display','768 variants: dismissible = Show icon right → times, XXS–M, split pill. Semantic colours → Status chip. Avatar-leading chip: verify swap sizing.'],
+ ['Collapse','Behaviour','behav','—','Show/hide of a region = two states of its host (the Accordion row). Nothing standalone.'],
+ ['Datepicker','Forms','have','Input 394:5591 Show action · Input group 562:3886 · Date picker 564:44 · Day 564:43 · Forms','Range via Day State=In range. The DS grid flags itself "no product evidence of the open grid, expect refinement".'],
+ ['Dimmer','Actions & overlays','comp','Surface-overlay-bg scrim + Button · Modal 540:3823','A rectangle on the scrim token at usage; Modal covers the with-actions case.'],
+ ['Dropdown','Actions & overlays','have','Dropdown 400:56 · Menu item 404:110 · List section 1090:5381 · Button Show icon right','Divider rows: a 1px Border line at usage, no divider master exists.'],
+ ['Footer','Content & layout','scope','—','Institutional page footer. If ever: Logo 446:14 + Link 568:2 on Surface-inverse-bg, composable, no master.'],
+ ['Form','Forms','comp','Input · Textarea 609:304 · Checkbox · Toggle 390:49 · Input group · Search bar 399:3479 · Dropzone 610:128 · Section card as fieldset','DSI Form is itself a layout pattern. The only hole inside it is Radio.'],
+ ['Forward','Navigation','comp','Button icon 363:1417 Ghost (chevron-down) · Overlay button 579:492','Website hero pattern; the scroll is app behaviour.'],
+ ['Header','Navigation','near','Navigation 428:344 · Navigation rail 429:1191 · Announcement bar 568:38','One-layer app bar vs DSI Slim + Center + Navbar layers, sticky, megamenu. The institutional layers are composable (Logo, Link, Button, Search bar) and not needed for the CRM.'],
+ ['Hero','Content & layout','near','Hero 569:15 · Cards & patterns','Portal-specific: photo, IvyMode greeting, Search bar, settings, announcement. DSI adds CTA and text-only: Show CTA / Show photo on demand.'],
+ ['Input','Forms','have','Input 394:5591 · Forms','48 variants, 6 states, label, helper, icons, dropdown icon, inline slot, action cell. DSI floating labels are a deliberate design difference. Password eye = Show action.'],
+ ['List','Data display','near','Menu item 404:110 · List section 1090:5381 · Data row 581:89 · File row 563:33 · Message row 541:115','Missing on Menu item: the two-line item (title + description) and the avatar-leading item.'],
+ ['Megamenu','Navigation','scope','—','Website navbar mega-panel. Composable: Dropdown widened + List section columns + Link. The CRM navigates via rail sections.'],
+ ['Modal','Actions & overlays','have','Modal 540:3823 + Surface-overlay scrim · Cards & patterns','Title, Intro, Content slot, Actions slot; width free (DSI sm/lg/xl = resize).'],
+ ['Navscroll','Navigation','comp','List section 1090:5381 · Menu item State=Current · Progress bar 607:2191','In-page index. Nested levels: indent at usage (Menu item lost its Level axis by design).'],
+ ['Notifications','Feedback','have','Toast 607:63 · Feedback & status','5 variants, message, subtext, action, close, icon. Dark panel vs DSI white card with coloured edge: style only. Stacking = app level.'],
+ ['Number input','Forms','comp','Input group 562:3886 Trailing slot + two Button icon 363:1417 XS','Works today via the addon slot; a dedicated Input number variant only if it recurs.'],
+ ['Overlay','Actions & overlays','comp','Scrim_Top / Scrim_Bottom / Fade_White paint styles · Overlay button 579:492 · Ribbon 576:43','Image-hover overlays with icon or text, at usage on photo frames.'],
+ ['Pagination','Navigation','gap','— (working file: local Pagination 13964:178789, 31 uses)','Proven need. New Pagination shell (Items slot + prev/next). Interim: Button group numbered Segments + Button icon arrows.'],
+ ['Popover','Actions & overlays','near','Tooltip 401:116 (title + slot, 4 arrows) · Panel 513:4712 (light flyout) · Data display','Tooltip already carries title + slot = popover role, but dark. DSI popover is light: Tooltip Variant=Light (precedent Day popover 919:2414).'],
+ ['Progress indicators','Feedback','near','Progress bar 607:2191 · Donut chart 563:51 · Spinner 606:40 · Level bar 407:77 · Skeleton 606:31','Missing: indeterminate bar. Loading button: compose Spinner into Button at usage rather than a State (+160 variants).'],
+ ['Radio button','Forms','gap','—','No Radio master. AI option button 545:84 Type=Single is AI-tinted, Tri-state toggle 561:29 is a filter. Mirror Checkbox 389:17.'],
+ ['Rating','Data display','scope','—','Star scale. Level bar is a semantic meter, Favorite 391:22 a single heart. If ever: Rating Value 0–5 from LA star glyphs, trivial.'],
+ ['Sections','Content & layout','comp','Section card 923:752 + Surface tokens','DSI Sections is a page-layout pattern: bands = frames on Surface-subtle / inverse / sector bg.'],
+ ['Select','Forms','have','Input 394:5591 select-mode · Dropdown · Menu item · List section (groups) · Chips in Content=Slot (multiple)','This is how Seleziona pipeline and Lingua were rebuilt.'],
+ ['Sidebar','Navigation','near','Navigation rail 429:1191 · List section · Menu item Current','Nested collapsible sub-items missing (Level axis removed on purpose); rail is sector-tinted. Nesting via a second List section.'],
+ ['Skiplinks','Navigation','scope','—','Focus-only skip links: a development requirement for CONVENTIONS (Button Ghost visible on focus), no master.'],
+ ['Steppers','Navigation','near','Stepper 562:3849 · Stepper/Step 562:27 · Forms','Desktop horizontal covered. DSI mobile single-step, dots variant and the Back/Save/Next bar = composition; Breakpoint=Mobile if mobile flows need it.'],
+ ['Sticky','Behaviour','behav','—','position: sticky; a sticky table header = Table cell Header at usage.'],
+ ['Tables','Data display','have','Table cell 412:90 · Data display','Header/Text/Chip/Slot × Base/Subtle; sort, status dot, icons, subtext, slot. Tables are composed from cells by design.'],
+ ['Tabs','Navigation','near','Tab 398:326 · Tab group 632:443 · Navigation','Horizontal only. Vertical tabs = List section + Menu item Current; tab with dropdown = Show icon right + Dropdown; card-style = Emphasis Outline.'],
+ ['Thumbnav','Navigation','scope','—','Gallery thumbnail strip. Composable: image frames + selected Border + Scrim paint. A Thumbnail master only if property galleries need it.'],
+ ['Timeline','Data display','gap','—','Nothing vertical exists (Stepper/Step is horizontal). New Timeline/Event: marker + rail + date + title + text.'],
+ ['Timepicker','Forms','have','Input 394:5591 Show action (clock glyph) · Dropdown · Menu item presets','By decision: Wave 50 chose presets over a picker. A spinner would be Input group + two Button icon steppers.'],
+ ['Toggles','Forms','have','Toggle 390:49 · Forms','On/Off/Disabled × M/S, label, state icons. 1:1.'],
+ ['Toolbar','Navigation','near','Toolbar 407:29 · Actions','DS Toolbar is an icon action bar. DSI items are stacked icon + label + badge, which is exactly the Bottom nav item.'],
+ ['Tooltip','Actions & overlays','have','Tooltip 401:116 · Data display','4 arrows + none, title, icon, content, slot. Superset.'],
+ ['Transfer','Forms','comp','Checkbox rows in two List section Type=Card · Button icon arrows · Button Ghost Reset','Rare in the CRM; a pattern, not a master.'],
+ ['Upload','Forms','near','Dropzone 610:128 · File row 563:33 · Progress bar 607:2191 · Add documents 544:125 (AI)','File row lacks per-file progress and a remove action. Avatar upload = Avatar + Button icon overlay at usage.'],
+ ['Video player','Media','scope','Video card 583:749 (thumbnail card only)','Player controls are media-app UI. Rough prototype: Overlay button + Progress bar + Button icons.']
+].map(r => ({n:r[0], g:r[1], v:r[2], ds:r[3], note:r[4]}));
+
+// Planner candidates. eff = eighths of a wave. ev: 3 proven · 2 basic · 1 conditional · 0 none.
+const EVL = ['no CRM evidence','conditional','basic','proven'];
+const PLAN = [
+ {id:'radio',kind:'gap',order:1,name:'Radio button',eff:2,ev:2,evNote:'basic form control',sug:'build',why:'Exclusive choice in forms. Checkbox exists, Radio was never minted; the only radio-like affordance is the AI option button, AI-tinted and panel-specific.',reuse:'Checkbox 389:17 anatomy: 16px control, label styles, Show label + Label, disabled triad',neu:'Radio master, State On/Off/Disabled'},
+ {id:'pagination',kind:'gap',order:2,name:'Pagination',eff:4,ev:3,evNote:'local master in the working file, 31 uses',sug:'build',why:'Tables and search results. Your file already carries Pagination 13964:178789 assembled from old NDL buttons: the need is proven, the master is just not in the DS.',reuse:'Button icon 363:1417 Ghost (prev/next) · Button 362:338 Ghost + Selected (pages) · Input select-mode (page size) · Items-slot pattern',neu:'Pagination shell; interim = Button group numbered Segments'},
+ {id:'accordion',kind:'gap',order:3,name:'Accordion (Section card extension)',eff:4,ev:2,evNote:'detail views use Section card',sug:'build',why:'Collapsible sections in detail views; DSI Collapse is the same behaviour. Section card is already the CRM detail-view block, so this is an axis on it, not a new master.',reuse:'Section card 923:752 (header, Content slot, Actions) · Button icon Neutral Ghost S (chevron)',neu:'State Expanded|Collapsed + Show chevron on Section card (published master: mockup passage)'},
+ {id:'bottomnav',kind:'gap',order:4,name:'Bottom nav',eff:4,ev:1,evNote:'needs a mobile shell on the roadmap',sug:'later',why:'Mobile shell navigation, five items max. Missing by evidence: the CRM is desktop, mobile is only a content breakpoint. Half the parts exist; the stacked item is new.',reuse:'Items-slot container pattern · Badge 391:9 via Show badge + swap · LA icons · Body_Xs · Surface-base tokens · Shadow_Raised',neu:'Bottom nav/Item (icon over label, 3 states) + Bottom nav container',dep:'Mobile shell decision. Also unlocks the labeled Toolbar.'},
+ {id:'timeline',kind:'gap',order:5,name:'Timeline',eff:4,ev:0,evNote:'verify a chronological view exists',sug:'later',why:'Vertical chronological events (activity history on deals or requests). Nothing vertical exists: Stepper/Step is a horizontal label-over-bar.',reuse:'Status dot 537:14 or icon marker · Border-1 rail · Body styles',neu:'Timeline/Event, State Past/Current/Upcoming',dep:'Product evidence of an activity history.'},
+ {id:'checkbox-ind',kind:'near',order:6,name:'Checkbox: Indeterminate, Error, description',eff:2,ev:2,evNote:'select-all in lists and tables',sug:'build',why:'The group-parent state every select-all column needs; Error and the description line complete the form-field set.',reuse:'Checkbox 389:17',neu:'State Indeterminate + Error · Show description (+ Focus ring)'},
+ {id:'alert-close',kind:'near',order:7,name:'Alert: dismiss × + actions slot',eff:2,ev:2,evNote:'dismissible alerts are standard',sug:'build',why:'DSI Alert closes and can carry extra content or buttons; ours has neither a close nor a slot. Doing the Callout colour families at the same time costs almost nothing extra.',reuse:'Alert 561:54 · Button icon Ghost XS',neu:'Show close prop + Actions slot'},
+ {id:'upload-filerow',kind:'near',order:8,name:'File row: progress, remove, error',eff:2,ev:2,evNote:'uploads exist (Dropzone, Living resources)',sug:'build',why:'A file list without per-file progress, an error state and a remove action cannot show an upload in flight or failing.',reuse:'File row 563:33 · Progress bar 607:2191 · Button icon Ghost XS · Dropzone 610:128',neu:'Show progress + Show remove + State Error on File row · State Uploading on Dropzone'},
+ {id:'list-subtitle',kind:'near',order:9,name:'Menu item: description line + avatar leading',eff:2,ev:2,evNote:'two-line lists: people, mailboxes',sug:'build',why:'DSI List has two-line and avatar-leading items; Menu item is single-line with a 16px icon.',reuse:'Menu item 404:110 · Avatar 512:979',neu:'Show subtitle prop · Icon left swap sized for Avatar S'},
+ {id:'breadcrumb-n',kind:'near',order:10,name:'Breadcrumb: N levels',eff:2,ev:1,evNote:'deep hierarchies not evidenced',sug:'later',why:'Ours is a two-level detail crumb; DSI walks N levels with separators.',reuse:'Breadcrumb 580:432 · Link 568:2 · Tab group Items-slot pattern',neu:'Breadcrumb/Item + Items slot'},
+ {id:'popover-light',kind:'near',order:11,name:'Tooltip: Light variant + close',eff:2,ev:1,evNote:'Day popover 919:2414 is a product-specific precedent',sug:'later',why:'Tooltip already has title + slot, so it plays the popover role, but only in dark and without a close. DSI popovers are light.',reuse:'Tooltip 401:116 · Panel 513:4712',neu:'Variant Dark|Light axis + Show close on Tooltip'},
+ {id:'progress-indet',kind:'near',order:12,name:'Progress bar: indeterminate + colour variants',eff:2,ev:1,evNote:'async actions',sug:'later',why:'Unknown-duration work and semantic colours on the bar. The loading button is better composed (Spinner swapped into Button) than minted: a Loading state would add 160 Button variants.',reuse:'Progress bar 607:2191 · Spinner 606:40',neu:'Indeterminate variant + Variant axis (Feedback family) on Progress bar'},
+ {id:'stepper-mobile',kind:'near',order:13,name:'Stepper: Mobile breakpoint + icon heading',eff:2,ev:1,evNote:'mobile flows',sug:'later',why:'DSI shows one step with a dropdown on mobile and a Back/Save/Next bar, and allows an icon in the step heading. Ours is desktop horizontal, text only.',reuse:'Stepper 562:3849 · Stepper/Step 562:27 · Button · Indicator dots',neu:'Breakpoint=Mobile on Stepper · Show icon on Step',dep:'Mobile flows.'},
+ {id:'tabs-vertical',kind:'near',order:14,name:'Tab group: vertical + icon-only / closable tabs',eff:2,ev:0,evNote:'List section + Menu item already cover vertical navigation',sug:'later',why:'DSI has vertical, icon-only and closable tabs. We route vertical navigation through List section + Menu item Current, which is arguably the better pattern.',reuse:'Tab 398:326 · Tab group 632:443',neu:'Orientation axis on Tab group · Show label + Show close on Tab'},
+ {id:'hero-cta',kind:'near',order:15,name:'Hero: title, text, CTA',eff:2,ev:0,evNote:'portal hero is fixed today',sug:'later',why:'DSI Hero carries a kicker, title, text and CTA buttons, optionally centered. Ours is the portal band with greeting and search.',reuse:'Hero 569:15 · Button',neu:'Show title / Show text / Show CTA (+ centered alignment)'},
+ {id:'callout-editorial',kind:'near',order:16,name:'Callout editorial types on Alert',eff:1,ev:0,evNote:'no editorial pages in the CRM',sug:'later',why:'Note / Important / Approfondimento are editorial. Cheap if done together with the Alert dismiss work.',reuse:'Alert 561:54',neu:'Variant Neutral + Brand',dep:'Ride along with Alert dismiss.'},
+ {id:'toolbar-labeled',kind:'near',order:17,name:'Toolbar: labeled + badged items, vertical',eff:1,ev:1,evNote:'items are free once the Bottom nav item exists; ⅛ for the vertical axis',sug:'later',why:'DSI Toolbar items are stacked icon + label + badge, and the bar can be vertical. The item is the Bottom nav item; building one gives the other.',reuse:'Toolbar 407:29 Items slot',neu:'Orientation axis; items = Bottom nav/Item (¼ wave if built alone)',dep:'Bottom nav.'},
+ {id:'header-layers',kind:'near',order:18,name:'Header: Slim + Center layers',eff:4,ev:0,evNote:'app shell has no institutional header',sug:'skip',why:'Institutional website header. The CRM has a one-layer app bar and that is right.',reuse:'Logo 446:14 · Link · Button · Search bar 399:3479 (composable if ever)',neu:'Nothing worth a master'},
+ {id:'sidebar-nesting',kind:'near',order:19,name:'Sidebar: nested collapsible items',eff:2,ev:0,evNote:'Level axis removed on purpose',sug:'skip',why:'You removed the Level axis from Menu item deliberately; a second List section covers grouping.',reuse:'Navigation rail 429:1191 · List section 1090:5381',neu:'Would reintroduce a Level axis'},
+ {id:'footer',kind:'scope',order:20,name:'Footer',eff:2,ev:0,evNote:'no public pages',sug:'skip',why:'Institutional page footer.',reuse:'Logo · Link · Surface-inverse-bg (composable)',neu:'Nothing'},
+ {id:'megamenu',kind:'scope',order:21,name:'Megamenu',eff:4,ev:0,evNote:'rail sections do this job',sug:'skip',why:'Website navbar mega-panel.',reuse:'Dropdown · List section · Link (composable)',neu:'Nothing'},
+ {id:'rating',kind:'scope',order:22,name:'Rating',eff:1,ev:0,evNote:'the CRM rates nothing',sug:'skip',why:'Star scale.',reuse:'LA star glyphs',neu:'Rating master, Value 0–5 (trivial if ever)'},
+ {id:'skiplinks',kind:'scope',order:23,name:'Skiplinks',eff:0,ev:0,evNote:'a development requirement, not a master',sug:'skip',why:'Focus-only skip links. Belongs in CONVENTIONS as a dev note.',reuse:'Button Ghost visible on focus',neu:'A line in CONVENTIONS'},
+ {id:'thumbnav',kind:'scope',order:24,name:'Thumbnav',eff:2,ev:0,evNote:'galleries live inside Property card today',sug:'skip',why:'Gallery thumbnail strip.',reuse:'Image frames · Border tokens · Scrim paint',neu:'Thumbnail master only if property galleries need it'},
+ {id:'video-player',kind:'scope',order:25,name:'Video player',eff:8,ev:0,evNote:'media-app UI',sug:'skip',why:'Player controls, captions, transcript.',reuse:'Overlay button · Progress bar · Button icons (rough prototype)',neu:'A whole family'}
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ids = s => esc(s).replace(/(\d{2,5}:\d{1,6})/g, '<span class="id">$1</span>');
+const FR = {1:'⅛',2:'¼',3:'⅜',4:'½',5:'⅝',6:'¾',7:'⅞'};
+const waves = e => { if (!e) return '0'; const w = Math.floor(e / 8), f = e % 8; return (w ? w : '') + (f ? FR[f] : '') + (w && !f ? '' : ''); };
+const wavesLabel = e => { const s = waves(e); return s === '0' ? 'no extra effort' : s + (e === 8 ? ' wave' : ' waves'); };
+
+// Overview
+(function overview(){
+  const c = {}; ORDER.forEach(k => c[k] = 0); ROWS.forEach(r => c[r.v]++);
+  const covered = c.have + c.near + c.comp;
+  document.getElementById('totals').innerHTML = '<b>55</b> DSI components · <b>' + covered + '</b> reproducible today · <b>' + c.gap + '</b> gaps · <b>' + c.scope + '</b> out of scope · <b>' + c.behav + '</b> behaviours';
+  document.getElementById('bar').innerHTML = ORDER.map(k => '<div class="' + k + '" style="flex:' + c[k] + '" title="' + V[k] + ': ' + c[k] + '">' + c[k] + '</div>').join('');
+  document.getElementById('kpis').innerHTML =
+    '<div class="kpi"><b>' + covered + ' / 52</b><span>real components reproducible today (55 minus 3 behaviours)</span></div>' +
+    '<div class="kpi"><b>' + c.have + '</b><span>have 1:1 — same role and functions</span></div>' +
+    '<div class="kpi"><b>' + c.near + '</b><span>near — one small extension away</span></div>' +
+    '<div class="kpi"><b>' + c.comp + '</b><span>composable at usage, no master needed</span></div>' +
+    '<div class="kpi"><b>' + c.gap + '</b><span>gaps worth closing</span></div>' +
+    '<div class="kpi"><b>' + c.scope + '</b><span>out of scope for a CRM</span></div>';
+  const groups = [...new Set(ROWS.map(r => r.g))];
+  let h = '<thead><tr><th>Group</th><th>DSI</th><th>Reproducible</th><th>Mix</th><th>Gaps</th><th>Out of scope</th></tr></thead><tbody>';
+  groups.forEach(g => {
+    const rs = ROWS.filter(r => r.g === g); const gc = {}; ORDER.forEach(k => gc[k] = rs.filter(r => r.v === k).length);
+    const cov = gc.have + gc.near + gc.comp; const denom = rs.length - gc.behav;
+    h += '<tr><td>' + esc(g) + '</td><td>' + rs.length + '</td><td>' + (denom ? cov + ' / ' + denom : '—') + '</td><td><div class="mini">' + ORDER.map(k => gc[k] ? '<div class="' + k + '" style="flex:' + gc[k] + ';background:var(--' + k + ')" title="' + V[k] + ' ' + gc[k] + '"></div>' : '').join('') + '</div></td><td>' + (gc.gap ? rs.filter(r => r.v === 'gap').map(r => esc(r.n)).join(', ') : '—') + '</td><td>' + (gc.scope ? rs.filter(r => r.v === 'scope').map(r => esc(r.n)).join(', ') : '—') + '</td></tr>';
+  });
+  document.getElementById('grp').innerHTML = h + '</tbody>';
+})();
+
+// Quadrants
+(function quad(){
+  const Q = [
+    {k:'first', t:'Do first — strong evidence, cheap', f:p => p.ev >= 2 && p.eff <= 2},
+    {k:'wave', t:'Plan a wave — strong evidence, costs a half wave or more', f:p => p.ev >= 2 && p.eff > 2},
+    {k:'cheap', t:'Cheap, when a screen asks for it — weak evidence, low cost', f:p => p.ev < 2 && p.eff <= 2},
+    {k:'road', t:'Only with a roadmap reason — weak evidence, real cost', f:p => p.ev < 2 && p.eff > 2}
+  ];
+  const col = {gap:'var(--gap-ink)', near:'var(--near-ink)', scope:'var(--scope-ink)'};
+  document.getElementById('quad').innerHTML = Q.map(q => '<div class="q ' + (q.k === 'first' ? 'first' : '') + '"><h4>' + q.t + '</h4>' +
+    PLAN.filter(q.f).sort((a, b) => b.ev - a.ev || a.eff - b.eff).map(p => '<span class="qi" title="' + esc(p.evNote) + '"><span class="dot" style="background:' + col[p.kind] + '"></span>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></span>').join('') + '</div>').join('');
+})();
+
+// Planner
+const KEY = 'dsi-plan-v1';
+let state = {choices:{}, notes:''};
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.choices) state = s; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const CH = {build:'Build now', later:'Later', skip:'Skip'};
+
+function rowHTML(p){
+  const ch = state.choices[p.id] || '';
+  return '<div class="prow" id="plan-' + p.id + '" data-id="' + p.id + '">' +
+    '<div class="t"><b>' + esc(p.name) + '</b><span class="chip ' + p.kind + '">' + V[p.kind] + '</span><span class="meta"><span class="tag">' + wavesLabel(p.eff) + '</span><span class="tag ev' + p.ev + '">' + EVL[p.ev] + ' · ' + esc(p.evNote) + '</span></span></div>' +
+    '<div><div class="seg">' + ['build','later','skip'].map(c => '<button class="' + c + (ch === c ? ' on' : '') + '" data-c="' + c + '">' + CH[c] + '</button>').join('') + '</div><div class="sug">suggested: ' + CH[p.sug] + (p.kind === 'near' ? ' · <a href="#near-' + p.id + '">what is missing ↑</a>' : '') + '</div></div>' +
+    '<div class="why">' + esc(p.why) + (p.dep ? ' <b>Depends on:</b> ' + esc(p.dep) : '') + '</div>' +
+    '<details><summary>Reused vs new</summary><div class="rn"><div class="re"><b>Reused DS masters</b>' + ids(p.reuse) + '</div><div class="ne"><b>New or extended</b>' + ids(p.neu) + '</div></div></details>' +
+  '</div>';
+}
+function renderPlanner(){
+  ['gap','near','scope'].forEach(k => { document.getElementById('p-' + k).innerHTML = PLAN.filter(p => p.kind === k).sort((a, b) => a.order - b.order).map(rowHTML).join(''); });
+  renderSummary();
+}
+function renderSummary(){
+  const by = c => PLAN.filter(p => state.choices[p.id] === c).sort((a, b) => a.order - b.order);
+  const eff = arr => arr.reduce((s, p) => s + p.eff, 0);
+  const B = by('build'), L = by('later'), S = by('skip'); const U = PLAN.length - B.length - L.length - S.length;
+  document.getElementById('sum-rows').innerHTML =
+    '<div class="row"><span>Build now</span><b>' + B.length + ' · ' + wavesLabel(eff(B)) + '</b></div>' +
+    '<div class="row"><span>Later</span><b>' + L.length + ' · ' + wavesLabel(eff(L)) + '</b></div>' +
+    '<div class="row"><span>Skip</span><b>' + S.length + '</b></div>' +
+    '<div class="row"><span>Undecided</span><b>' + U + '</b></div>';
+  document.getElementById('ol-build').innerHTML = B.length ? B.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  document.getElementById('ol-later').innerHTML = L.length ? L.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  const line = (label, arr) => label + (arr.length ? ' (' + wavesLabel(eff(arr)) + '): ' + arr.map(p => p.name).join(' · ') : ': —');
+  let msg = 'Vai — DSI gaps plan (' + new Date().toISOString().slice(0, 10) + ')\n' +
+    line('Build now', B) + '\n' + line('Later', L) + '\n' + 'Skip: ' + (S.length ? S.map(p => p.name).join(' · ') : '—') + '\n' +
+    (U ? 'Undecided: ' + PLAN.filter(p => !state.choices[p.id]).map(p => p.name).join(' · ') + '\n' : '') +
+    (state.notes ? 'Notes: ' + state.notes + '\n' : '') +
+    'Pipeline per item: mockup on WIP - Luca → Vai → master → QA strip → records.';
+  document.getElementById('msg').value = msg;
+  document.getElementById('notes').value = state.notes || '';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.seg button'); if (!b) return;
+  const id = b.closest('.prow').dataset.id; const c = b.dataset.c;
+  state.choices[id] = (state.choices[id] === c) ? '' : c; save();
+  const seg = b.closest('.seg'); seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.c === state.choices[id]));
+  renderSummary();
+});
+document.getElementById('apply').onclick = () => { PLAN.forEach(p => state.choices[p.id] = p.sug); save(); renderPlanner(); };
+document.getElementById('reset').onclick = () => { state.choices = {}; state.notes = ''; save(); renderPlanner(); };
+document.getElementById('notes').addEventListener('input', e => { state.notes = e.target.value; save(); renderSummary(); });
+document.getElementById('copy').onclick = async () => {
+  const t = document.getElementById('msg'); const ok = document.getElementById('copied');
+  try { await navigator.clipboard.writeText(t.value); ok.textContent = 'copied'; }
+  catch (e) { t.focus(); t.select(); try { document.execCommand('copy'); ok.textContent = 'copied'; } catch (e2) { ok.textContent = 'select the text and copy'; } }
+  setTimeout(() => ok.textContent = '', 2000);
+};
+renderPlanner();
+
+// Near deep-dive
+const FS = {have:['have','have'], comp:['comp','composable'], miss:['gap','missing'], skip:['scope','not for us']};
+const MOCK = {
+ alert:'<div class="mk-alert m-reuse"><span class="ico"></span><div class="mtx"><span class="lbl" style="width:90px;background:#8f93a8"></span><span class="lbl" style="width:170px"></span><div class="mbtns"><span class="mbtn m-new">Action</span><span class="mbtn m-new">Action</span></div></div><span class="mx m-new">×</span></div>',
+ crumb:'<div class="mk-crumb"><span class="crumb m-new"><span class="lbl" style="width:34px"></span></span><span class="sep">›</span><span class="crumb m-new"><span class="lbl" style="width:44px"></span></span><span class="sep">›</span><span class="crumb m-reuse"><span class="ico sm"></span><span class="lbl" style="width:50px"></span></span><span class="sep">›</span><span class="crumb m-reuse"><span class="lbl" style="width:56px;background:#8f93a8"></span></span></div>',
+ callout:'<div class="mk-callout m-reuse"><div class="mtx"><span class="lbl" style="width:80px;background:#8f93a8"></span><span class="lbl" style="width:190px"></span><span class="lbl" style="width:150px"></span></div><span class="tagx m-new">Neutral · Brand</span></div>',
+ checkbox:'<div class="rm"><div class="r"><span class="cb m-reuse on">✓</span><span class="lbl m-reuse" style="width:100px"></span></div><div class="r"><span class="cb m-new mixed">–</span><div class="mtx"><span class="lbl m-reuse" style="width:90px"></span><span class="lbl m-new" style="width:150px;height:7px"></span></div></div><div class="r"><span class="cb m-new err"></span><div class="mtx"><span class="lbl m-reuse" style="width:70px"></span><span class="lbl" style="width:110px;height:7px;background:#c0392b"></span></div></div></div>',
+ header:'<div class="mk-hdr"><div class="band m-new"><span class="lbl" style="width:60px"></span><span class="lbl" style="width:30px;margin-left:auto"></span><span class="lbl" style="width:36px"></span></div><div class="band tall m-new"><span class="ico"></span><span class="lbl" style="width:90px;background:#8f93a8"></span><span class="lbl" style="width:40px;margin-left:auto"></span></div><div class="band m-reuse"><span class="ico sm"></span><span class="lbl" style="width:60px"></span><span class="lbl" style="width:80px;margin-left:auto;height:14px;border-radius:7px;background:#fff;border:1px solid #c9cde0"></span><span class="ico sm"></span></div></div>',
+ hero:'<div class="mk-hero m-reuse"><span class="lbl" style="width:120px;background:#8f93a8"></span><span class="lbl m-new" style="width:200px;height:12px"></span><span class="lbl m-new" style="width:160px"></span><div class="mbtns"><span class="mbtn m-new">CTA</span><span class="mbtn m-new">CTA</span></div><span class="lbl" style="width:180px;height:16px;border-radius:8px;background:#fff;border:1px solid #c9cde0;margin-top:6px"></span></div>',
+ list:'<div class="mk-list m-reuse"><div class="li"><span class="ico sm"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:24px;margin-left:auto"></span></div><div class="li"><span class="av m-new"></span><div class="mtx"><span class="lbl" style="width:100px"></span><span class="lbl m-new" style="width:140px;height:7px"></span></div><span class="ico sm" style="margin-left:auto"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:70px"></span></div></div>',
+ popover:'<div class="mk-pop"><div class="bub dark m-reuse"><span class="lbl" style="width:70px;background:#fff"></span><span class="lbl" style="width:100px;background:#9aa0b8"></span></div><div class="bub m-new"><span class="lbl" style="width:70px;background:#8f93a8"></span><span class="lbl" style="width:100px"></span><span class="mx m-new" style="position:absolute;top:6px;right:6px">×</span></div></div>',
+ progress:'<div class="mk-prog"><div class="pb m-reuse"><div class="fill"></div></div><div class="pb m-new"><div class="fill ind"></div></div><div class="pbs"><div class="pb m-new"><div class="fill" style="background:#2e9e6f;width:70%"></div></div><div class="pb m-new"><div class="fill" style="background:#c0392b;width:35%"></div></div></div></div>',
+ sidebar:'<div class="mk-side m-reuse"><div class="li"><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div><div class="li sel"><span class="ico sm"></span><span class="lbl" style="width:60px"></span><span class="chev m-new" style="margin-left:auto">⌄</span></div><div class="li sub m-new"><span class="lbl" style="width:70px"></span></div><div class="li sub m-new"><span class="lbl" style="width:50px"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:90px"></span></div></div>',
+ stepper:'<div class="mk-step"><div class="steps"><div class="st m-reuse"><span class="num on">1</span><span class="lbl" style="width:50px"></span></div><div class="st m-reuse"><span class="num">2</span><span class="lbl" style="width:60px"></span></div><div class="st m-reuse"><span class="num m-new" style="border-radius:5px">★</span><span class="lbl" style="width:44px"></span></div></div><div class="mob m-new"><span class="num on">2</span><span class="lbl" style="width:90px"></span><span class="chev">⌄</span><div class="pb" style="grid-column:1/-1;height:6px;background:#e4e7f4"><div class="fill" style="width:50%"></div></div></div></div>',
+ tabs:'<div class="mk-tabs"><div class="tg m-reuse"><span class="tab on"><span class="lbl" style="width:40px;background:var(--brass)"></span></span><span class="tab"><span class="ico sm"></span><span class="lbl" style="width:36px"></span></span><span class="tab m-new" style="border-radius:6px"><span class="ico sm"></span></span><span class="tab cardt"><span class="lbl" style="width:30px"></span><span class="mx m-new" style="width:14px;height:14px;font-size:10px">×</span></span></div><div class="vt m-new"><span class="lbl" style="width:50px;background:var(--brass)"></span><span class="lbl" style="width:60px"></span><span class="lbl" style="width:44px"></span></div></div>',
+ toolbar:'<div class="mk-tb m-reuse"><div class="ti"><span class="ico"></span><span class="lbl m-new" style="width:26px;height:6px"></span></div><span class="vdiv m-new"></span><div class="ti"><span class="ico"></span><span class="lbl m-new" style="width:30px;height:6px"></span><span class="badge m-new" style="border-style:dashed">3</span></div><div class="ti"><span class="ico"></span><span class="lbl m-new" style="width:22px;height:6px"></span></div></div>',
+ upload:'<div class="mk-up"><div class="dz m-reuse"><span class="ico"></span><span class="lbl" style="width:120px"></span><span class="lbl" style="width:70px;height:7px;background:var(--brass)"></span></div><div class="fr m-reuse"><span class="ico sm"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:30px;height:7px;margin-left:auto"></span></div><div class="fr m-reuse"><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:80px"></span><div class="pb m-new" style="height:6px;width:140px"><div class="fill" style="width:60%"></div></div></div><span class="mx m-new" style="margin-left:auto">×</span></div><div class="fr m-new" style="border-color:#c0392b"><span class="ico sm"></span><span class="lbl" style="width:70px"></span><span class="lbl" style="width:60px;height:7px;background:#c0392b;margin-left:auto"></span></div></div>'
+};
+const NEAR = [
+ {id:'alert-close', dsi:'Alert', oursShort:'Alert 561:54', ours:'Alert 561:54 — Variant Warning|Danger|Info|Success · Layout Banner|Inline|Mini banner · Size M|S · props Title, Content, Show icon, Show title', dsiVars:'variants per type · highlighted link · additional content · close button. Anatomy: container, indicator bar, title, icon, close button, text', mock:'alert',
+  feats:[['Four semantic types (info, success, warning, danger)','have','Variant axis, the same four'],['Icon per type','have','Show icon'],['Title','have','Show title + Title'],['Text with inline links','comp','Content is a TEXT prop: an inline link is Link 568:2 or mixed text at usage'],['Additional content (paragraphs, buttons)','miss','An Actions slot for Button instances; no slot exists today'],['Close button (dismissible)','miss','Show close → Button icon 363:1417 Neutral Ghost XS'],['Indicator bar on the left (style)','have','Ours tints the family surface instead; same role']],
+  missing:'A dismiss control and a slot for actions or extra content. Every semantic part is there.'},
+ {id:'breadcrumb-n', dsi:'Breadcrumbs', oursShort:'Breadcrumb 580:432', ours:'Breadcrumb 580:432 — standalone; props Parent, Current, Show icon, Show parent, Show chevron', dsiVars:'base · con icona · con sfondo scuro. Anatomy: icons, parent pages with link, separator, current page', mock:'crumb',
+  feats:[['Hierarchical levels (N crumbs)','miss','Items slot of a Breadcrumb/Item (Tab group pattern), or a Show grandparent boolean'],['Icon on crumbs','have','Show icon (entity icon on the parent)'],['Separator','have','Show chevron (DSI draws / or ›: style)'],['Parent as link, current as text','have','Parent + Current props'],['Dark background','skip','No dark shells in the CRM; a Background=Inverse axis if ever'],['Responsive collapse on mobile','comp','Hide the parent at usage (Show parent)']],
+  missing:'Only depth: ours stops at parent › current.'},
+ {id:'callout-editorial', dsi:'Callout', oursShort:'Alert 561:54 Layout=Inline', ours:'Alert 561:54 Layout=Inline (border only) and Layout=Banner (tinted fill)', dsiVars:'Testo · Successo · Attenzione · Pericolo · Importante · Nota, each also "in evidenza" (filled) · Approfondimento (folded corner, read more, action). Anatomy: border, title, icon, text', mock:'callout',
+  feats:[['Successo / Attenzione / Pericolo','have','Alert Variant Success / Warning / Danger, Layout Inline'],['Testo and Nota (neutral)','miss','Variant Neutral on Alert'],['Importante (brand emphasis)','miss','Variant Brand on Alert'],['"In evidenza" filled versions','have','Layout Banner = tinted fill; Inline = border only'],['Full border vs left border (style)','have','Style only'],['Approfondimento: folded corner','skip','Editorial decoration, not worth carrying'],['Approfondimento: read more / action','comp','Section card 923:752 with the collapsed state once Accordion exists']],
+  missing:'Two colour families, neutral and brand. Cheap if done together with the Alert dismiss work.'},
+ {id:'checkbox-ind', dsi:'Checkbox', oursShort:'Checkbox 389:17', ours:'Checkbox 389:17 — State On|Off|Disabled · props Show label, Label', dsiVars:'base · in linea · disabilitato · raggruppati visivamente · con stato mixed. Anatomy: control box, label, optional description. States: default, hover, focus, active, disabled, readonly, error', mock:'checkbox',
+  feats:[['Checked / unchecked','have','State On / Off'],['Disabled','have','State Disabled'],['Inline and visually grouped','comp','Layout at usage; a group title is a label text or a Section card'],['Mixed / indeterminate state','miss','State Indeterminate (the group parent, select-all columns)'],['Description under the label','miss','Show description + Description text'],['Hover / Focus states','miss','A Focus ring on the Focus token; today only On / Off / Disabled exist'],['Error validation state','miss','State Error or Show error (danger border + message)'],['Readonly','skip','Disabled covers the read-only look in a design file']],
+  missing:'The states around the box: indeterminate, error, focus, and the optional description line.'},
+ {id:'header-layers', dsi:'Header', oursShort:'Navigation 428:344 + Navigation rail 429:1191', ours:'Navigation 428:344 — Size S|M|L; Title, Show logo, Show title, Show search, Show actions, Actions slot · Navigation rail 429:1191 — Sector × Collapsed|Expanded, Items slot · Announcement bar 568:38', dsiVars:'slim header (entity link, language, login) · header centrale (logo, name, tagline, social, search) · header navigazione (primary + secondary menu) · header completa · light variants · sticky · mobile overlay menu', mock:'header',
+  feats:[['Slim header (entity link, language, login)','skip','Institutional layer; SSO button 570:39 covers login on its own page'],['Header centrale (logo, name, tagline, social, search)','skip','Institutional layer; composable from Logo 446:14 + Link if ever'],['Primary navigation menu','have','Navigation 428:344 top bar + Navigation rail 429:1191 sections'],['Secondary (cross-cutting) navigation','comp','Actions slot on Navigation, or a List section in the rail'],['Dropdown submenus','have','Dropdown 400:56 + Menu item 404:110'],['Search (dedicated or overlay)','have','Show search on Navigation'],['Mobile menu overlay','miss','No mobile navigation shell: the same decision as Bottom nav'],['Sticky positioning','comp','Behaviour, prototype-level']],
+  missing:'Nothing for an app shell. What is missing are institutional layers and a mobile menu, the latter tied to the mobile-shell decision.'},
+ {id:'hero-cta', dsi:'Hero', oursShort:'Hero 569:15', ours:'Hero 569:15 — standalone; props Greeting, Show greeting, Show search, Show settings, Show announcement', dsiVars:'con immagine · con immagine piccolo · con testo · con testo centrato · con testo e immagine di sfondo · con overlay primary · con overlay e filtro · con margine negativo. Anatomy: container, overlay, kicker, title, text, call to action', mock:'hero',
+  feats:[['Background image','have','Photo fill at usage over the dark base'],['Small height variant','comp','Resize at usage (no Size axis)'],['Text-only on solid colour','comp','Drop the image fill at usage'],['Centered alignment','miss','An alignment variant or boolean'],['Colour overlay / filter','comp','Scrim_Top / Scrim_Bottom paint styles'],['Kicker + title + text','miss','Show title / Show text; ours carries only the IvyMode greeting'],['Call to action buttons','miss','Show CTA + an Actions slot of Buttons']],
+  missing:'Ours is a portal band (greeting, search, settings, announcement). It lacks the editorial trio: title, text, CTA.'},
+ {id:'list-subtitle', dsi:'List', oursShort:'Menu item 404:110 + List section 1090:5381', ours:'Menu item 404:110 — State Default|Hover|Selected|Disabled|Current; props Label, Number, Show icon left, Icon left, Show drag handle, Show remove icon, Show delete icon, Show open icon · List section 1090:5381 — Type Default|Card; Title, Items slot, Show action · Data row 581:89 — Label, Value, Control swap', dsiVars:'base · with avatar · with icon · with image · actions with arrow · multiple actions · with metadata · with description · menu variants (active, disabled, header + divider, large, multiline, controls left/right, nested) · link list with toggle · with checkbox', mock:'list',
+  feats:[['Text item','have','Menu item Label'],['Leading icon','have','Show icon left + Icon left'],['Leading avatar or thumbnail','miss','Icon left swap is 16px; a media slot sized for Avatar S (24)'],['Arrow / open action','have','Show open icon'],['Multiple actions, primary and secondary','have','Actions frame: Delete + Open, plus the Remove icon'],['Metadata on the right','have','Number prop (right-aligned text)'],['Description / multiline','miss','Show subtitle + Subtitle text'],['Header and divider','have','List section 1090:5381 Title; divider = 1px line at usage'],['Item with toggle or checkbox','have','Data row 581:89 Control swap (Toggle, Checkbox)'],['Active / disabled','have','State Selected, Current, Disabled'],['Nested expanded / collapsible','skip','Level axis removed on purpose; a second List section groups'],['Large size','skip','Density is fixed by design']],
+  missing:'Two things: a second line of text and a leading avatar or thumbnail.'},
+ {id:'popover-light', dsi:'Popover', oursShort:'Tooltip 401:116 + Panel 513:4712', ours:'Tooltip 401:116 — Arrow Bottom|Top|Left|Right|None; props Show title, Title, Show icon, Show content, Content, Show slot, Content slot · Panel 513:4712 — light flyout, Title + Content slot, no pointer', dsiVars:'base · alignment variants · with icon and link · hover modality · click-to-dismiss · for disabled elements. Anatomy: white background shape, title, icon, triangle pointer, text, link', mock:'popover',
+  feats:[['Title + text','have','Show title + Content'],['Pointer with alignment variants','have','Arrow Bottom / Top / Left / Right / None'],['Icon','have','Show icon'],['Link in the content','have','Content slot → Link 568:2'],['White (light) surface','miss','Variant Light on Tooltip; Panel 513:4712 is light but has no pointer'],['Close button','miss','Show close (Button icon Ghost XS)'],['Hover / click trigger, click-outside dismiss','comp','Behaviour, prototype-level'],['Popover on disabled elements','comp','Behaviour']],
+  missing:'Surface colour and a close button. Functionally, Tooltip already is the popover.'},
+ {id:'progress-indet', dsi:'Progress indicators', oursShort:'Progress bar 607:2191 · Donut chart 563:51 · Spinner 606:40', ours:'Progress bar 607:2191 — Label, Percentage, Show label · Donut chart 563:51 · Spinner 606:40 — Size S|M, Background Default|Inverse · Level bar 407:77 (semantic meter) · Skeleton 606:31', dsiVars:'donut · progress bar · with label · indeterminate · colour variants · button with progress bar · spinner · spinner alternative animation', mock:'progress',
+  feats:[['Donut','have','Donut chart 563:51'],['Progress bar','have','Progress bar 607:2191'],['Bar with label','have','Show label + Percentage'],['Indeterminate bar','miss','An Indeterminate variant (moving segment)'],['Colour variants','miss','A Variant axis on the Feedback family; today brass only, Level bar 407:77 is the semantic meter'],['Button with progress','comp','Spinner 606:40 swapped into Button Icon left at usage; a Loading state would add 160 Button variants'],['Spinner','have','Spinner S / M, Default / Inverse'],['Spinner alternative animation','skip','Motion, not a design-file concern']],
+  missing:'An indeterminate bar and semantic colours on the bar.'},
+ {id:'sidebar-nesting', dsi:'Sidebar', oursShort:'Navigation rail 429:1191 + List section 1090:5381', ours:'Navigation rail 429:1191 — Sector (15) × State Collapsed|Expanded; Show logo, Items slot · List section 1090:5381 + Menu item 404:110 State Current', dsiVars:'base · with icon · with right line · with left line · nested · dark background. Anatomy: header, main item, nesting icon, nested item, outer border, dividing line, secondary item', mock:'sidebar',
+  feats:[['Item list with header','have','List section 1090:5381 Title + Menu items'],['Icons','have','Show icon left'],['Active item','have','State Current'],['Left / right border line (style)','have','The rail has its own border'],['Nested collapsible sub-items','skip','Level axis removed on purpose; a second List section groups'],['Nesting icon (expand / collapse)','skip','Follows the nesting decision'],['Dark background','have','Sector axis: 15 tints incl. Neutral, a richer model than dark / light']],
+  missing:'Nothing, unless you reverse the nesting decision.'},
+ {id:'stepper-mobile', dsi:'Steppers', oursShort:'Stepper 562:3849 + Stepper/Step 562:27', ours:'Stepper 562:3849 — Items slot · Stepper/Step 562:27 — State Current|Complete|Upcoming; props Number, Label', dsiVars:'text-only heading · text and icon heading · ordered heading · with step navigation · mobile progress bar · mobile dots · mobile with save / confirm · dark background. Anatomy: step title, number, icon, state icon, expand icon, steps dropdown, navigation bar (back, save, forward, confirm)', mock:'stepper',
+  feats:[['Text-only and ordered headings','have','Step Label + Number'],['Text and icon heading','miss','Show icon + Icon swap on Stepper/Step'],['Step states active / completed / pending','have','State Current / Complete / Upcoming'],['Navigation bar: Back, Save, Forward, Confirm','comp','Buttons at usage under the Stepper'],['Mobile: single step with steps dropdown','miss','Breakpoint=Mobile on Stepper (Dropdown + Menu items for the list)'],['Mobile: progress bar or dots','miss','Same Mobile variant: Progress bar 607:2191 or Indicator 405:50'],['Dark background','skip','Background=Inverse only if a dark flow appears']],
+  missing:'The mobile form and an icon in the step heading.'},
+ {id:'tabs-vertical', dsi:'Tabs', oursShort:'Tab 398:326 + Tab group 632:443', ours:'Tab 398:326 — Emphasis Muted|Outline|Underline · Shape Default|Rounded · Size S|M|L|XL · State Default|Hover|Selected|Disabled; props Label, Show icon left/right, Icon left/right, Show badge, Badge · Tab group 632:443 — Emphasis, Items slot, Show rail', dsiVars:'horizontal full width / horizontal (text, icon, large icon, text + icon) · no scrollbar on mobile · panel control (text, large icon, text + icon, vertical left / right, horizontal bottom, dark) · card type · card type with add / remove', mock:'tabs',
+  feats:[['Text, icon, text + icon','have','Show icon left / right + Label'],['Icon-only tab','miss','A Show label boolean (Button group Segment has it, Tab does not)'],['Large icon','comp','Icon size follows Size S / M / L / XL'],['Full width','have','FILL items in Tab group 632:443'],['Card type','have','Emphasis Outline + Shape'],['Card type with add / remove','miss','Show close on Tab; add = Button icon at usage'],['Vertical (left / right, with background)','miss','An Orientation axis on Tab group, or List section + Menu item Current, the current answer'],['Horizontal bottom (border on top)','skip','Rare; not worth an axis'],['Dark background','skip','Background=Inverse only if needed'],['Badge on a tab','have','Show badge + Badge swap (DSI has none)']],
+  missing:'Vertical orientation, icon-only tabs and closable tabs.'},
+ {id:'toolbar-labeled', dsi:'Toolbar', oursShort:'Toolbar 407:29', ours:'Toolbar 407:29 — standalone; Items slot of Button / Button icon; Surface-inverse floating bar, horizontal', dsiVars:'grande / media / piccola · con divisori · con badge · con dropdown · verticale. Anatomy: background shape, icon, label, counter badge', mock:'toolbar',
+  feats:[['Icon items','have','Items slot of Button / Button icon'],['Three sizes','have','Button Size at usage'],['Active item','have','Button State Selected'],['Dividers','comp','A 1px line at usage inside the slot'],['Badge counter on an item','miss','A badge overlay; comes with the Bottom nav item'],['Icon + label stacked','miss','The Bottom nav item, reused here'],['Dropdown sub-navigation','comp','Button + Dropdown at usage'],['Vertical orientation','miss','An Orientation axis (the slot is horizontal)']],
+  missing:'Labels, badges and a vertical form. The first two are the Bottom nav item.'},
+ {id:'upload-filerow', dsi:'Upload', oursShort:'Dropzone 610:128 + File row 563:33', ours:'Dropzone 610:128 — Title, Hint, Show hint (icon, dashed border, browse Link) · File row 563:33 — Name, Meta, Show status dot · Progress bar 607:2191 · Add documents 544:125 (AI)', dsiVars:'con lista di file · con anteprima delle immagini · con avatar · galleria · trascina e rilascia · con animazione. Anatomy: button, filename, size, status icon, progress bar, error state; dropzone icon, text, link, progress, percentage, file details', mock:'upload',
+  feats:[['Upload button','have','Button 362:338 with icon'],['Drag and drop area (icon, text, browse link)','have','Dropzone 610:128'],['File row: name + size','have','File row 563:33 Name + Meta'],['File row: upload status icon','have','Show status dot'],['File row: progress bar','miss','Show progress on File row (Progress bar 607:2191)'],['File row: error state','miss','State Error on File row'],['Cancel / remove','miss','Show remove (Button icon Ghost XS)'],['Dropzone: progress + percentage while uploading','miss','State Uploading on Dropzone'],['Image preview','miss','A thumbnail variant of File row'],['Avatar upload','comp','Avatar 512:979 + Button icon overlay at usage'],['Gallery','comp','Image frames + Button; Property card carousel for the display side'],['Animation','skip','Motion']],
+  missing:'The in-flight and failure states: progress, error, cancel, and a preview.'}
+];
+(function near(){
+  const planById = Object.fromEntries(PLAN.map(p => [p.id, p]));
+  const counts = n => { const c = {have:0, comp:0, miss:0, skip:0}; n.feats.forEach(f => c[f[1]]++); return c; };
+  const bar = c => '<div class="mini nbar">' + ['have','comp','miss','skip'].map(k => c[k] ? '<div style="flex:' + c[k] + ';background:var(--' + FS[k][0] + ')" title="' + FS[k][1] + ' ' + c[k] + '"></div>' : '').join('') + '</div>';
+  const sorted = [...NEAR].sort((a, b) => counts(b).miss - counts(a).miss || a.dsi.localeCompare(b.dsi));
+  let h = '<thead><tr><th>DSI</th><th>Our master</th><th>Features</th><th>Missing</th><th>Effort</th><th>Suggested</th><th></th></tr></thead><tbody>';
+  sorted.forEach(n => { const c = counts(n), p = planById[n.id];
+    h += '<tr><td class="nm"><a href="#near-' + n.id + '">' + esc(n.dsi) + '</a></td><td class="dsc">' + ids(n.oursShort) + '</td><td>' + bar(c) + '<span class="small muted">' + c.have + ' have · ' + c.comp + ' composable · <b>' + c.miss + ' missing</b> · ' + c.skip + ' not for us</span></td><td class="dsc">' + (c.miss ? n.feats.filter(f => f[1] === 'miss').map(f => esc(f[0])).join(' · ') : '—') + '</td><td>' + wavesLabel(p.eff) + '</td><td>' + CH[p.sug] + '</td><td><a class="small" href="#plan-' + n.id + '" style="color:var(--ink)">decide ↓</a></td></tr>'; });
+  document.getElementById('near-sum').innerHTML = h + '</tbody>';
+  document.getElementById('near-cards').innerHTML = sorted.map(n => { const c = counts(n), p = planById[n.id];
+    return '<div class="card near-card" id="near-' + n.id + '"><div class="card-h"><h3>' + esc(n.dsi) + ' <span class="muted">→</span> ' + ids(n.oursShort) + '</h3><span class="n">' + wavesLabel(p.eff) + ' · published master, mockup passage applies</span><span class="n" style="margin-left:auto">' + bar(c) + '</span></div>' +
+      '<div class="near-b"><div><p class="small muted" style="margin:0 0 8px"><b>DSI offers:</b> ' + esc(n.dsiVars) + '</p><p class="small muted" style="margin:0 0 10px"><b>Ours:</b> ' + ids(n.ours) + '</p>' +
+      '<table class="feat"><thead><tr><th>DSI feature</th><th>Status</th><th>How we cover or close it</th></tr></thead><tbody>' + n.feats.map(f => '<tr><td>' + esc(f[0]) + '</td><td><span class="chip ' + FS[f[1]][0] + '">' + FS[f[1]][1] + '</span></td><td class="dsc">' + ids(f[2]) + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<div><div class="mock">' + MOCK[n.mock] + '</div><p class="small" style="margin:10px 0"><b>Missing, in one line:</b> ' + esc(n.missing) + '</p><a class="btn" href="#plan-' + n.id + '" style="display:inline-block;text-decoration:none">Decide in the planner ↓</a></div></div></div>'; }).join('');
+})();
+
+// Full table
+(function table(){
+  const f = {q:'', g:'', v:new Set(ORDER), hide:false, sort:'n', dir:1};
+  const gsel = document.getElementById('gsel'); [...new Set(ROWS.map(r => r.g))].forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; gsel.appendChild(o); });
+  document.getElementById('fchips').innerHTML = ORDER.map(k => '<span class="chip ' + k + ' fchip on" data-v="' + k + '">' + V[k] + '</span>').join(' ');
+  const tb = document.getElementById('tb'), cnt = document.getElementById('count');
+  function draw(){
+    let rs = ROWS.filter(r => f.v.has(r.v) && (!f.g || r.g === f.g) && (!f.hide || ['near','gap','scope'].includes(r.v)));
+    if (f.q) { const q = f.q.toLowerCase(); rs = rs.filter(r => (r.n + ' ' + r.ds + ' ' + r.note + ' ' + r.g).toLowerCase().includes(q)); }
+    rs.sort((a, b) => { const ka = f.sort === 'v' ? ORDER.indexOf(a.v) : a[f.sort], kb = f.sort === 'v' ? ORDER.indexOf(b.v) : b[f.sort]; return (ka > kb ? 1 : ka < kb ? -1 : a.n.localeCompare(b.n)) * f.dir; });
+    tb.innerHTML = rs.map(r => '<tr><td class="nm">' + esc(r.n) + '</td><td class="muted small">' + esc(r.g) + '</td><td><span class="chip ' + r.v + '">' + V[r.v] + '</span></td><td class="dsc">' + ids(r.ds) + '</td><td class="dsc">' + esc(r.note) + '</td></tr>').join('');
+    cnt.textContent = rs.length + ' of 55';
+  }
+  document.getElementById('q').addEventListener('input', e => { f.q = e.target.value; draw(); });
+  gsel.addEventListener('change', e => { f.g = e.target.value; draw(); });
+  document.getElementById('hidecovered').addEventListener('change', e => { f.hide = e.target.checked; draw(); });
+  document.getElementById('fchips').addEventListener('click', e => { const c = e.target.closest('.fchip'); if (!c) return; const v = c.dataset.v; if (f.v.has(v)) f.v.delete(v); else f.v.add(v); c.classList.toggle('on', f.v.has(v)); draw(); });
+  document.querySelectorAll('#all th[data-k]').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; if (f.sort === k) f.dir *= -1; else { f.sort = k; f.dir = 1; } document.querySelectorAll('#all th').forEach(x => x.classList.toggle('sorted', x === th)); draw(); }));
+  draw();
+})();
+</script>
+</body>
+</html>
