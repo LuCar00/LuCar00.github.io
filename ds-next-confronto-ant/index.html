@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS Next · Ant Design coverage — decide what to build</title>
+<style>
+  :root{--bg:#ffffff;--ink:#3f4254;--muted:#656876;--line:#d3d3db;--soft:#f6f7fb;--brass:#ae9142;--brass-soft:#fbf7ea;
+    --have:#cef1e6;--have-ink:#076e4f;--near:#d2deec;--near-ink:#113760;--comp:#e4e7f4;--comp-ink:#2a2b2f;--behav:#f1f1f4;--behav-ink:#656876;
+    --gap:#f8d7da;--gap-ink:#842029;--scope:#ffeecc;--scope-ink:#664300}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  header .tot{color:var(--muted);font-size:13px}
+  header .tot b{color:var(--ink)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;white-space:nowrap}
+  .chip.have{background:var(--have);color:var(--have-ink)}
+  .chip.near{background:var(--near);color:var(--near-ink)}
+  .chip.comp{background:var(--comp);color:var(--comp-ink)}
+  .chip.behav{background:var(--behav);color:var(--behav-ink);border:1px dashed #c3c5cf}
+  .chip.gap{background:var(--gap);color:var(--gap-ink)}
+  .chip.scope{background:var(--scope);color:var(--scope-ink)}
+  .chip.lock{background:#fff;color:var(--muted);border:1px solid var(--line)}
+  nav.top{padding:10px 24px;border-bottom:1px solid var(--line);background:var(--soft);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  nav.top a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:15px;margin:36px 0 8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  h2:first-child{margin-top:8px}
+  h3{font-size:15px;margin:0}
+  .intro{color:var(--muted);font-size:13px;max-width:900px;margin:0 0 12px}
+  .intro a,.small a{color:var(--ink)}
+  .card{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;margin:0 0 16px}
+  .card-h{display:flex;align-items:baseline;gap:14px;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .card-h .n{color:var(--muted);font-size:12px}
+  .card-b{padding:14px}
+  code,.id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--muted);background:var(--soft);padding:0 4px;border-radius:3px}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  .bar{display:flex;height:28px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin:8px 0 6px}
+  .bar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.2px}
+  .bar .have{background:var(--have);color:var(--have-ink)} .bar .near{background:var(--near);color:var(--near-ink)} .bar .comp{background:var(--comp);color:var(--comp-ink)}
+  .bar .behav{background:var(--behav);color:var(--behav-ink)} .bar .gap{background:var(--gap);color:var(--gap-ink)} .bar .scope{background:var(--scope);color:var(--scope-ink)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 0}
+  .kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
+  .kpi b{display:block;font-size:22px;line-height:1.1}
+  .kpi span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:7px 12px;border-bottom:1px solid #eef0f4;vertical-align:top;font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .grp td:first-child{white-space:nowrap;font-weight:600}
+  .mini{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line);min-width:160px}
+  .mini div{height:100%}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .two .card{margin:0}
+  .two ul{margin:0;padding-left:18px;font-size:13px}
+  .two li{margin:4px 0}
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .q{border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:110px;background:#fff}
+  .q h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .q .qi{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;font-size:12px;margin:0 6px 6px 0;background:#fff}
+  .q .qi .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .q.first{background:#f3fbf8;border-color:#b7e4d4}
+  .axis{font-size:11px;color:var(--muted);margin:6px 0 0}
+  .planner{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .summary{position:sticky;top:76px;border:1px solid var(--line);border-radius:8px;background:var(--soft);padding:14px}
+  .summary h3{margin:0 0 10px;font-size:14px}
+  .summary .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .summary .row:last-of-type{border-bottom:0}
+  .summary ol{margin:6px 0 10px;padding-left:20px;font-size:12.5px}
+  .summary textarea{width:100%;height:190px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical;background:#fff;color:var(--ink)}
+  .summary input[type=text]{width:100%;font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .btn{font:12.5px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer}
+  .btn:hover{background:var(--soft)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:#2a2b2f}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding:10px 14px;border-bottom:1px solid #eef0f4;align-items:center}
+  .prow:last-child{border-bottom:0}
+  .prow .t{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+  .prow .t b{font-size:13.5px}
+  .prow .why{grid-column:1 / -1;font-size:12.5px;color:var(--muted)}
+  .prow .meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);align-items:center}
+  .prow.locked{background:#fcfcfd}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--muted);background:#fff;white-space:nowrap}
+  .tag.ev3{border-color:#b7e4d4;background:#f3fbf8;color:var(--have-ink)} .tag.ev2{border-color:#c9d6e6;background:#f4f8fc;color:var(--near-ink)} .tag.ev1{border-color:#f0d9a6;background:#fff8ea;color:var(--scope-ink)} .tag.ev0{border-color:#e4c8cb;background:#fdf3f4;color:var(--gap-ink)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .seg button{font:12px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:0;background:#fff;color:var(--muted);padding:7px 10px;cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button:hover{background:var(--soft)}
+  .seg button.on.build{background:var(--have);color:var(--have-ink)}
+  .seg button.on.later{background:var(--near);color:var(--near-ink)}
+  .seg button.on.skip{background:var(--comp);color:var(--comp-ink)}
+  .prow details{grid-column:1 / -1;font-size:12.5px}
+  .prow summary{cursor:pointer;color:var(--muted);font-size:12px}
+  .prow .rn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 2px}
+  .prow .rn div{border-radius:6px;padding:8px 10px;font-size:12.5px}
+  .prow .rn .re{background:var(--comp)}
+  .prow .rn .ne{background:var(--brass-soft);border:1px dashed var(--brass)}
+  .prow .rn b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:3px}
+  .sug{font-size:11px;color:var(--muted)}
+  .sug a{color:var(--ink)}
+  .gaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+  .gap-card .card-b{display:grid;gap:12px}
+  .mock{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;justify-content:center;align-items:center;min-height:130px;background-image:radial-gradient(#eceef3 1px,transparent 1px);background-size:12px 12px}
+  .m-reuse{background:#e4e7f4;border:1px solid #c9cde0}
+  .m-new{border:1.5px dashed var(--brass);background:var(--brass-soft)}
+  .mlegend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+  .mlegend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  .ico{width:22px;height:22px;border-radius:6px;background:#c9cde0;display:inline-block;position:relative;flex:0 0 auto}
+  .ico:after{content:"";position:absolute;inset:6px;border:2px solid #fff;border-radius:50%}
+  .ico.sm{width:14px;height:14px;border-radius:4px}
+  .ico.sm:after{inset:4px;border-width:1.5px}
+  .lbl{height:9px;border-radius:5px;background:#b9bdd0;display:inline-block}
+  .mtx{display:grid;gap:6px;flex:1;min-width:0}
+  .mbtns{display:flex;gap:6px;margin-top:2px}
+  .mbtn{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;color:var(--ink)}
+  .mx{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);flex:0 0 auto}
+  .pb{height:10px;border-radius:5px;overflow:hidden;position:relative}
+  .fill{height:100%;width:55%;background:var(--brass);border-radius:5px}
+  .fill.ind{width:30%;margin-left:35%;background:repeating-linear-gradient(45deg,var(--brass) 0 6px,#e5d7a8 6px 12px)}
+  .li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  .li.sel{box-shadow:inset 3px 0 0 var(--brass)}
+  .li.sub{margin-left:28px}
+  .chev{font-size:12px;width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink)}
+  .rm{display:grid;gap:12px} .rm .r{display:flex;align-items:center;gap:10px}
+  .cb{width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 auto}
+  .cb.on{background:var(--ink);border-color:var(--ink)} .cb.mixed{color:var(--brass)}
+  .mk-alert{display:flex;gap:10px;padding:10px 12px;border-radius:8px;width:300px;align-items:flex-start;border-left:4px solid #8f93a8!important}
+  .mk-crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+  .crumb{display:inline-flex;align-items:center;gap:5px;padding:4px 6px;border-radius:5px}
+  .sep{color:var(--muted);font-size:12px}
+  .mk-list{width:270px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .av{width:24px;height:24px;border-radius:50%;flex:0 0 auto}
+  .mk-pop{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  .bub{position:relative;padding:10px 28px 10px 12px;border-radius:8px;display:grid;gap:6px;width:150px}
+  .bub.dark{background:#3f4254!important;border-color:#3f4254!important}
+  .bub:after{content:"";position:absolute;left:18px;bottom:-7px;width:12px;height:12px;transform:rotate(45deg);background:#3f4254}
+  .bub.m-new:after{background:var(--brass-soft);border-right:1.5px dashed var(--brass);border-bottom:1.5px dashed var(--brass)}
+  .mk-prog{width:280px;display:grid;gap:10px} .pbs{display:grid;gap:6px}
+  .mk-side{width:220px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .mk-step{display:grid;gap:12px;width:300px}
+  .steps{display:flex;gap:8px}
+  .st{flex:1;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px}
+  .num{width:18px;height:18px;border-radius:50%;background:#fff;border:1px solid #8f93a8;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;color:var(--ink);flex:0 0 auto}
+  .num.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .num.err{border-color:#c0392b;color:#c0392b}
+  .vsteps{display:grid;gap:8px;padding:8px 10px;border-radius:8px}
+  .vsteps .st{padding:2px 0}
+  .mk-tabs{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  .tg{display:flex;gap:4px;padding:6px;border-radius:8px;align-items:flex-end}
+  .tab{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-bottom:2px solid transparent}
+  .tab.on{border-bottom-color:var(--brass)}
+  .tab.cardt{border:1px solid #c9cde0;border-radius:6px 6px 0 0;background:#fff}
+  .mk-up{width:300px;display:grid;gap:6px}
+  .dz{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px;border-radius:8px;border-style:dashed!important}
+  .fr{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  .mk-tree{width:260px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .mk-tree .li{gap:6px}
+  .mk-tree .li.l1{margin-left:22px} .mk-tree .li.l2{margin-left:44px}
+  .mk-drawer{width:320px;height:170px;border-radius:8px;position:relative;overflow:hidden;background:#fff!important}
+  .mk-drawer .scrim{position:absolute;inset:0;background:rgba(63,66,84,.35)}
+  .mk-drawer .sheet{position:absolute;top:0;right:0;bottom:0;width:150px;background:var(--brass-soft);border-left:1.5px dashed var(--brass);display:grid;grid-template-rows:auto 1fr auto;gap:8px;padding:10px}
+  .mk-drawer .sheet .hd{display:flex;align-items:center;justify-content:space-between}
+  .mk-drawer .sheet .ft{display:flex;gap:6px;justify-content:flex-end}
+  .mk-drawer .ghost{position:absolute;left:12px;top:12px;display:grid;gap:8px}
+  .mk-slider{width:300px;display:grid;gap:14px}
+  .mk-slider .track{height:6px;border-radius:3px;position:relative}
+  .mk-slider .sfill{position:absolute;left:25%;right:35%;top:0;bottom:0;background:var(--brass);border-radius:3px}
+  .mk-slider .hd{position:absolute;top:-7px;width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--brass);box-shadow:0 0 0 1.5px var(--brass-soft)}
+  .mk-slider .marks{display:flex;justify-content:space-between}
+  .mk-slider .tip{position:absolute;top:-34px;left:25%;transform:translateX(-50%);background:#3f4254;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+  .walk td:first-child{white-space:nowrap;font-weight:600}
+  .nsum td.nm a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .nsum .mini{margin-bottom:4px}
+  .nears{display:grid;grid-template-columns:1fr;gap:16px}
+  .near-card .card-h h3{font-size:14.5px}
+  .near-b{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:14px}
+  .near-b .mock{min-height:150px}
+  table.feat th{padding:6px 8px}
+  table.feat td{font-size:12.5px;padding:5px 8px;vertical-align:middle}
+  table.feat td:first-child{font-weight:600}
+  .nbar{min-width:120px;width:140px}
+  .filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);font-size:12.5px}
+  .filters input[type=search]{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:200px;background:#fff;color:var(--ink)}
+  .filters select{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .fchip{cursor:pointer;opacity:.45;border:1px solid transparent}
+  .fchip.on{opacity:1;border-color:rgba(0,0,0,.15)}
+  .tablewrap{overflow-x:auto}
+  #all th{cursor:pointer;user-select:none}
+  #all th.sorted:after{content:" ▾";color:var(--brass)}
+  #all td.dsc{font-size:12.5px}
+  #all td.nm{font-weight:600;white-space:nowrap}
+  .count{font-size:12px;color:var(--muted);margin-left:auto}
+  footer{padding:24px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:32px}
+  @media (max-width:900px){.planner{grid-template-columns:1fr}.summary{position:static}.quad{grid-template-columns:1fr}.gaps{grid-template-columns:1fr}.prow .rn{grid-template-columns:1fr}.two{grid-template-columns:1fr}.near-b{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>DS Next · Ant Design coverage — decide what to build</h1>
+  <div class="tot" id="totals"></div>
+  <div class="legend">
+    <span class="chip have">have 1:1</span><span class="chip near">have, near</span><span class="chip comp">composable</span><span class="chip behav">behaviour / primitive</span><span class="chip gap">gap</span><span class="chip scope">out of scope</span>
+  </div>
+</header>
+<nav class="top">
+  <a href="#overview">Overview</a><a href="#adds">What Ant adds to the program</a><a href="#matrix">Evidence × effort</a><a href="#decide">Decide: the planner</a><a href="#gaps">New pieces, drawn</a><a href="#drawer">Drawer walk-through</a><a href="#near">Near: what exactly is missing</a><a href="#all">All 73 components</a><a href="#method">Method</a>
+</nav>
+<main>
+
+<h2 id="overview">Overview</h2>
+<p class="intro">Ant Design 6.6.4, 73 components in its own seven categories, against the live census of every DS Next Claude master (2026-09-15). Ant is a developer library: nine of the 73 are layout primitives, scroll behaviours or React plumbing that Figma expresses with auto-layout and prototypes, so the real denominator is 64. Same legend as the Design System Italia page, which this one is meant to be read next to.</p>
+<div class="card"><div class="card-b">
+  <div class="bar" id="bar"></div>
+  <div class="kpis" id="kpis"></div>
+  <h3 style="margin:18px 0 6px">Coverage by Ant category <span class="muted small">(Ant's own grouping)</span></h3>
+  <div class="tablewrap"><table class="grp" id="grp"></table></div>
+</div></div>
+
+<h2 id="adds">What Ant adds to the approved program</h2>
+<p class="intro">Most of what Ant exposes as missing is already in the DSI program you approved on 2026-09-15. The left card is informational; the right card is the new work this pass surfaces, and the planner below decides it.</p>
+<div class="two">
+  <div class="card"><div class="card-h"><h3>Already covered by the DSI program</h3><span class="n">no new decision</span></div><div class="card-b"><ul id="covered"></ul></div></div>
+  <div class="card"><div class="card-h"><h3>New from Ant</h3><span class="n">decide below</span></div><div class="card-b"><ul>
+    <li><b>Drawer</b> — a right-hand sheet for details and forms, Ant's most used CRM pattern. Every part exists inside Modal <code>540:3823</code>; what is missing is edge anchoring: a Placement axis. ½ wave.</li>
+    <li><b>Slider</b> — the only genuinely new gap. Nothing draggable exists; the natural home is the filter UI (price, surface, distance). ½ wave, when that UI is designed.</li>
+    <li><b>Tree row</b> — Tree and TreeSelect need a row that indents, expands and optionally checks; Wave 58 gives the nesting, this adds chevron + checkbox. ¼ on top.</li>
+    <li><b>Steps vertical + Error</b> — an Orientation axis on Stepper and an Error state on Step. ¼.</li>
+    <li><b>Divider master</b> — a bound 1px line with optional label, so lists and cards stop drawing their own. ⅛.</li>
+    <li>Six optional refinements (Table density, Date picker month/year views, Status dot Info + Neutral, Avatar square, Cascader panel, Result illustrations), most suggested as later or skip.</li>
+  </ul></div></div>
+</div>
+
+<h2 id="matrix">Evidence × effort — the new candidates</h2>
+<p class="intro">Only the items that are new decisions. The already-approved ones sit in their DSI waves. Effort in waves, as usual.</p>
+<div class="quad" id="quad"></div>
+<p class="axis">Evidence: <b>proven</b> = used in the working file · <b>basic</b> = a standard pattern the CRM screens hit constantly · <b>conditional</b> = depends on a roadmap or design decision · <b>none</b> = no CRM evidence. Effort: ⅛ props-only · ¼ small master or axis · ½ master + sub-component or a published-master restructure.</p>
+
+<h2 id="decide">Decide — mark each new candidate Build now · Later · Skip</h2>
+<p class="intro"><b>Apply suggestions</b> pre-fills my recommendation. Approved and skipped items from the DSI plan are shown locked, for context. The summary turns your choices into a message to paste back as the "Vai".</p>
+<div class="planner">
+  <div>
+    <div class="btns"><button class="btn primary" id="apply">Apply suggestions</button><button class="btn" id="reset">Reset all</button></div>
+    <div class="card"><div class="card-h"><h3>New from Ant — structural</h3><span class="n">a new master or a published-master extension</span></div><div id="p-main"></div></div>
+    <div class="card"><div class="card-h"><h3>New from Ant — refinements</h3><span class="n">small axes or props on masters we have</span></div><div id="p-minor"></div></div>
+    <div class="card"><div class="card-h"><h3>Out of scope</h3><span class="n">listed so the decision is explicit</span></div><div id="p-scope"></div></div>
+    <div class="card"><div class="card-h"><h3>Already decided in the DSI program</h3><span class="n">locked · approved items with their wave, skipped items as skipped</span></div><div id="p-locked"></div></div>
+  </div>
+  <aside class="summary">
+    <h3>Your plan</h3>
+    <div id="sum-rows"></div>
+    <div style="margin-top:12px"><b class="small">Build now, in order</b><ol id="ol-build"></ol></div>
+    <div><b class="small">Later</b><ol id="ol-later"></ol></div>
+    <label class="small muted" for="notes">Notes for the message</label>
+    <input type="text" id="notes" placeholder="e.g. filter UI planned for Q1 → move Slider up">
+    <div class="btns"><button class="btn primary" id="copy">Copy message</button><span class="small muted" id="copied"></span></div>
+    <textarea id="msg" readonly></textarea>
+  </aside>
+</div>
+
+<h2 id="gaps">New pieces, drawn</h2>
+<p class="intro">Schematic only. Solid gray parts are existing DS masters we would reuse; brass dashed parts are new or extended. The four gaps Ant shares with DSI (Pagination, Radio, Collapse, Timeline) are drawn on the <a href="https://lucar00.github.io/ds-next-confronto-dsitalia/#gaps">DSI page</a> and are not repeated here.</p>
+<div class="mlegend" style="margin:0 0 12px"><span><i class="m-reuse"></i>existing DS master, reused</span><span><i class="m-new"></i>new master or extension</span></div>
+<div class="gaps">
+  <div class="card gap-card"><div class="card-h"><h3>Drawer</h3><span class="n">½ wave · Placement axis on Modal</span></div><div class="card-b">
+    <div class="mock"><div class="mk-drawer m-reuse"><div class="ghost"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="scrim"></div><div class="sheet"><div class="hd"><span class="lbl" style="width:60px;background:#8f93a8"></span><span class="mx m-reuse" style="width:16px;height:16px;font-size:10px">×</span></div><div class="mtx"><span class="lbl m-reuse" style="width:100%"></span><span class="lbl m-reuse" style="width:80%"></span><span class="lbl m-reuse" style="width:60%"></span></div><div class="ft"><span class="mbtn m-reuse">Annulla</span><span class="mbtn m-reuse" style="background:#3f4254;color:#fff;border-color:#3f4254">Salva</span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Modal <code>540:3823</code> parts as they are: Title, close, Intro, Content slot, Actions slot, the Surface-overlay scrim, Shadow_Overlay. <b>Extension:</b> <code>Placement=Center | Right | Left</code>; Right and Left are full height and edge-anchored, widths 378 and 736 as presets at usage (Ant's default and large). <b>Why it is missing:</b> Panel <code>513:4712</code> floats under a trigger and the AI panel <code>548:360</code> is a domain shell; nothing generic is anchored to an edge. Modal is a standalone component today, so becoming a set is a restructure: mockup passage.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Slider</h3><span class="n">½ wave · new master · evidence: filters, not yet designed</span></div><div class="card-b">
+    <div class="mock"><div class="mk-slider m-new" style="padding:34px 18px 14px;border-radius:8px"><div class="track m-reuse" style="border:0;background:#e4e7f4"><div class="sfill"></div><span class="hd" style="left:calc(25% - 10px)"></span><span class="hd" style="left:calc(65% - 10px)"></span><span class="tip m-reuse" style="background:#3f4254;border:0">250k</span></div><div class="marks"><span class="lbl" style="width:22px;height:6px"></span><span class="lbl" style="width:22px;height:6px"></span><span class="lbl" style="width:22px;height:6px"></span><span class="lbl" style="width:22px;height:6px"></span><span class="lbl" style="width:22px;height:6px"></span></div></div></div>
+    <div class="small"><b>Reuse:</b> Tooltip <code>401:116</code> Top as the value bubble, Action-primary tokens for the fill and handle border, Action-secondary-bg-muted for the track, Body_Xs for marks. <b>New:</b> the <code>Slider</code> master: track + fill + handle (20px on element-size-xxs, Surface-base-bg with Action-primary Border-2), <code>Range Off | On</code>, States Default / Hover / Disabled, <code>Show marks</code>, <code>Show value</code>. Vertical and reverse not for us. <b>Why it is missing:</b> nothing draggable exists; Level bar <code>407:77</code> and Progress bar are static meters. No slider in the working file yet, hence "later, when the filter UI is designed".</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Tree row</h3><span class="n">¼ wave on top of Wave 58 · Tree + TreeSelect</span></div><div class="card-b">
+    <div class="mock"><div class="mk-tree m-reuse"><div class="li"><span class="chev m-new">⌄</span><span class="cb m-new mixed">–</span><span class="ico sm"></span><span class="lbl" style="width:90px"></span></div><div class="li l1"><span class="chev m-new">⌄</span><span class="cb m-new on">✓</span><span class="ico sm"></span><span class="lbl" style="width:70px"></span></div><div class="li l2"><span class="chev" style="opacity:0">⌄</span><span class="cb m-new on">✓</span><span class="lbl" style="width:60px"></span></div><div class="li l2"><span class="chev" style="opacity:0">⌄</span><span class="cb m-new"></span><span class="lbl" style="width:50px"></span></div><div class="li l1"><span class="chev m-new">›</span><span class="cb m-new"></span><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div></div></div>
+    <div class="small"><b>Reuse:</b> Menu item <code>404:110</code> with the nesting Wave 58 adds (indent), its drag handle and icons, Checkbox <code>389:17</code> for checkable trees. <b>New:</b> <code>Show expand icon</code> (chevron, open/closed) and <code>Show checkbox</code> on the nested row; TreeSelect = Input select-mode + Dropdown <code>400:56</code> filled with these rows, multiple values as Chips. <b>Not for us:</b> connector lines (showLine). <b>Evidence:</b> building → floor → unit hierarchies are plausible in the product, none is drawn yet.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Steps: vertical + Error</h3><span class="n">¼ wave · Stepper axis + Step state</span></div><div class="card-b">
+    <div class="mock"><div class="mk-step" style="grid-template-columns:1fr auto;display:grid;gap:18px;align-items:start"><div class="steps m-reuse" style="padding:6px;border-radius:8px"><div class="st"><span class="num on">1</span><span class="lbl" style="width:40px"></span></div><div class="st"><span class="num err m-new" style="background:#fff">!</span><span class="lbl" style="width:44px"></span></div><div class="st"><span class="num">3</span><span class="lbl" style="width:36px"></span></div></div><div class="vsteps m-new"><div class="st"><span class="num on">1</span><span class="lbl" style="width:60px"></span></div><div class="st"><span class="num">2</span><span class="lbl" style="width:48px"></span></div><div class="st"><span class="num">3</span><span class="lbl" style="width:56px"></span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Stepper <code>562:3849</code> and Stepper/Step <code>562:27</code> as they are, Feedback-danger tokens for the failed step. <b>Extension:</b> <code>Orientation=Horizontal | Vertical</code> on Stepper (vertical = steps stacked, the bar becomes a left rail) and <code>State=Error</code> on Step. Rides with Wave 54 (Stepper Mobile + icon heading) if approved together; Ant's dot, navigation, inline and panel types are not for us.</div>
+  </div></div>
+</div>
+
+<h2 id="drawer">Drawer — where side panels live today</h2>
+<p class="intro">The one Ant pattern a CRM leans on most, checked against every panel-like master we have: could it be the edge-anchored sheet, and if not, what is it.</p>
+<div class="card"><div class="tablewrap"><table class="walk">
+  <thead><tr><th>Master</th><th>What it is</th><th>As an edge-anchored sheet?</th></tr></thead>
+  <tbody>
+    <tr><td>Modal <code>540:3823</code></td><td>Centered dialog: Title, Show icon, Intro, Content slot, Actions slot, over the Surface-overlay scrim</td><td>Has every part a Drawer needs except the anchoring. The natural host of a Placement axis</td></tr>
+    <tr><td>Panel <code>513:4712</code></td><td>Floating flyout shell (profile, mailboxes): Title + Content slot, width free</td><td>Floats under a trigger; no scrim, no footer, not full height</td></tr>
+    <tr><td>AI panel <code>548:360</code></td><td>The assistant's right-hand panel: header + chat feed + input bar</td><td>Proof that a right panel exists in the product, but a domain shell, not a generic sheet</td></tr>
+    <tr><td>Navigation rail <code>429:1191</code> Expanded</td><td>Sidebar that overlays the top bar</td><td>Navigation, not content</td></tr>
+    <tr><td>Contextual actions <code>547:140</code></td><td>Gradient scrim above the AI input</td><td>An overlay fragment, not a container</td></tr>
+  </tbody>
+</table></div></div>
+<p class="intro">Conclusion: no Drawer, but every part exists inside Modal. Extend rather than mint: Placement Center · Right · Left, full height on the sides, widths as presets at usage, mask = the existing scrim. Half a wave including the mockup passage.</p>
+
+<h2 id="near">Have, near — what exactly is missing</h2>
+<p class="intro">The 14 Ant components we cover by role but not feature by feature. Each Ant page's examples and API props were turned into feature rows and checked against our master: <b>have</b> · <b>composable</b> · <b>missing</b> · <b>not for us</b>. Where the missing piece is already in the DSI program, the row says which wave. Sorted by how much is missing.</p>
+<div class="card"><div class="tablewrap"><table id="near-sum" class="nsum"></table></div></div>
+<div class="mlegend" style="margin:0 0 12px"><span><span class="chip have">have</span></span><span><span class="chip comp">composable</span></span><span><span class="chip gap">missing</span></span><span><span class="chip scope">not for us</span></span><span style="margin-left:auto"><i class="m-reuse"></i>existing master</span><span><i class="m-new"></i>missing piece</span></div>
+<div class="nears" id="near-cards"></div>
+
+<h2 id="all">All 73 components</h2>
+<div class="card">
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search Ant component, DS master or id…">
+    <select id="gsel"><option value="">All categories</option></select>
+    <span id="fchips"></span>
+    <label class="small"><input type="checkbox" id="hidecovered"> hide have / composable / primitives</label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="tablewrap"><table id="all">
+    <thead><tr><th data-k="n" class="sorted">Ant component</th><th data-k="g">Category</th><th data-k="v">Verdict</th><th>DS Next equivalent (page · id)</th><th>What differs · how to build</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+</div>
+
+<h2 id="method">Method and sources</h2>
+<div class="card"><div class="card-b small">
+  <p style="margin:0 0 8px"><b>Ant side:</b> the components overview of Ant Design 6.6.4 read live on 2026-09-15 (73 components, Ant's seven categories; List deprecated in favour of Listy 6.6.0; Masonry 6.0.0 and BorderBeam 6.4.0 are 6.x additions). The six Pro components, Ant Design X, Charts and Mobile are separate libraries and stay out. For the 14 near components and Slider, each component page's examples and API props were read the same day and turned into the feature rows of the deep-dive.</p>
+  <p style="margin:0 0 8px"><b>DS side:</b> the live census of every component set and standalone component taken for the DSI comparison the same day (Actions 7 sets + 3 · Forms 10 + 3 · Navigation 6 + 1 · Feedback &amp; status 9 + 1 · Cards &amp; patterns 8 + 6 · AI 10 + 2 · Data display 16 + 14 · Utilities 1 + 3; icon pages counted only).</p>
+  <p style="margin:0 0 8px"><b>Evidence check:</b> the CE and NDL censuses of the working file were searched for slider, range, tree, drawer, cascader, segmented, mention, divider: nothing. Pagination remains the only proven gap (local master, 31 uses).</p>
+  <p style="margin:0"><b>Limits:</b> comparison by role and function, not prop by prop; Ant runtime behaviours (virtual scroll, async loading, animations) are marked as behaviours, not gaps. Effort figures are estimates in waves under the standard pipeline (mockup on WIP - Luca → Vai → master → QA strip → records). Companion documents: <code>ds-next-claude/ANT-COMPARISON.md</code> and the <a href="https://lucar00.github.io/ds-next-confronto-dsitalia/">Design System Italia page</a>.</p>
+</div></div>
+
+</main>
+<footer>DS Next Claude · analysis of 2026-09-15 · read-only, nothing built. Companion pages: lucar00.github.io/ds-next-confronto-dsitalia/ · lucar00.github.io/ds-next-variables/</footer>
+
+<script>
+const V = {have:'have 1:1', near:'have, near', comp:'composable', behav:'behaviour / primitive', gap:'gap', scope:'out of scope'};
+const ORDER = ['have','near','comp','behav','gap','scope'];
+const ROWS = [
+ ['Button','General','have','Button 362:338 · Button icon 363:1417 · Button group 364:219 · Link 568:2','primary / default / text / link → Solid / Outline / Ghost / Link; danger ✓; sizes ✓; icon-only ✓; block = FILL; loading = Spinner swapped in at usage; dashed and round shape not for us.'],
+ ['FloatButton','General','have','FAB 570:36 · Button icon','FloatButton.Group and BackTop = layout + behaviour; badge = Badge 391:9 overlay at usage.'],
+ ['Icon','General','have','Line Awesome 1,545 + Property 24 glyphs (Icons pages)','Ant outlined / filled / two-tone themes vs LA solid; spin and rotate = motion.'],
+ ['Typography','General','have','140 text styles (35 bases × 4 weights) · Link 568:2','Title levels ↔ Heading_Sans_1–6 + Display; copyable / editable / ellipsis are behaviours.'],
+ ['Divider','Layout','comp','1px line on Border tokens at usage; with text = text between two lines','A Divider master (orientation + optional label) is an ⅛-wave convenience: see the planner.'],
+ ['Flex','Layout','behav','auto-layout','Layout primitive.'],
+ ['Grid','Layout','behav','layout grids + auto-layout wrap','Layout primitive.'],
+ ['Layout','Layout','comp','Navigation 428:344 (Header) + Navigation rail 429:1191 (Sider) + content frame','Header / Sider / Content / Footer = the app shell we already have.'],
+ ['Masonry','Layout','behav','manual columns','Layout primitive (Ant 6.0); no component.'],
+ ['Space','Layout','behav','auto-layout gap on the Spacing scale','Layout primitive.'],
+ ['Splitter','Layout','behav','resizable panes','Behaviour; a 1px line + grip at usage if drawn.'],
+ ['Anchor','Navigation','comp','List section 1090:5381 + Menu item State=Current (+ Progress bar 607:2191)','In-page index, the same composition as DSI Navscroll.'],
+ ['Breadcrumb','Navigation','near','Breadcrumb 580:432','N items, custom separators, item dropdown; ours is parent › current with the entity icon. The N-level extension was skipped in the DSI plan.'],
+ ['Dropdown','Navigation','have','Dropdown 400:56 + Menu item 404:110 + Button trigger','Dropdown.Button split = Button + Button icon flush at usage; submenu = nesting (Wave 58); context menu = the same panel.'],
+ ['Menu','Navigation','near','Navigation rail 429:1191 + List section 1090:5381 + Menu item 404:110','Inline collapsible submenus = nesting (Wave 58); horizontal mode = Tab group or Navigation Actions; groups ✓ List section Title; collapsed ✓ rail; dark theme ↔ Sector tints.'],
+ ['Pagination','Navigation','gap','— (in program: Wave 52 mockup 1131:2295 waiting for your choices)','Sizes, simple mode, quick jumper, size changer, total text ↔ mockup options A / B / C.'],
+ ['Steps','Navigation','near','Stepper 562:3849 + Stepper/Step 562:27','Vertical ✗, status error ✗, dot / navigation / inline / panel types ✗, small ~, clickable ✓, Mobile in Wave 54. New asks: Orientation axis + State Error.'],
+ ['Tabs','Navigation','near','Tab 398:326 + Tab group 632:443','Card ✓ Outline; editable-card (add / close) ✗; placement bottom / start / end ✗; size ✓; centered = layout; extra content ✗ minor; draggable = behaviour. Placement and closable were skipped in the DSI plan.'],
+ ['AutoComplete','Data Entry','comp','Input 394:5591 + Dropdown 400:56 + Menu item','Custom suggestion rows = Menu item variants.'],
+ ['Cascader','Data Entry','comp','Dropdown + Menu item Show open icon → second Dropdown beside; multiple = Chips','A multi-column Cascader panel master only if the picker recurs (regions → cities → zones).'],
+ ['Checkbox','Data Entry','near','Checkbox 389:17','Indeterminate ✗ (in program Wave 56 with Error + description); group and check-all = layout; grid = layout.'],
+ ['ColorPicker','Data Entry','scope','—','Design-tool feature; the CRM never picks colours (tag colours are presets).'],
+ ['DatePicker','Data Entry','have','Input Show action (calendar) or Input group 562:3886 + Date picker 564:44 + Day 564:43','RangePicker ✓ Day State=In range; presets ✓ Menu items; week / month / quarter / year pickers ✗ extra grid views (planner); showTime ↔ Timepicker presets.'],
+ ['Form','Data Entry','comp','Input Layout Vertical / Horizontal · Textarea 609:304 · Checkbox · Toggle 390:49 · Input group · Section card as fieldset','Layouts ✓; validation ✓ Input Error / Warning / Success + helper; Form.List dynamic rows = layout.'],
+ ['Input','Data Entry','have','Input 394:5591 · Input group 562:3886 · Textarea 609:304 · Search bar 399:3479','Prefix / suffix ✓ (Inline slot, Icon right); addons ✓ Input group; allowClear ✓; Password ✓ Show action eye; Search ✓; TextArea ✓; outlined / filled ✓ Filled axis (borderless ✗ minor); OTP ✗ minor (six Inputs at usage); count ✗ minor.'],
+ ['InputNumber','Data Entry','comp','Input group 562:3886 Trailing + two Button icon 363:1417 XS','Stacked handles inside the field are a style; prefix / suffix ✓; keyboard = behaviour.'],
+ ['Mentions','Data Entry','comp','Textarea / Input + Dropdown + Menu item (avatar leading = Wave 58)','@ trigger = behaviour.'],
+ ['Radio','Data Entry','gap','— (in program: Wave 52 mockup 1131:2295)','Radio.Group = layout; Radio.Button (button style) ✓ Button group 364:219 / Segment 364:182.'],
+ ['Rate','Data Entry','scope','—','Skipped in the DSI plan; LA star glyphs if ever.'],
+ ['Select','Data Entry','have','Input select-mode + Dropdown + Menu item + List section (groups) + Chip 379:2205 (multiple / tags)','Search ✓ Search bar inside the panel; loading ✓ Spinner; maxTagCount ✓ Chip "+N"; status ✓; variants ✓ Filled axis.'],
+ ['Slider','Data Entry','gap','—','Nothing draggable exists (Level bar 407:77 and Progress bar are static). New Slider master: track + fill + one or two handles, marks, value Tooltip; Range Off | On. Natural home: price and surface filters. See the planner.'],
+ ['Switch','Data Entry','have','Toggle 390:49','Sizes ✓ M / S; checkedChildren icons ✓ Show state icons (text inside ✗ minor); loading ✗ minor; disabled ✓.'],
+ ['TimePicker','Data Entry','have','Input Show action (clock) + Dropdown + Menu item presets','By decision (Wave 50): presets instead of the column spinner.'],
+ ['Transfer','Data Entry','comp','Two List section Type=Card of Checkbox rows + Button icon arrows + Search bar','One-way mode = same; pagination inside = the Pagination gap.'],
+ ['TreeSelect','Data Entry','near','Input select-mode + Dropdown + Menu item nested (Wave 58)','Tree rows need indent + expand chevron (+ Checkbox for treeCheckable); multiple = Chips; showTreeLine ✗ skip. Depends on the Wave 58 nesting design.'],
+ ['Upload','Data Entry','near','Dropzone 610:128 + File row 563:33 + Progress bar 607:2191','In program Wave 56 (progress, remove, error, preview); picture-card / picture-circle grids ✗ thumbnail variant; directory / paste = behaviour; drag ✓ Dropzone.'],
+ ['Avatar','Data Display','have','Avatar 512:979 + Avatar group 607:2251','Square shape ✗ minor (Shape axis if needed); sizes ✓ 4 rungs; icon / photo / initials ✓; group maxCount ✓ counter.'],
+ ['Badge','Data Display','have','Badge 391:9 (count) · Status dot 537:14 (status + text) · Ribbon 576:43 (Badge.Ribbon)','overflowCount = text; dot ✓ Status dot S; colour presets ✓ Success / Warning / Danger (Info / Neutral ✗ minor, planner); single size 16 ~.'],
+ ['Calendar','Data Display','comp','Calendar day 516:783 + Date picker 564:44 grid + Team matrix Day header 860:101','Full-page calendar with cell content = composition; month / year switch = Button group; Luca’s Calendario frames on WIP are the product reference.'],
+ ['Card','Data Display','have','Section card 923:752 · News card 570:29 · Video card 583:749 · domain cards (Opportunity 478:4993, Property 506:4808, Appointment 516:738, Reminder 538:120) · Section tile 527:184','extra ✓ Actions slot; cover ✓ News / Video card; Card.Meta (avatar + title + description) ↔ Opportunity card pattern; inner tabs = Tab group in the slot; loading ✓ Skeleton recipe; size small ✗ minor.'],
+ ['Carousel','Data Display','comp','Carousel dots 406:25 + Indicator 405:50 + Carousel arrows 406:35 + Property card Show carousel','autoplay / fade / dotPosition = behaviour or usage.'],
+ ['Collapse','Data Display','gap','— (in program: Wave 53, Section card State Expanded | Collapsed + Show chevron)','Accordion mode ✓ one open; bordered / ghost = List section Type or usage; extra ✓ Actions slot; expandIconPosition = mockup decision.'],
+ ['Descriptions','Data Display','have','Data row 581:89 (Label / Value / Control) in Section card 923:752','Bordered table layout = Table cell 412:90; columns / responsive = layout; vertical label-above layout ✗ minor.'],
+ ['Empty','Data Display','have','Empty state 451:1001 + Illustration/No properties 588:34 + Illustration/Contact manager 589:36','Simple image ✓ swap; description + footer button ✓ Content slot.'],
+ ['Image','Data Display','comp','Image fill at usage + Modal 540:3823 / scrim for preview; Property card carousel for galleries','Preview toolbar (zoom / rotate / flip) not for us; fallback ✓ Skeleton Rect.'],
+ ['List','Data Display','near','Menu item 404:110 + List section 1090:5381 + Data row 581:89','Ant deprecated it in 6.6 (use Listy). Item.Meta (avatar + title + description) ✗ (in program Wave 58); actions / extra ✓; header ✓ Title (footer ✗ minor); grid / pagination / loadMore = layout or gap.'],
+ ['Listy','Data Display','near','Same as List: Menu item + List section','Ant 6.6 successor of List: virtual scroll, grouping with sticky headers (= List section Title), drag sorting ✓ Show drag handle, infinite loading = behaviour. Same missing pieces as List.'],
+ ['Popover','Data Display','near','Tooltip 401:116 (title + slot, 4 arrows) · Panel 513:4712','Light surface + close (in program Wave 59); 12 placements → 4 arrows + None with offset at usage; trigger = behaviour.'],
+ ['QRCode','Data Display','scope','—','A generated image placed at usage; not a DS master.'],
+ ['Segmented','Data Display','have','Button group 364:219 + Segment 364:182','Icons ✓, icon-only ✓ Show label off, block = FILL, sizes ✓ XS / S / M, disabled ✓; vertical ✗ minor.'],
+ ['Statistic','Data Display','have','Stat block 577:110 (Label, Number, Unit, icon, divider; Background Dark)','prefix / suffix ✓ Unit; precision / formatter = content; Countdown / Timer = behaviour.'],
+ ['Table','Data Display','have','Table cell 412:90 (Header / Text / Chip / Slot × Base / Subtle; sort, status dot, icons, subtext, slot)','Selection ✓ Slot Checkbox; filters ✓ Dropdown at usage; expandable rows ↔ Accordion wave; fixed header / columns, virtual, resizable = behaviour; summary ✓ Subtle row; sizes small / middle ✗ (density axis, planner); pagination = the Pagination gap.'],
+ ['Tag','Data Display','have','Chip 379:2205 + Status chip 402:140','Closable ✓ Show icon right → times; colour presets ✓ Status chip; CheckableTag ✓ Chip Selected; icon ✓; borderless ✓ Muted; arbitrary hex ✗ by design (tokens only).'],
+ ['Timeline','Data Display','gap','— (in program: Wave 55)','Mode left / right / alternate + label side = mockup decisions; pending item ✓ Spinner marker; custom dot / colour ✓ Status dot or icon.'],
+ ['Tooltip','Data Display','have','Tooltip 401:116','12 placements → 4 arrows + None (offset at usage); colour presets ✗ minor (dark until Wave 59 Light); arrow pointAtCenter = usage.'],
+ ['Tour','Data Display','scope','—','Onboarding walkthrough = Tooltip Light + Buttons + scrim at usage; not a master (same call as Skiplinks).'],
+ ['Tree','Data Display','near','Menu item 404:110 (Show drag handle ✓, icons ✓) + nesting (Wave 58)','Needs indent + expand chevron (+ Checkbox for checkable); showLine connectors ✗ skip; directory tree = icons; virtual = behaviour. The tree row is the Wave 58 nested item plus an expand chevron.'],
+ ['Alert','Feedback','near','Alert 561:54','In program Wave 57 (closable + action slot); types ✓ 4 (Ant has no neutral either); banner ✓ Layout Banner; description ✓ Content; icon ✓; variant filled / outlined ✓ Banner vs Inline; ErrorBoundary = dev.'],
+ ['Drawer','Feedback','near','Modal 540:3823 (Title, icon, Intro, Content slot, Actions slot) + Surface-overlay scrim · Panel 513:4712 · AI panel 548:360 (right-panel precedent)','Side sheet from an edge: placement right / left (top / bottom rare), size default 378 / large 736, header + close, footer, extra, mask. Extension: a Placement axis on Modal (Center | Right | Left) with full-height anchoring. See the planner.'],
+ ['Message','Feedback','have','Toast 607:63','Top-center transient text; 5 types ✓; loading ✓ Spinner icon swap; duration = behaviour.'],
+ ['Modal','Feedback','have','Modal 540:3823 + scrim','confirm / info / success / error / warning ✓ Show icon + Intro; footer ✓ Actions slot; width / centered = usage; loading ✓ Skeleton in the slot.'],
+ ['Notification','Feedback','have','Toast 607:63 with Subtext + Action + Close','Corner placement and stacking = usage; types ✓; pause on hover / progress = behaviour.'],
+ ['Popconfirm','Feedback','comp','Tooltip 401:116 Content slot: icon + text + two Buttons XS','Light after Wave 59; composable today in dark.'],
+ ['Progress','Feedback','near','Progress bar 607:2191 · Donut chart 563:51 · Level bar 407:77 (steps type) · Spinner 606:40','In program Wave 59 (active / indeterminate + status colours); circle ✓ Donut; dashboard gauge ✗ minor; steps ✓ Level bar; gradient not for us; size ✗ minor.'],
+ ['Result','Feedback','comp','Empty state 451:1001 Content slot: status icon + title + subtitle + Buttons','403 / 404 / 500 illustrations ✗ (only two Illustration masters) → optional artwork, planner.'],
+ ['Skeleton','Feedback','have','Skeleton 606:31 Text / Rect / Circle + recipes','avatar / button / input / image shapes via Rect / Circle sizes; active shimmer = motion.'],
+ ['Spin','Feedback','have','Spinner 606:40 S / M, Default / Inverse','large ✗ minor; tip text = text at usage; fullscreen / nested = scrim at usage.'],
+ ['Watermark','Feedback','scope','—','Code overlay, not a design component.'],
+ ['Affix','Other','behav','—','Fixed-position behaviour.'],
+ ['App','Other','behav','—','React context wrapper, code-only.'],
+ ['BorderBeam','Other','scope','—','Animated border effect (Ant 6.4), motion decoration; not for us.'],
+ ['ConfigProvider','Other','behav','—','Global config, code-only.'],
+ ['Util','Other','behav','—','Helper functions, code-only.']
+].map(r => ({n:r[0], g:r[1], v:r[2], ds:r[3], note:r[4]}));
+
+// Planner candidates (new decisions). eff = eighths of a wave. ev: 3 proven · 2 basic · 1 conditional · 0 none.
+const EVL = ['no CRM evidence','conditional','basic','proven'];
+const PLAN = [
+ {id:'drawer',group:'main',kind:'near',order:1,name:'Drawer = Placement axis on Modal',eff:4,ev:2,evNote:'CRM detail and edit flows; AI panel is a right-panel precedent',sug:'build',why:'A right-hand sheet for details and forms is the most used Ant pattern in CRMs. We have Panel (floating flyout) and Modal (centered), nothing edge-anchored and full-height.',reuse:'Modal 540:3823 parts: Title, close, Intro, Content slot, Actions slot · Surface-overlay scrim · Shadow_Overlay',neu:'Placement axis on Modal: Center | Right | Left; sides full height, widths 378 / 736 as presets at usage',dep:'Modal is a standalone component: becoming a set is a restructure, mockup passage.'},
+ {id:'divider',group:'main',kind:'comp',order:2,name:'Divider master (line, optional label)',eff:1,ev:2,evNote:'lines are drawn by hand everywhere',sug:'build',why:'Every list, menu and card draws its own 1px line. A master keeps the Border token bound and adds the labelled form Ant has.',reuse:'Border-muted tokens · Body_Sm muted label',neu:'Divider: Orientation Horizontal | Vertical, Show label'},
+ {id:'slider',group:'main',kind:'gap',order:3,name:'Slider (value + range)',eff:4,ev:1,evNote:'no slider in the working file; filters are its natural home',sug:'later',why:'Price, surface and distance filters are the natural home in a real-estate CRM, but no screen with a slider exists yet. The only genuinely new gap of this pass.',reuse:'Tooltip 401:116 (value bubble) · Action-primary tokens · Action-secondary-bg-muted track · Body_Xs marks',neu:'Slider master: track + fill + handle 20px (element-size-xxs), Range Off | On, States Default / Hover / Disabled, Show marks, Show value',dep:'Design of the filter UI.'},
+ {id:'tree-item',group:'main',kind:'near',order:4,name:'Tree row: expand chevron + checkbox on the nested Menu item',eff:2,ev:1,evNote:'building → floor → unit hierarchies are plausible',sug:'later',why:'Tree and TreeSelect need a row that indents, expands and optionally checks. Wave 58 already adds nesting to Menu item; this adds the chevron and the checkbox.',reuse:'Menu item 404:110 + Wave 58 nesting · Checkbox 389:17 · Button icon chevron',neu:'Show expand icon + Show checkbox on the nested row; TreeSelect = Input select-mode + Dropdown of these rows',dep:'Wave 58 nesting design.'},
+ {id:'steps-vertical',group:'main',kind:'near',order:5,name:'Stepper: vertical orientation + Error status',eff:2,ev:1,evNote:'long wizards, validation feedback',sug:'later',why:'Ant Steps run vertically and mark a failed step. Ours is horizontal with Current / Complete / Upcoming.',reuse:'Stepper 562:3849 · Stepper/Step 562:27 · Feedback-danger tokens',neu:'Orientation axis on Stepper · State Error on Step',dep:'Rides with Wave 54 (Stepper Mobile) if approved together.'},
+ {id:'table-density',group:'minor',kind:'have',order:6,name:'Table cell: density axis (small / middle)',eff:2,ev:1,evNote:'dense data tables',sug:'later',why:'Ant tables come in three densities; Table cell has one height.',reuse:'Table cell 412:90',neu:'Size axis on Table cell (8 → 16 or 24 variants)'},
+ {id:'datepicker-views',group:'minor',kind:'have',order:7,name:'Date picker: month / year views',eff:2,ev:1,evNote:'reports by month or year',sug:'later',why:'Ant picks weeks, months, quarters and years; our grid picks days and ranges.',reuse:'Date picker 564:44 · Day 564:43 · Button group for the view switch',neu:'View axis on Date picker: Days | Months | Years'},
+ {id:'badge-colours',group:'minor',kind:'have',order:8,name:'Status dot: Info + Neutral colours',eff:1,ev:1,evNote:'status legends beyond success / warning / danger',sug:'later',why:'Ant Badge status has five presets; Status dot has three.',reuse:'Status dot 537:14 · Feedback-info and neutral tokens',neu:'Variant Info + Neutral on Status dot'},
+ {id:'avatar-square',group:'minor',kind:'have',order:9,name:'Avatar: square shape',eff:1,ev:0,evNote:'company logos would be the only use',sug:'skip',why:'Ant avatars come round or square; ours are round. Square only matters for logos, which have Logo 446:14.',reuse:'Avatar 512:979',neu:'Shape axis'},
+ {id:'cascader-panel',group:'minor',kind:'comp',order:10,name:'Cascader panel (multi-column picker)',eff:2,ev:0,evNote:'no cascading selection in the product',sug:'skip',why:'Two Dropdowns side by side cover the rare case.',reuse:'Dropdown 400:56 · Menu item Show open icon',neu:'Cascader panel master'},
+ {id:'result-illustrations',group:'minor',kind:'comp',order:11,name:'Result: 403 / 404 / 500 illustrations',eff:2,ev:0,evNote:'error pages are dev territory',sug:'skip',why:'Empty state + status icon covers results; page-level illustrations are artwork.',reuse:'Empty state 451:1001 · Illustration masters',neu:'Three illustrations'},
+ {id:'colorpicker',group:'scope',kind:'scope',order:12,name:'ColorPicker',eff:4,ev:0,evNote:'the CRM never picks colours',sug:'skip',why:'Design-tool feature.',reuse:'—',neu:'A whole picker'},
+ {id:'qrcode',group:'scope',kind:'scope',order:13,name:'QRCode',eff:0,ev:0,evNote:'generated image',sug:'skip',why:'An image placed at usage.',reuse:'—',neu:'Nothing'},
+ {id:'tour',group:'scope',kind:'scope',order:14,name:'Tour',eff:2,ev:0,evNote:'onboarding is a prototype concern',sug:'skip',why:'Walkthrough = Tooltip Light + Buttons + scrim at usage.',reuse:'Tooltip 401:116 · Button · scrim',neu:'Nothing worth a master'},
+ {id:'watermark',group:'scope',kind:'scope',order:15,name:'Watermark',eff:0,ev:0,evNote:'code overlay',sug:'skip',why:'Not a design component.',reuse:'—',neu:'Nothing'},
+ {id:'borderbeam',group:'scope',kind:'scope',order:16,name:'BorderBeam',eff:0,ev:0,evNote:'motion decoration (Ant 6.4)',sug:'skip',why:'Animated border effect.',reuse:'—',neu:'Nothing'}
+];
+// Locked context rows: decided in the DSI program.
+const LOCKED = [
+ {name:'Pagination',status:'Approved · Wave 52',note:'mockup 1131:2295 on WIP - Luca waiting for your choices'},
+ {name:'Radio',status:'Approved · Wave 52',note:'same mockup; Radio.Button = Button group / Segment'},
+ {name:'Collapse = Accordion',status:'Approved · Wave 53',note:'Section card State Expanded | Collapsed + Show chevron'},
+ {name:'Timeline',status:'Approved · Wave 55',note:'Timeline/Event with Status dot markers'},
+ {name:'Checkbox indeterminate (+ Error, description)',status:'Approved · Wave 56',note:'Ant check-all = the indeterminate parent'},
+ {name:'Upload file row (progress, remove, error, thumbnail)',status:'Approved · Wave 56',note:'covers picture list; picture-card grid = thumbnail variant'},
+ {name:'Alert closable + action slot',status:'Approved · Wave 57',note:'Ant closable + action props'},
+ {name:'Menu nested submenus = Sidebar nesting',status:'Approved · Wave 58',note:'Ant inline mode with SubMenu'},
+ {name:'List / Listy rich row = Menu item description + avatar',status:'Approved · Wave 58',note:'List.Item.Meta'},
+ {name:'Popover light = Tooltip Light + close',status:'Approved · Wave 59',note:'also gives Popconfirm its light form'},
+ {name:'Progress active + status colours',status:'Approved · Wave 59',note:'Ant status active / success / exception'},
+ {name:'Breadcrumb N levels',status:'Skipped (DSI plan)',note:'Ant items array; ours stays parent › current'},
+ {name:'Tabs placement + closable (editable-card)',status:'Skipped (DSI plan)',note:'tabPlacement start / end / bottom, add & close'},
+ {name:'Rate',status:'Skipped (DSI plan)',note:'star scale'}
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ids = s => esc(s).replace(/(\d{2,5}:\d{1,6})/g, '<span class="id">$1</span>');
+const FR = {1:'⅛',2:'¼',3:'⅜',4:'½',5:'⅝',6:'¾',7:'⅞'};
+const waves = e => { if (!e) return '0'; const w = Math.floor(e / 8), f = e % 8; return (w ? w : '') + (f ? FR[f] : ''); };
+const wavesLabel = e => { const s = waves(e); return s === '0' ? 'no extra effort' : s + (e === 8 ? ' wave' : ' waves'); };
+
+// Overview
+(function overview(){
+  const c = {}; ORDER.forEach(k => c[k] = 0); ROWS.forEach(r => c[r.v]++);
+  const covered = c.have + c.near + c.comp; const denom = ROWS.length - c.behav;
+  document.getElementById('totals').innerHTML = '<b>' + ROWS.length + '</b> Ant components · <b>' + covered + '</b> reproducible today · <b>' + c.gap + '</b> gaps (1 new) · <b>' + c.scope + '</b> out of scope · <b>' + c.behav + '</b> primitives';
+  document.getElementById('bar').innerHTML = ORDER.map(k => '<div class="' + k + '" style="flex:' + c[k] + '" title="' + V[k] + ': ' + c[k] + '">' + c[k] + '</div>').join('');
+  document.getElementById('kpis').innerHTML =
+    '<div class="kpi"><b>' + covered + ' / ' + denom + '</b><span>real components reproducible today (73 minus ' + c.behav + ' primitives)</span></div>' +
+    '<div class="kpi"><b>' + c.have + '</b><span>have 1:1 — same role and functions</span></div>' +
+    '<div class="kpi"><b>' + c.near + '</b><span>near — one small extension away</span></div>' +
+    '<div class="kpi"><b>' + c.comp + '</b><span>composable at usage, no master needed</span></div>' +
+    '<div class="kpi"><b>' + c.gap + '</b><span>gaps — 4 already in the program, Slider new</span></div>' +
+    '<div class="kpi"><b>' + c.scope + '</b><span>out of scope for a CRM design system</span></div>';
+  const groups = [...new Set(ROWS.map(r => r.g))];
+  let h = '<thead><tr><th>Category</th><th>Ant</th><th>Reproducible</th><th>Mix</th><th>Gaps</th><th>Out of scope</th></tr></thead><tbody>';
+  groups.forEach(g => {
+    const rs = ROWS.filter(r => r.g === g); const gc = {}; ORDER.forEach(k => gc[k] = rs.filter(r => r.v === k).length);
+    const cov = gc.have + gc.near + gc.comp; const d = rs.length - gc.behav;
+    h += '<tr><td>' + esc(g) + '</td><td>' + rs.length + '</td><td>' + (d ? cov + ' / ' + d : '—') + '</td><td><div class="mini">' + ORDER.map(k => gc[k] ? '<div style="flex:' + gc[k] + ';background:var(--' + k + ')" title="' + V[k] + ' ' + gc[k] + '"></div>' : '').join('') + '</div></td><td>' + (gc.gap ? rs.filter(r => r.v === 'gap').map(r => esc(r.n)).join(', ') : '—') + '</td><td>' + (gc.scope ? rs.filter(r => r.v === 'scope').map(r => esc(r.n)).join(', ') : '—') + '</td></tr>';
+  });
+  document.getElementById('grp').innerHTML = h + '</tbody>';
+  document.getElementById('covered').innerHTML = LOCKED.filter(l => l.status.startsWith('Approved')).map(l => '<li><b>' + esc(l.name) + '</b> <span class="muted small">' + esc(l.status.replace('Approved · ', '')) + ' · ' + esc(l.note) + '</span></li>').join('');
+})();
+
+// Quadrants (new candidates only, out-of-scope excluded)
+(function quad(){
+  const Q = [
+    {k:'first', t:'Do first — strong evidence, cheap', f:p => p.ev >= 2 && p.eff <= 2},
+    {k:'wave', t:'Plan a wave — strong evidence, half a wave or more', f:p => p.ev >= 2 && p.eff > 2},
+    {k:'cheap', t:'Cheap, when a screen asks for it — weak evidence, low cost', f:p => p.ev < 2 && p.eff <= 2},
+    {k:'road', t:'Only with a roadmap reason — weak evidence, real cost', f:p => p.ev < 2 && p.eff > 2}
+  ];
+  const col = {gap:'var(--gap-ink)', near:'var(--near-ink)', comp:'var(--comp-ink)', have:'var(--have-ink)', scope:'var(--scope-ink)'};
+  const cand = PLAN.filter(p => p.group !== 'scope');
+  document.getElementById('quad').innerHTML = Q.map(q => '<div class="q ' + (q.k === 'first' ? 'first' : '') + '"><h4>' + q.t + '</h4>' +
+    cand.filter(q.f).sort((a, b) => b.ev - a.ev || a.eff - b.eff).map(p => '<span class="qi" title="' + esc(p.evNote) + '"><span class="dot" style="background:' + col[p.kind] + '"></span>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></span>').join('') + '</div>').join('');
+})();
+
+// Planner
+const KEY = 'ant-plan-v1';
+let state = {choices:{}, notes:''};
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.choices) state = s; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const CH = {build:'Build now', later:'Later', skip:'Skip'};
+function rowHTML(p){
+  const ch = state.choices[p.id] || '';
+  return '<div class="prow" id="plan-' + p.id + '" data-id="' + p.id + '">' +
+    '<div class="t"><b>' + esc(p.name) + '</b><span class="chip ' + p.kind + '">' + V[p.kind] + '</span><span class="meta"><span class="tag">' + wavesLabel(p.eff) + '</span><span class="tag ev' + p.ev + '">' + EVL[p.ev] + ' · ' + esc(p.evNote) + '</span></span></div>' +
+    '<div><div class="seg">' + ['build','later','skip'].map(c => '<button class="' + c + (ch === c ? ' on' : '') + '" data-c="' + c + '">' + CH[c] + '</button>').join('') + '</div><div class="sug">suggested: ' + CH[p.sug] + (NEAR_IDS.has(p.id) ? ' · <a href="#near-' + p.id + '">what is missing ↑</a>' : '') + '</div></div>' +
+    '<div class="why">' + esc(p.why) + (p.dep ? ' <b>Depends on:</b> ' + esc(p.dep) : '') + '</div>' +
+    '<details><summary>Reused vs new</summary><div class="rn"><div class="re"><b>Reused DS masters</b>' + ids(p.reuse) + '</div><div class="ne"><b>New or extended</b>' + ids(p.neu) + '</div></div></details>' +
+  '</div>';
+}
+const NEAR_IDS = new Set(['drawer','tree-item','steps-vertical']);
+function renderPlanner(){
+  ['main','minor','scope'].forEach(g => { document.getElementById('p-' + g).innerHTML = PLAN.filter(p => p.group === g).sort((a, b) => a.order - b.order).map(rowHTML).join(''); });
+  document.getElementById('p-locked').innerHTML = LOCKED.map(l => '<div class="prow locked"><div class="t"><b>' + esc(l.name) + '</b><span class="chip lock">' + esc(l.status) + '</span></div><div class="small muted">' + esc(l.note) + '</div></div>').join('');
+  renderSummary();
+}
+function renderSummary(){
+  const by = c => PLAN.filter(p => state.choices[p.id] === c).sort((a, b) => a.order - b.order);
+  const eff = arr => arr.reduce((s, p) => s + p.eff, 0);
+  const B = by('build'), L = by('later'), S = by('skip'); const U = PLAN.length - B.length - L.length - S.length;
+  document.getElementById('sum-rows').innerHTML =
+    '<div class="row"><span>Build now</span><b>' + B.length + ' · ' + wavesLabel(eff(B)) + '</b></div>' +
+    '<div class="row"><span>Later</span><b>' + L.length + ' · ' + wavesLabel(eff(L)) + '</b></div>' +
+    '<div class="row"><span>Skip</span><b>' + S.length + '</b></div>' +
+    '<div class="row"><span>Undecided</span><b>' + U + '</b></div>';
+  document.getElementById('ol-build').innerHTML = B.length ? B.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  document.getElementById('ol-later').innerHTML = L.length ? L.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  const line = (label, arr) => label + (arr.length ? ' (' + wavesLabel(eff(arr)) + '): ' + arr.map(p => p.name).join(' · ') : ': —');
+  let msg = 'Vai — Ant additions to the DSI program (' + new Date().toISOString().slice(0, 10) + ')\n' +
+    line('Build now', B) + '\n' + line('Later', L) + '\n' + 'Skip: ' + (S.length ? S.map(p => p.name).join(' · ') : '—') + '\n' +
+    (U ? 'Undecided: ' + PLAN.filter(p => !state.choices[p.id]).map(p => p.name).join(' · ') + '\n' : '') +
+    (state.notes ? 'Notes: ' + state.notes + '\n' : '') +
+    'Already approved via DSI (unchanged): Pagination · Radio · Accordion · Timeline · Checkbox · Upload · Alert · Menu nesting · List rich row · Popover light · Progress.\n' +
+    'Pipeline per item: mockup on WIP - Luca → Vai → master → QA strip → records.';
+  document.getElementById('msg').value = msg;
+  document.getElementById('notes').value = state.notes || '';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.seg button'); if (!b) return;
+  const id = b.closest('.prow').dataset.id; const c = b.dataset.c;
+  state.choices[id] = (state.choices[id] === c) ? '' : c; save();
+  const seg = b.closest('.seg'); seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.c === state.choices[id]));
+  renderSummary();
+});
+document.getElementById('apply').onclick = () => { PLAN.forEach(p => state.choices[p.id] = p.sug); save(); renderPlanner(); };
+document.getElementById('reset').onclick = () => { state.choices = {}; state.notes = ''; save(); renderPlanner(); };
+document.getElementById('notes').addEventListener('input', e => { state.notes = e.target.value; save(); renderSummary(); });
+document.getElementById('copy').onclick = async () => {
+  const t = document.getElementById('msg'); const ok = document.getElementById('copied');
+  try { await navigator.clipboard.writeText(t.value); ok.textContent = 'copied'; }
+  catch (e) { t.focus(); t.select(); try { document.execCommand('copy'); ok.textContent = 'copied'; } catch (e2) { ok.textContent = 'select the text and copy'; } }
+  setTimeout(() => ok.textContent = '', 2000);
+};
+renderPlanner();
+
+// Near deep-dive
+const FS = {have:['have','have'], comp:['comp','composable'], miss:['gap','missing'], skip:['scope','not for us']};
+const MOCK = {
+ alert:'<div class="mk-alert m-reuse"><span class="ico"></span><div class="mtx"><span class="lbl" style="width:90px;background:#8f93a8"></span><span class="lbl" style="width:170px"></span><div class="mbtns"><span class="mbtn m-new">Action</span></div></div><span class="mx m-new">×</span></div>',
+ crumb:'<div class="mk-crumb"><span class="crumb m-new"><span class="lbl" style="width:34px"></span></span><span class="sep">/</span><span class="crumb m-new"><span class="lbl" style="width:44px"></span></span><span class="sep">/</span><span class="crumb m-reuse"><span class="ico sm"></span><span class="lbl" style="width:50px"></span></span><span class="sep">/</span><span class="crumb m-reuse"><span class="lbl" style="width:56px;background:#8f93a8"></span></span></div>',
+ menu:'<div class="mk-side m-reuse"><div class="li"><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div><div class="li sel"><span class="ico sm"></span><span class="lbl" style="width:60px"></span><span class="chev m-new" style="margin-left:auto">⌄</span></div><div class="li sub m-new"><span class="lbl" style="width:70px"></span></div><div class="li sub m-new"><span class="lbl" style="width:50px"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:90px"></span></div></div>',
+ steps:'<div class="mk-step" style="grid-template-columns:1fr auto;display:grid;gap:18px;align-items:start"><div class="steps m-reuse" style="padding:6px;border-radius:8px"><div class="st"><span class="num on">1</span><span class="lbl" style="width:40px"></span></div><div class="st"><span class="num err m-new" style="background:#fff">!</span><span class="lbl" style="width:44px"></span></div><div class="st"><span class="num">3</span><span class="lbl" style="width:36px"></span></div></div><div class="vsteps m-new"><div class="st"><span class="num on">1</span><span class="lbl" style="width:60px"></span></div><div class="st"><span class="num">2</span><span class="lbl" style="width:48px"></span></div><div class="st"><span class="num">3</span><span class="lbl" style="width:56px"></span></div></div></div>',
+ tabs:'<div class="mk-tabs"><div class="tg m-reuse"><span class="tab on"><span class="lbl" style="width:40px;background:var(--brass)"></span></span><span class="tab"><span class="ico sm"></span><span class="lbl" style="width:36px"></span></span><span class="tab cardt"><span class="lbl" style="width:30px"></span><span class="mx m-new" style="width:14px;height:14px;font-size:10px">×</span></span><span class="mbtn m-new" style="margin-left:6px">extra</span></div></div>',
+ checkbox:'<div class="rm"><div class="r"><span class="cb m-reuse on">✓</span><span class="lbl m-reuse" style="width:100px"></span></div><div class="r"><span class="cb m-new mixed">–</span><span class="lbl m-reuse" style="width:90px"></span></div><div class="r"><span class="cb m-reuse"></span><span class="lbl m-reuse" style="width:70px"></span></div></div>',
+ tree:'<div class="mk-tree m-reuse"><div class="li"><span class="chev m-new">⌄</span><span class="cb m-new mixed">–</span><span class="ico sm"></span><span class="lbl" style="width:90px"></span></div><div class="li l1"><span class="chev m-new">⌄</span><span class="cb m-new on">✓</span><span class="lbl" style="width:70px"></span></div><div class="li l2"><span class="chev" style="opacity:0">⌄</span><span class="cb m-new on">✓</span><span class="lbl" style="width:60px"></span></div><div class="li l1"><span class="chev m-new">›</span><span class="cb m-new"></span><span class="lbl" style="width:80px"></span></div></div>',
+ upload:'<div class="mk-up"><div class="dz m-reuse"><span class="ico"></span><span class="lbl" style="width:120px"></span><span class="lbl" style="width:70px;height:7px;background:var(--brass)"></span></div><div class="fr m-reuse"><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:80px"></span><div class="pb m-new" style="height:6px;width:140px"><div class="fill" style="width:60%"></div></div></div><span class="mx m-new" style="margin-left:auto">×</span></div><div class="fr m-new" style="border-color:#c0392b"><span class="ico sm"></span><span class="lbl" style="width:70px"></span><span class="lbl" style="width:60px;height:7px;background:#c0392b;margin-left:auto"></span></div></div>',
+ list:'<div class="mk-list m-reuse"><div class="li"><span class="ico sm"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:24px;margin-left:auto"></span></div><div class="li"><span class="av m-new"></span><div class="mtx"><span class="lbl" style="width:100px"></span><span class="lbl m-new" style="width:140px;height:7px"></span></div><span class="ico sm" style="margin-left:auto"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:70px"></span></div></div>',
+ popover:'<div class="mk-pop"><div class="bub dark m-reuse"><span class="lbl" style="width:70px;background:#fff"></span><span class="lbl" style="width:100px;background:#9aa0b8"></span></div><div class="bub m-new"><span class="lbl" style="width:70px;background:#8f93a8"></span><span class="lbl" style="width:100px"></span><span class="mx m-new" style="position:absolute;top:6px;right:6px">×</span></div></div>',
+ drawer:'<div class="mk-drawer m-reuse"><div class="ghost"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="scrim"></div><div class="sheet"><div class="hd"><span class="lbl" style="width:60px;background:#8f93a8"></span><span class="mx m-reuse" style="width:16px;height:16px;font-size:10px">×</span></div><div class="mtx"><span class="lbl m-reuse" style="width:100%"></span><span class="lbl m-reuse" style="width:80%"></span></div><div class="ft"><span class="mbtn m-reuse">Annulla</span><span class="mbtn m-reuse" style="background:#3f4254;color:#fff;border-color:#3f4254">Salva</span></div></div></div>',
+ progress:'<div class="mk-prog"><div class="pb m-reuse"><div class="fill"></div></div><div class="pb m-new"><div class="fill ind"></div></div><div class="pbs"><div class="pb m-new"><div class="fill" style="background:#2e9e6f;width:70%"></div></div><div class="pb m-new"><div class="fill" style="background:#c0392b;width:35%"></div></div></div></div>'
+};
+const NEAR = [
+ {id:'drawer', dsi:'Drawer', oursShort:'Modal 540:3823 · Panel 513:4712', ours:'Modal 540:3823 — standalone; Title, Show title, Show icon, Intro, Content slot, Actions slot, over the Surface-overlay scrim · Panel 513:4712 — floating flyout, Title + Content slot · AI panel 548:360 — the right-panel precedent', dsiVars:'basic · custom placement (top / right / bottom / left) · resizable · loading · extra actions · render in current dom · submit form in drawer · preview drawer · multi-level · preset size (378 default / 736 large) · mask · closable placement', mock:'drawer', prog:'',
+  feats:[['Side sheet anchored to the right edge, full height','miss','Placement axis on Modal: Center | Right | Left'],['Placement left','miss','Same axis'],['Placement top / bottom','skip','Rare; not worth two more variants'],['Header with title and close','have','Modal Title + close'],['Footer actions','have','Modal Actions slot'],['Extra actions in the header corner','comp','Button icon in the header at usage'],['Mask (scrim)','have','Surface-overlay scrim, as Modal'],['Preset sizes 378 / 736','comp','Width presets at usage'],['Loading state','comp','Skeleton 606:31 in the Content slot'],['Multi-level drawers','comp','Two instances at usage'],['Resizable','comp','Behaviour']],
+  missing:'Edge anchoring and full height: a Placement axis on Modal.'},
+ {id:'tree-item', dsi:'Tree · TreeSelect', oursShort:'Menu item 404:110 (+ Wave 58 nesting)', ours:'Menu item 404:110 — State ×5; Label, Number, Show icon left, Show drag handle, Show remove icon, Show delete icon, Show open icon · List section 1090:5381 · Input select-mode + Dropdown 400:56 for TreeSelect', dsiVars:'Tree: basic · controlled · draggable · async load · searchable · tree with line · customize icon · directory · custom collapse/expand icon · virtual scroll · block node · checkable. TreeSelect: basic · multiple · checkable · async · show tree line · placement · variants · status · max count · prefix and suffix', mock:'tree', prog:'',
+  feats:[['Indented hierarchy rows','miss','Nesting on Menu item (Wave 58)'],['Expand / collapse chevron per row','miss','Show expand icon (open / closed)'],['Checkable rows with a mixed parent','miss','Show checkbox = Checkbox 389:17 (Mixed after Wave 56)'],['Draggable rows','have','Show drag handle'],['Custom icons, directory tree','have','Show icon left + Icon left'],['Searchable','comp','Search bar 399:3479 above the list'],['Connecting lines (showLine)','skip','Decoration'],['Async loading, virtual scroll','comp','Behaviour'],['TreeSelect: field + panel','comp','Input select-mode + Dropdown of these rows'],['TreeSelect: multiple values','have','Chips in Content=Slot'],['TreeSelect: status / variants','have','Input State + Filled axis']],
+  missing:'Indent + expand chevron + optional checkbox on the nested Menu item.'},
+ {id:'steps-vertical', dsi:'Steps', oursShort:'Stepper 562:3849 + Stepper/Step 562:27', ours:'Stepper 562:3849 — Items slot · Stepper/Step 562:27 — State Current | Complete | Upcoming; Number, Label', dsiVars:'basic · error status · vertical · clickable · panel steps · with icon · title placement and progress · max count · dot style · navigation steps · inline steps. Props: orientation, status (wait / process / finish / error), size, type (default / dot / inline / navigation / panel), variant, titlePlacement, percent, maxCount', mock:'steps', prog:'',
+  feats:[['Horizontal steps with number + title','have','Stepper + Step'],['Step status wait / process / finish','have','Upcoming / Current / Complete'],['Step status error','miss','State Error on Step'],['Vertical orientation','miss','Orientation axis on Stepper'],['Step with icon','miss','Show icon on Step (Wave 54)'],['Clickable steps','have','States'],['Progress ring on the current step','skip','Not for us'],['Dot, navigation, inline, panel types','skip','Not for us'],['Small size','comp','Resize at usage'],['Max count with ellipsis','comp','Layout at usage'],['Description under the title','have','Label + second text at usage']],
+  missing:'Vertical orientation, an Error state, and the icon heading Wave 54 already carries.'},
+ {id:'menu-nesting', dsi:'Menu', oursShort:'Navigation rail 429:1191 + List section + Menu item', ours:'Navigation rail 429:1191 — Sector × Collapsed | Expanded, Items slot · List section 1090:5381 — Type, Title, Items · Menu item 404:110 — State ×5', dsiVars:'top navigation · inline menu · collapsed inline menu · menu tooltip · open current submenu only · vertical menu · menu themes · sub-menu theme · switch the menu type. Props: mode (vertical / horizontal / inline), theme, inlineCollapsed, inlineIndent, expandIcon, items, selectedKeys, openKeys, multiple', mock:'menu', prog:'Wave 58',
+  feats:[['Inline menu with groups','have','List section Title + Menu items'],['Collapsed inline menu (icons only)','have','Navigation rail Collapsed = Button icon column'],['Tooltip on collapsed items','have','Tooltip 401:116'],['Nested submenus (SubMenu)','miss','Nesting on Menu item — Wave 58'],['Expand icon on submenu','miss','Comes with the nesting'],['Horizontal (top) menu','comp','Tab group 632:443 or Navigation Actions slot'],['Themes light / dark','have','Sector axis, 15 tints incl. Neutral'],['Selected and disabled items','have','State Current / Selected / Disabled'],['Multiple selection','have','State Selected on several rows'],['Item groups','have','List section']],
+  missing:'Nested submenus, already in Wave 58.'},
+ {id:'list-meta', dsi:'List · Listy', oursShort:'Menu item 404:110 + List section 1090:5381', ours:'Menu item 404:110 · List section 1090:5381 · Data row 581:89 · Message row 541:115 · Opportunity card 478:4993 Type=List', dsiVars:'List (deprecated in 6.6): simple · basic (Item.Meta: avatar, title, description) · load more · vertical · pagination · grid · drag sorting · virtual. Listy (6.6): basic · virtual scrolling · grouping and sticky headers · rich content · drag sorting · infinite loading', mock:'list', prog:'Wave 58',
+  feats:[['Simple text rows','have','Menu item Label'],['Item.Meta: avatar + title + description','miss','Menu item description line + avatar leading — Wave 58'],['Actions and extra on the right','have','Actions frame, Number, Show open icon'],['Header / footer','have','List section Title (footer at usage)'],['Bordered list','have','List section Type=Card'],['Dividers between items','comp','1px line at usage (Divider master if built)'],['Grouping with sticky headers (Listy)','have','List section Title; sticky = behaviour'],['Drag sorting','have','Show drag handle'],['Vertical layout with image on the right','comp','Message row / Opportunity card Type=List'],['Grid mode','comp','Layout of cards'],['Pagination, load more, infinite, virtual','comp','Pagination gap + behaviour']],
+  missing:'The avatar + title + description row, already in Wave 58.'},
+ {id:'checkbox-ind', dsi:'Checkbox', oursShort:'Checkbox 389:17', ours:'Checkbox 389:17 — State On | Off | Disabled; Show label, Label', dsiVars:'basic · disabled · controlled · checkbox group · check all · use with grid. Props: checked, indeterminate, disabled; Group: options, value, disabled', mock:'checkbox', prog:'Wave 56',
+  feats:[['Checked / unchecked','have','State On / Off'],['Disabled','have','State Disabled'],['Indeterminate (check all parent)','miss','State Indeterminate — Wave 56'],['Checkbox group','comp','Layout'],['Grid arrangement','comp','Layout']],
+  missing:'Indeterminate, already in Wave 56.'},
+ {id:'upload-filerow', dsi:'Upload', oursShort:'Dropzone 610:128 + File row 563:33', ours:'Dropzone 610:128 — Title, Hint, Show hint · File row 563:33 — Name, Meta, Show status dot · Progress bar 607:2191', dsiVars:'upload by clicking · avatar · default files · pictures wall · picture-circle · complete control · drag and drop · paste · directory · manual · png only · pictures with list style · customize preview · max count · transform · custom action icon · drag sorting · crop · customize progress bar. listType: text / picture / picture-card / picture-circle', mock:'upload', prog:'Wave 56',
+  feats:[['Upload button','have','Button 362:338'],['Drag and drop area','have','Dropzone 610:128'],['File list: name + size + status','have','File row 563:33'],['Per-file progress','miss','Show progress — Wave 56'],['Error state per file','miss','State Error — Wave 56'],['Remove / cancel action','miss','Show remove — Wave 56'],['Picture list (thumbnail row)','miss','Thumbnail variant — Wave 56'],['Pictures wall (picture-card grid)','skip','Grid of thumbnails at usage once the thumbnail row exists'],['Avatar upload','comp','Avatar + Button icon overlay'],['Drag sorting of the list','have','Menu item drag handle pattern'],['Paste, directory, crop, custom request','comp','Behaviour / dev']],
+  missing:'Per-file progress, error, remove and a thumbnail row, all in Wave 56.'},
+ {id:'alert-close', dsi:'Alert', oursShort:'Alert 561:54', ours:'Alert 561:54 — Variant Warning | Danger | Info | Success · Layout Banner | Inline | Mini banner · Size M | S · Title, Content, Show icon, Show title', dsiVars:'basic · more types · filled · closable · description · icon · banner · loop banner · smoothly unmount · ErrorBoundary · custom action · custom title alignment. Props: type, variant (outlined / filled), closable, description, icon, showIcon, banner, action', mock:'alert', prog:'Wave 57',
+  feats:[['Types success / info / warning / error','have','Variant axis, the same four'],['Filled vs outlined','have','Layout Banner (fill) vs Inline (border)'],['Title + description','have','Show title + Content'],['Icon','have','Show icon'],['Banner mode','have','Layout Banner'],['Closable','miss','Show close — Wave 57'],['Custom action','miss','Actions slot — Wave 57'],['Loop banner (marquee)','skip','Motion'],['ErrorBoundary','skip','Dev']],
+  missing:'Close and action, already in Wave 57.'},
+ {id:'popover-light', dsi:'Popover', oursShort:'Tooltip 401:116 · Panel 513:4712', ours:'Tooltip 401:116 — Arrow Bottom | Top | Left | Right | None; Show title, Title, Show icon, Content, Content slot · Panel 513:4712 — light flyout without pointer', dsiVars:'basic · three ways to trigger · placement (12) · arrow · auto shift · controlling the close · hover with click. Props: content, title, placement, trigger (hover / click / focus / contextMenu), arrow, open', mock:'popover', prog:'Wave 59',
+  feats:[['Title + content','have','Show title + Content / slot'],['Pointer','have','Arrow axis (None available)'],['12 placements','comp','4 arrows + None, offset at usage'],['Light (white) surface','miss','Variant Light — Wave 59'],['Close control inside','miss','Show close — Wave 59'],['Trigger modes, auto shift','comp','Behaviour']],
+  missing:'Light surface and close, already in Wave 59.'},
+ {id:'progress-indet', dsi:'Progress', oursShort:'Progress bar 607:2191 · Donut 563:51 · Level bar 407:77', ours:'Progress bar 607:2191 — Label, Percentage, Show label · Donut chart 563:51 · Level bar 407:77 (7 levels, semantic colours) · Spinner 606:40', dsiVars:'progress bar · circular · mini · responsive circular · dynamic · custom text · dashboard · success segment · stroke linecap · gradient · steps · circular with steps · size · value position. Props: percent, status (success / exception / normal / active), type (line / circle / dashboard), steps, size', mock:'progress', prog:'Wave 59',
+  feats:[['Line','have','Progress bar'],['Circle','have','Donut chart'],['Dashboard (gauge)','skip','Not for us'],['Label / custom text','have','Show label + Percentage'],['Status active (animated)','miss','Indeterminate / active variant — Wave 59'],['Status success / exception colours','miss','Variant axis on the Feedback family — Wave 59'],['Steps type (segmented bar)','have','Level bar 407:77'],['Success segment (two-tone)','skip','Not for us'],['Gradient stroke','skip','Not for us'],['Sizes','comp','Resize at usage']],
+  missing:'Active/indeterminate and status colours, in Wave 59.'},
+ {id:'breadcrumb-n', dsi:'Breadcrumb', oursShort:'Breadcrumb 580:432', ours:'Breadcrumb 580:432 — standalone; Parent, Current, Show icon, Show parent, Show chevron', dsiVars:'basic · with an icon · with params · configuring the separator · with drop down menu · separator independently. Props: items, separator, itemRender, dropdownIcon', mock:'crumb', prog:'skipped (DSI plan)',
+  feats:[['N levels (items array)','miss','Items slot — skipped in the DSI plan'],['Icon on items','have','Show icon'],['Custom separator','comp','Show chevron; other glyph = swap at usage'],['Item with dropdown menu','have','Show chevron on the current crumb + Dropdown at usage'],['Route params','skip','Dev']],
+  missing:'Depth beyond two levels, which you chose to skip.'},
+ {id:'tabs-skip', dsi:'Tabs', oursShort:'Tab 398:326 + Tab group 632:443', ours:'Tab 398:326 — Emphasis, Shape, Size, State; Label, icons, badge · Tab group 632:443 — Emphasis, Items slot, Show rail', dsiVars:'basic · disabled · centered · icon · indicator · slide · extra content · size · placement · custom popup search · card type · add & close · customized trigger · customized bar · draggable. Props: type (line / card / editable-card), tabPlacement (top / bottom / start / end), size, centered, tabBarExtraContent', mock:'tabs', prog:'skipped (DSI plan)',
+  feats:[['Line tabs, disabled, icons','have','Tab + Tab group'],['Centered','comp','Layout'],['Sizes','have','Size S / M / L / XL'],['Card type','have','Emphasis Outline'],['Editable-card (add and close)','miss','Show close on Tab — skipped in the DSI plan'],['Placement bottom / start / end','miss','Orientation axis — skipped in the DSI plan'],['Extra content in the bar','miss','A slot on Tab group (minor, new)'],['Slide / overflow, draggable','comp','Behaviour'],['Custom indicator size','skip','Not for us']],
+  missing:'Placement and closable tabs (both skipped); an extra-content slot is the only new item.'}
+];
+(function near(){
+  const counts = n => { const c = {have:0, comp:0, miss:0, skip:0}; n.feats.forEach(f => c[f[1]]++); return c; };
+  const bar = c => '<div class="mini nbar">' + ['have','comp','miss','skip'].map(k => c[k] ? '<div style="flex:' + c[k] + ';background:var(--' + FS[k][0] + ')" title="' + FS[k][1] + ' ' + c[k] + '"></div>' : '').join('') + '</div>';
+  const planById = Object.fromEntries(PLAN.map(p => [p.id, p]));
+  const sorted = [...NEAR].sort((a, b) => counts(b).miss - counts(a).miss || a.dsi.localeCompare(b.dsi));
+  const statusOf = n => { const p = planById[n.id]; if (p) return '<span class="chip ' + (p.kind === 'gap' ? 'gap' : 'near') + '">new decision</span>'; return '<span class="chip lock">' + esc(n.prog) + '</span>'; };
+  let h = '<thead><tr><th>Ant</th><th>Our master</th><th>Features</th><th>Missing</th><th>Status</th><th></th></tr></thead><tbody>';
+  sorted.forEach(n => { const c = counts(n), p = planById[n.id];
+    h += '<tr><td class="nm"><a href="#near-' + n.id + '">' + esc(n.dsi) + '</a></td><td class="dsc">' + ids(n.oursShort) + '</td><td>' + bar(c) + '<span class="small muted">' + c.have + ' have · ' + c.comp + ' composable · <b>' + c.miss + ' missing</b> · ' + c.skip + ' not for us</span></td><td class="dsc">' + (c.miss ? n.feats.filter(f => f[1] === 'miss').map(f => esc(f[0])).join(' · ') : '—') + '</td><td>' + statusOf(n) + (p ? '<div class="small muted">' + wavesLabel(p.eff) + ' · suggested ' + CH[p.sug] + '</div>' : '') + '</td><td>' + (p ? '<a class="small" href="#plan-' + n.id + '" style="color:var(--ink)">decide ↓</a>' : '') + '</td></tr>'; });
+  document.getElementById('near-sum').innerHTML = h + '</tbody>';
+  document.getElementById('near-cards').innerHTML = sorted.map(n => { const c = counts(n), p = planById[n.id];
+    return '<div class="card near-card" id="near-' + n.id + '"><div class="card-h"><h3>' + esc(n.dsi) + ' <span class="muted">→</span> ' + ids(n.oursShort) + '</h3><span class="n">' + (p ? wavesLabel(p.eff) + ' · new decision · published master, mockup passage applies' : 'status: ' + esc(n.prog)) + '</span><span class="n" style="margin-left:auto">' + bar(c) + '</span></div>' +
+      '<div class="near-b"><div><p class="small muted" style="margin:0 0 8px"><b>Ant offers:</b> ' + esc(n.dsiVars) + '</p><p class="small muted" style="margin:0 0 10px"><b>Ours:</b> ' + ids(n.ours) + '</p>' +
+      '<table class="feat"><thead><tr><th>Ant feature</th><th>Status</th><th>How we cover or close it</th></tr></thead><tbody>' + n.feats.map(f => '<tr><td>' + esc(f[0]) + '</td><td><span class="chip ' + FS[f[1]][0] + '">' + FS[f[1]][1] + '</span></td><td class="dsc">' + ids(f[2]) + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<div><div class="mock">' + MOCK[n.mock] + '</div><p class="small" style="margin:10px 0"><b>Missing, in one line:</b> ' + esc(n.missing) + '</p>' + (p ? '<a class="btn" href="#plan-' + n.id + '" style="display:inline-block;text-decoration:none">Decide in the planner ↑</a>' : '<span class="small muted">Decided in the DSI program: ' + esc(n.prog) + '</span>') + '</div></div></div>'; }).join('');
+})();
+
+// Full table
+(function table(){
+  const f = {q:'', g:'', v:new Set(ORDER), sort:'n', dir:1, hide:false};
+  const gsel = document.getElementById('gsel'); [...new Set(ROWS.map(r => r.g))].forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; gsel.appendChild(o); });
+  document.getElementById('fchips').innerHTML = ORDER.map(k => '<span class="chip ' + k + ' fchip on" data-v="' + k + '">' + V[k] + '</span>').join(' ');
+  const tb = document.getElementById('tb'), cnt = document.getElementById('count');
+  function draw(){
+    let rs = ROWS.filter(r => f.v.has(r.v) && (!f.g || r.g === f.g) && (!f.hide || ['near','gap','scope'].includes(r.v)));
+    if (f.q) { const q = f.q.toLowerCase(); rs = rs.filter(r => (r.n + ' ' + r.ds + ' ' + r.note + ' ' + r.g).toLowerCase().includes(q)); }
+    rs.sort((a, b) => { const ka = f.sort === 'v' ? ORDER.indexOf(a.v) : a[f.sort], kb = f.sort === 'v' ? ORDER.indexOf(b.v) : b[f.sort]; return (ka > kb ? 1 : ka < kb ? -1 : a.n.localeCompare(b.n)) * f.dir; });
+    tb.innerHTML = rs.map(r => '<tr><td class="nm">' + esc(r.n) + '</td><td class="muted small">' + esc(r.g) + '</td><td><span class="chip ' + r.v + '">' + V[r.v] + '</span></td><td class="dsc">' + ids(r.ds) + '</td><td class="dsc">' + esc(r.note) + '</td></tr>').join('');
+    cnt.textContent = rs.length + ' of ' + ROWS.length;
+  }
+  document.getElementById('q').addEventListener('input', e => { f.q = e.target.value; draw(); });
+  gsel.addEventListener('change', e => { f.g = e.target.value; draw(); });
+  document.getElementById('hidecovered').addEventListener('change', e => { f.hide = e.target.checked; draw(); });
+  document.getElementById('fchips').addEventListener('click', e => { const c = e.target.closest('.fchip'); if (!c) return; const v = c.dataset.v; if (f.v.has(v)) f.v.delete(v); else f.v.add(v); c.classList.toggle('on', f.v.has(v)); draw(); });
+  document.querySelectorAll('#all th[data-k]').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; if (f.sort === k) f.dir *= -1; else { f.sort = k; f.dir = 1; } document.querySelectorAll('#all th').forEach(x => x.classList.toggle('sorted', x === th)); draw(); }));
+  draw();
+})();
+</script>
+</body>
+</html>
