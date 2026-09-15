@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS Next · semantic variables — today vs after</title>
+<style>
+  :root{--bg:#ffffff;--ink:#3f4254;--muted:#656876;--line:#d3d3db;--soft:#f6f7fb;--brass:#ae9142;--add:#cef1e6;--add-ink:#076e4f;--keep:#e4e7f4;--keep-ink:#2a2b2f;--ren:#ffeecc;--ren-ink:#664300;--rem:#f8d7da;--rem-ink:#842029;--open:#d2deec;--open-ink:#113760}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  header .tot{color:var(--muted);font-size:13px}
+  header .tot b{color:var(--ink)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;white-space:nowrap}
+  .chip.keep{background:var(--keep);color:var(--keep-ink)}
+  .chip.add{background:var(--add);color:var(--add-ink)}
+  .chip.rename{background:var(--ren);color:var(--ren-ink)}
+  .chip.remove{background:var(--rem);color:var(--rem-ink)}
+  .chip.open{background:var(--open);color:var(--open-ink)}
+  .controls{margin-left:auto;display:flex;gap:16px;align-items:center;font-size:13px}
+  nav{padding:10px 24px;border-bottom:1px solid var(--line);background:var(--soft);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  nav a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:15px;margin:32px 0 8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  h2:first-child{margin-top:8px}
+  .fam{border:1px solid var(--line);border-radius:8px;margin:0 0 16px;overflow:hidden;background:#fff}
+  .fam-h{display:flex;align-items:baseline;gap:14px;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line)}
+  .fam-h h3{margin:0;font-size:15px}
+  .fam-h .n{color:var(--muted);font-size:12px}
+  table{width:100%;border-collapse:collapse;table-layout:fixed}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
+  th.rung{width:150px}
+  td{padding:6px 12px;border-bottom:1px solid #eef0f4;vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  td.rung{font-size:12px;color:var(--muted);font-weight:600}
+  .v{display:flex;align-items:center;gap:10px;min-height:28px}
+  .sw{width:28px;height:28px;border-radius:6px;border:1px solid rgba(0,0,0,.12);flex:0 0 auto;background-size:8px 8px}
+  .sw.dash{border:1px dashed #a8acbe;background:repeating-linear-gradient(45deg,#fff 0 4px,#f0f0f3 4px 8px)}
+  .sw.alpha{background-image:linear-gradient(45deg,#ccc 25%,transparent 25%),linear-gradient(-45deg,#ccc 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ccc 75%),linear-gradient(-45deg,transparent 75%,#ccc 75%);background-color:#fff}
+  .name{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .hex{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted)}
+  .cr{font-size:11px;color:var(--muted);margin-left:4px}
+  .cr.ok{color:var(--add-ink)} .cr.ko{color:var(--rem-ink)}
+  .dash-t{color:#a8acbe;font-size:12px}
+  .note{font-size:12px;color:var(--muted);padding:8px 14px 12px;border-top:1px solid #eef0f4}
+  .arrow{color:var(--muted);margin:0 6px}
+  tr.unchanged.hidden{display:none}
+  .intro{color:var(--muted);font-size:13px;max-width:900px;margin:0 0 8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>DS Next · semantic color variables — today vs after</h1>
+  <div class="tot" id="totals"></div>
+  <div class="legend">
+    <span class="chip keep">keep</span><span class="chip add">add</span><span class="chip rename">rename</span><span class="chip remove">remove</span><span class="chip open">open point</span>
+  </div>
+  <div class="controls">
+    <label><input type="checkbox" id="hideKeep"> hide unchanged rows</label>
+  </div>
+</header>
+<nav id="nav"></nav>
+<main>
+  <p class="intro">Left: the variable as it exists in <em>Applied / Semantic</em> today (swatch, hex, contrast of each <em>on</em> against its surface). Right: the same rung under the 18-rung grammar. Added rungs show a dashed swatch: their values are chosen in the next wave, as aliases of the existing colour ramps. Rulings applied: no plan B on bg-muted (ceiling rule stays), strong on every family including Base, hover and active on every family including sectors.</p>
+  <div id="root"></div>
+</main>
+<script>
+const RUNGS = ['bg','bg-muted','bg-strong','bg-disabled','on','on-muted','on-strong','on-disabled','on-light','on-dark','border','border-muted','border-strong','border-disabled','bg-hover','bg-active','border-hover','border-active'];
+const ON_PAIR = {'on':'bg','on-muted':'bg-muted','on-strong':'bg-strong','on-disabled':'bg-disabled','on-light':'#ffffff','on-dark':'#000000'};
+const SEC6 = (bg,on,border,bgm,onm,bm)=>({'bg':bg,'on':on,'border':border,'bg-muted':bgm,'on-muted':onm,'border-muted':bm});
+const SECTOR = (bg,bgm,bgs,on,onm,ons,b,bm,bs)=>({'bg':bg,'bg-muted':bgm,'bg-strong':bgs,'on':on,'on-muted':onm,'on-strong':ons,'border':b,'border-muted':bm,'border-strong':bs});
+const ACT = (bg,on,b,bgm,onm,bm,hov,act,bgd,ond,bd)=>({'bg':bg,'on':on,'border':b,'bg-muted':bgm,'on-muted':onm,'border-muted':bm,'bg-hover':hov,'bg-active':act,'bg-disabled':bgd,'on-disabled':ond,'border-disabled':bd});
+const FB = (bg,on,b,bgm,onm,bm,ol,od)=>({'bg':bg,'on':on,'border':b,'bg-muted':bgm,'on-muted':onm,'border-muted':bm,'on-light':ol,'on-dark':od});
+const CURRENT = {
+  'Surface-base': SEC6('ffffff','3f4254','d3d3db','ffffff','656876','c4c4cf'),
+  'Surface-subtle': SEC6('e4e7f4','2a2b2f','a8acbe','f6f7fb','54565f','d3d3db'),
+  'Surface-inverse': SEC6('191a22','f6f7fb','323543','262832','e4e7f4','323543'),
+  'Surface-ai': SEC6('e6d0ee','340844','b371cc','e6d0ee','670f88','9a42bb'),
+  'Surface-overlay': {'bg':'alpha','bg-hover':'alpha'},
+  'Surface-living': SECTOR('ecd9e3','f6ecf1','d0a1ba','53404a','7d6170','ffffff','e3c7d6','d9b4c8','d0a1ba'),
+  'Surface-office': SECTOR('d1e3ea','e8f1f4','8db9ca','384a51','556f79','ffffff','bbd5df','a4c7d5','8db9ca'),
+  'Surface-retail': SECTOR('dfd3b3','efe9d9','ae9142','463a1a','685728','ffffff','cebd8e','bea768','ae9142'),
+  'Surface-logistics': SECTOR('c9d9d3','e4ece9','789f90','30403a','485f56','ffffff','aec5bc','93b2a6','789f90'),
+  'Surface-hospitality': SECTOR('efcdc3','f7e6e1','ffffff','56342a','824e40','000000','e8b4a6','e09b88','ffffff'),
+  'Surface-capital-markets': SECTOR('cbc2c5','e5e0e2','7e666d','32292c','4c3d41','ffffff','b2a3a7','98858a','7e666d'),
+  'Surface-corporate': SECTOR('999999','cccccc','000000','000000','000000','ffffff','666666','333333','000000'),
+  'Surface-technology': SECTOR('999999','cccccc','000000','000000','000000','ffffff','666666','333333','000000'),
+  'Surface-marketing': SECTOR('99cdd4','cce6e9','008193','00343b','004d58','ffffff','66b3be','339aa9','008193'),
+  'Surface-finance': SECTOR('c1e1c5','e0f0e2','64b46e','28482c','3c6c42','ffffff','a2d2a8','83c38b','64b46e'),
+  'Surface-research': SECTOR('beb4c2','ded9e0','5c4366','251b29','4a3652','ffffff','9d8ea3','7d6985','5c4366'),
+  'Surface-hr': SECTOR('eedceb','f6edf5','d4a7ce','554352','7f647c','ffffff','e5cae2','ddb9d8','d4a7ce'),
+  'Surface-it': SECTOR('bcbcbb','dddddd','575756','232322','575756','ffffff','9a9a9a','797978','575756'),
+  'Surface-legal': SECTOR('cccc99','e6e6cc','808000','333300','4d4d00','ffffff','b3b366','999933','808000'),
+  'Action-primary': ACT('ae9142','231d0d','8b7435','dfd3b3','685728','bea768','8b7435','685728','d9d9dd','8c8e98','b2b3bb'),
+  'Action-secondary': Object.assign(ACT('d3d3db','242427','91919c','e1e1e7','48484e','b5b5c3',null,'b5b5c3','f0f0f3','91919c','c4c4cf'),{'bg-muted-hover':'e1e1e7'}),
+  'Action-neutral': ACT('3f4254','f6f7fb','323543','b2b3bb','323543','656876','323543','262832','d9d9dd','8c8e98','b2b3bb'),
+  'Action-danger': ACT('b02a37','f6f7fb','b02a37','f8d7da','b02a37','dc3545','b02a37','842029','d9d9dd','8c8e98','b2b3bb'),
+  'Action-success': ACT('076e4f','f6f7fb','076e4f','9de2cd','044934','0bb783','099269','044934','d9d9dd','8c8e98','b2b3bb'),
+  'Action-brand': ACT('b92d2d','f6f7fb','8b2222','f5afaf','8b2222','ec6060','8b2222','5c1616','d9d9dd','8c8e98','b2b3bb'),
+  'Action-ai': ACT('670f88','f6f7fb','4d0b66','cda1dd','4d0b66','9a42bb','4d0b66','340844','d9d9dd','8c8e98','b2b3bb'),
+  'Action-warning': ACT('cc8600','332200','996500','ffdc99','664300','ffb933','996500','664300','d9d9dd','8c8e98','b2b3bb'),
+  'Feedback-danger': FB('b02a37','f6f7fb','b02a37','f8d7da','842029','ea868f','b02a37','dc3545'),
+  'Feedback-success': FB('099269','f6f7fb','099269','cef1e6','076e4f','6dd4b5','099269','0bb783'),
+  'Feedback-warning': FB('ffa800','332200','ffa800','ffeecc','664300','ffcb66','996500','ffa800'),
+  'Feedback-info': FB('174a80','f6f7fb','174a80','d2deec','113760','779dc6','174a80','1d5ca0'),
+  'Feedback-ai': FB('670f88','f6f7fb','670f88','e6d0ee','4d0b66','b371cc','670f88','8113aa'),
+  'Feedback-neutral': {'bg':'656876','on':'f6f7fb','border':'656876'}
+};
+// remove the null placeholder on secondary bg-hover
+delete CURRENT['Action-secondary']['bg-hover'];
+const GROUPS = [
+  ['Surface — core', ['Surface-base','Surface-subtle','Surface-inverse','Surface-ai']],
+  ['Surface — overlay (scrim, special family)', ['Surface-overlay']],
+  ['Surface — sectors', ['Surface-living','Surface-office','Surface-retail','Surface-logistics','Surface-hospitality','Surface-capital-markets','Surface-corporate','Surface-technology','Surface-marketing','Surface-finance','Surface-research','Surface-hr','Surface-it','Surface-legal']],
+  ['Action', ['Action-primary','Action-secondary','Action-neutral','Action-danger','Action-success','Action-brand','Action-ai','Action-warning']],
+  ['Feedback', ['Feedback-danger','Feedback-success','Feedback-warning','Feedback-info','Feedback-ai','Feedback-neutral']]
+];
+const OVERLAY_TARGET = ['bg','bg-hover','bg-active','on'];
+const NOTES = {
+  'Surface-base': 'Ceiling: bg-muted stays equal to bg (white). bg-strong gets its own neutral value per ruling 2 (Subtle is an alternative surface, not the dark step of Base).',
+  'Surface-ai': 'Ceiling: bg-muted equals bg (e6d0ee, the lightest lilac step).',
+  'Surface-overlay': 'Open point: a scrim has no meaningful muted/strong/border levels. Proposed as a declared partial family of 4 rungs; the alternative is the full 18.',
+  'Surface-hospitality': 'Value flag for the next wave: bg-strong white and on-strong black are NDL-era oddities.',
+  'Surface-corporate': 'Value flag: pure black/white ramp inherited from NDL.',
+  'Surface-technology': 'Value flag: identical to Corporate today.',
+  'Action-secondary': 'bg-muted-hover is renamed bg-hover (3-step rename, id preserved). Its 40 uses on non-button surfaces (Menu item, Reminder card, Input/Action) move to the new Surface hover rungs. Today its value equals bg-muted: the flat-hover finding.',
+  'Feedback-warning': 'Your working file already binds Feedback-warning-on-strong (6) to a variable the DS no longer has: it re-attaches once the rung exists.',
+  'Feedback-success': 'Same as warning: 2 stale bindings to on-strong in your file.'
+};
+const TEXT_CURRENT = [['base','3f4254'],['muted','656876'],['inverse','f6f7fb'],['disabled','8c8e98'],['link','685728'],['link-hover','463a1a'],['brand','b92d2d'],['highlight','8b7435'],['ai','8113aa']];
+const TEXT_ROWS = [
+  ['base','3f4254','remove','Surface-<family>-on of the surface under the text (white → Surface-base-on, same value)','505 DS + 60 product bindings'],
+  ['muted','656876','remove','Surface-<family>-on-muted (white → Surface-base-on-muted, same value)','438 DS + 75 product'],
+  ['inverse','f6f7fb','remove','Surface-inverse-on (same value) · on scrims Surface-overlay-on','21 DS'],
+  ['disabled','8c8e98','remove','<family>-on-disabled of the surface (same value)','248 DS'],
+  ['link','685728','keep','Text-color-link (proposed alias of Action-primary-on-light)','74 DS'],
+  ['link-hover','463a1a','keep','Text-color-link-hover',''],
+  [null,null,'add','Text-color-link-active',''],
+  ['brand','b92d2d','keep','Text-color-brand (proposed alias of Action-brand-on-light)',''],
+  [null,null,'add','Text-color-brand-hover',''],
+  [null,null,'add','Text-color-brand-active',''],
+  ['highlight','8b7435','keep','Text-color-highlight (proposed alias of Action-primary-on-light or its hover step)','30 product'],
+  [null,null,'add','Text-color-highlight-hover',''],
+  [null,null,'add','Text-color-highlight-active',''],
+  ['ai','8113aa','keep','Text-color-ai (proposed alias of Action-ai-on-light)',''],
+  [null,null,'add','Text-color-ai-hover',''],
+  [null,null,'add','Text-color-ai-active','']
+];
+function lum(hex){const c=hex.replace('#','');const f=i=>{let v=parseInt(c.substr(i,2),16)/255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)};return 0.2126*f(0)+0.7152*f(2)+0.0722*f(4)}
+function ratio(a,b){const l1=lum(a),l2=lum(b);const hi=Math.max(l1,l2),lo=Math.min(l1,l2);return (hi+0.05)/(lo+0.05)}
+function sw(hex){if(!hex)return '<span class="sw dash" title="value chosen in the next wave"></span>';if(hex==='alpha')return '<span class="sw alpha" title="alpha scrim"></span>';return `<span class="sw" style="background:#${hex}"></span>`}
+function cell(name,hex,extra){return `<div class="v">${sw(hex)}<div><div class="name">${name}</div><div class="hex">${hex?(hex==='alpha'?'alpha scrim':'#'+hex):'value: next wave'}${extra||''}</div></div></div>`}
+function crBadge(fam,rung,hex){const ref=ON_PAIR[rung];if(!ref||!hex||hex==='alpha')return '';let bgHex=ref.startsWith('#')?ref.slice(1):CURRENT[fam][ref];if(!bgHex||bgHex==='alpha')return '';const r=ratio(hex,bgHex);const ok=r>=4.5;return `<span class="cr ${ok?'ok':'ko'}" title="contrast vs ${ref.startsWith('#')?ref:fam+'-'+ref}">${r.toFixed(1)}:1</span>`}
+let totals={have:0,keep:0,add:0,rename:0,remove:0};
+function famBlock(fam){
+  const cur=CURRENT[fam]||{};const isOverlay=fam==='Surface-overlay';
+  const target=isOverlay?OVERLAY_TARGET:RUNGS;
+  let rows='';
+  for(const r of target){
+    // Action-secondary: the existing bg-muted-hover becomes bg-hover (same variable, renamed)
+    if(r==='bg-hover'&&cur['bg-muted-hover']&&!cur['bg-hover']){
+      const old=cur['bg-muted-hover'];totals.have++;totals.rename++;
+      rows+=`<tr><td class="rung">${r}</td><td>${cell(fam+'-bg-muted-hover',old)}</td><td><div class="v">${sw(old)}<div><div class="name">${fam}-bg-hover</div><div class="hex">renamed from bg-muted-hover (id preserved) · value to fix: equals bg-muted today</div></div><span class="chip rename">rename</span></div></td></tr>`;
+      continue;
+    }
+    const hex=cur[r];const status=hex?'keep':'add';
+    if(hex){totals.have++;totals.keep++}else totals.add++;
+    rows+=`<tr class="${status==='keep'?'unchanged':''}"><td class="rung">${r}</td><td>${hex?cell(fam+'-'+r,hex,crBadge(fam,r,hex)):'<span class="dash-t">—</span>'}</td><td><div class="v">${hex?sw(hex):sw(null)}<div><div class="name">${fam}-${r}</div></div><span class="chip ${status}">${status}</span>${(isOverlay&&!hex)?'<span class="chip open">open</span>':''}</div></td></tr>`;
+  }
+  const haveN=Object.keys(cur).length, afterN=target.length;
+  return `<section class="fam" id="${fam}"><div class="fam-h"><h3>${fam}</h3><span class="n">today ${haveN} · after ${afterN} · +${afterN-haveN}${cur['bg-muted-hover']?' · 1 renamed':''}</span></div><table><thead><tr><th class="rung">rung</th><th>today</th><th>after</th></tr></thead><tbody>${rows}</tbody></table>${NOTES[fam]?`<div class="note">${NOTES[fam]}</div>`:''}</section>`;
+}
+function textBlock(){
+  let rows='';
+  for(const [rung,hex,status,target,uses] of TEXT_ROWS){
+    if(hex){totals.have++} if(status==='keep')totals.keep++; if(status==='add')totals.add++; if(status==='remove')totals.remove++;
+    rows+=`<tr class="${status==='keep'?'unchanged':''}"><td class="rung">${rung||'—'}</td><td>${hex?cell('Text-color-'+rung,hex,crBadge('Text-color',rung==='inverse'?null:'on-light',hex)):'<span class="dash-t">—</span>'}</td><td><div class="v">${status==='remove'?'<span class="sw dash" style="border-color:#ea868f"></span>':(hex?sw(hex):sw(null))}<div><div class="name">${target}</div>${uses?`<div class="hex">${uses}</div>`:''}</div><span class="chip ${status}">${status}</span></div></td></tr>`;
+  }
+  return `<section class="fam" id="Text-color"><div class="fam-h"><h3>Text-color</h3><span class="n">today 9 · after 12 · +7 · −4</span></div><table><thead><tr><th class="rung">rung</th><th>today</th><th>after</th></tr></thead><tbody>${rows}</tbody></table><div class="note">base, muted, inverse and disabled are removed only after their re-bind census reads zero. Open point: link, brand, highlight and ai as aliases of the family on-light rungs, so the interactive text colours have one source.</div></section>`;
+}
+function focusBlock(){totals.have++;totals.keep++;return `<section class="fam" id="Focus"><div class="fam-h"><h3>Focus</h3><span class="n">unchanged</span></div><table><thead><tr><th class="rung">rung</th><th>today</th><th>after</th></tr></thead><tbody><tr class="unchanged"><td class="rung">ring</td><td>${cell('Focus-ring','1d5ca0')}</td><td><div class="v">${sw('1d5ca0')}<div><div class="name">Focus-ring</div></div><span class="chip keep">keep</span></div></td></tr></tbody></table></section>`}
+const root=document.getElementById('root');let html='';let navHtml='';
+for(const [gname,fams] of GROUPS){html+=`<h2>${gname}</h2>`;for(const f of fams){html+=famBlock(f);navHtml+=`<a href="#${f}">${f.replace(/^(Surface|Action|Feedback)-/,'')}</a>`}}
+html+='<h2>Text</h2>'+textBlock()+'<h2>Focus</h2>'+focusBlock();
+navHtml+='<a href="#Text-color">Text-color</a><a href="#Focus">Focus</a>';
+root.innerHTML=html;document.getElementById('nav').innerHTML=navHtml;
+document.getElementById('totals').innerHTML=`today <b>${totals.have}</b> color variables · after <b>${totals.have-totals.remove-totals.rename+totals.add+totals.rename}</b> · <b>+${totals.add}</b> added · <b>${totals.rename}</b> renamed · <b>−${totals.remove}</b> removed`;
+document.getElementById('hideKeep').addEventListener('change',e=>{document.querySelectorAll('tr.unchanged').forEach(tr=>tr.classList.toggle('hidden',e.target.checked))});
+</script>
+</body>
+</html>
