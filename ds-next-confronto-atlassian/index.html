@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS Next · Atlassian coverage — what changes in the program</title>
+<style>
+  :root{--bg:#ffffff;--ink:#3f4254;--muted:#656876;--line:#d3d3db;--soft:#f6f7fb;--brass:#ae9142;--brass-soft:#fbf7ea;
+    --have:#cef1e6;--have-ink:#076e4f;--near:#d2deec;--near-ink:#113760;--comp:#e4e7f4;--comp-ink:#2a2b2f;--behav:#f1f1f4;--behav-ink:#656876;
+    --gap:#f8d7da;--gap-ink:#842029;--scope:#ffeecc;--scope-ink:#664300}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  header .tot{color:var(--muted);font-size:13px}
+  header .tot b{color:var(--ink)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;white-space:nowrap}
+  .chip.have{background:var(--have);color:var(--have-ink)}
+  .chip.near{background:var(--near);color:var(--near-ink)}
+  .chip.comp{background:var(--comp);color:var(--comp-ink)}
+  .chip.behav{background:var(--behav);color:var(--behav-ink);border:1px dashed #c3c5cf}
+  .chip.gap{background:var(--gap);color:var(--gap-ink)}
+  .chip.scope{background:var(--scope);color:var(--scope-ink)}
+  .chip.depr{background:#fff;color:var(--muted);border:1px solid var(--line);text-decoration:line-through}
+  .chip.lock{background:#fff;color:var(--muted);border:1px solid var(--line)}
+  .chip.re{background:var(--brass-soft);color:#6b5620;border:1px dashed var(--brass)}
+  nav.top{padding:10px 24px;border-bottom:1px solid var(--line);background:var(--soft);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  nav.top a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:15px;margin:36px 0 8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  h2:first-child{margin-top:8px}
+  h3{font-size:15px;margin:0}
+  .intro{color:var(--muted);font-size:13px;max-width:900px;margin:0 0 12px}
+  .intro a,.small a{color:var(--ink)}
+  .card{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;margin:0 0 16px}
+  .card-h{display:flex;align-items:baseline;gap:14px;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .card-h .n{color:var(--muted);font-size:12px}
+  .card-b{padding:14px}
+  code,.id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--muted);background:var(--soft);padding:0 4px;border-radius:3px}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  .bar{display:flex;height:28px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin:8px 0 6px}
+  .bar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.2px}
+  .bar .have{background:var(--have);color:var(--have-ink)} .bar .near{background:var(--near);color:var(--near-ink)} .bar .comp{background:var(--comp);color:var(--comp-ink)}
+  .bar .behav{background:var(--behav);color:var(--behav-ink)} .bar .gap{background:var(--gap);color:var(--gap-ink)} .bar .scope{background:var(--scope);color:var(--scope-ink)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 0}
+  .kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
+  .kpi b{display:block;font-size:22px;line-height:1.1}
+  .kpi span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:7px 12px;border-bottom:1px solid #eef0f4;vertical-align:top;font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .grp td:first-child{white-space:nowrap;font-weight:600}
+  .mini{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line);min-width:160px}
+  .mini div{height:100%}
+  .re-table td:first-child{white-space:nowrap;font-weight:600}
+  .re-table td.was{color:var(--muted)}
+  .re-table td.now{background:var(--brass-soft)}
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .q{border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:110px;background:#fff}
+  .q h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .q .qi{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;font-size:12px;margin:0 6px 6px 0;background:#fff}
+  .q .qi .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .q.first{background:#f3fbf8;border-color:#b7e4d4}
+  .axis{font-size:11px;color:var(--muted);margin:6px 0 0}
+  .planner{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .summary{position:sticky;top:76px;border:1px solid var(--line);border-radius:8px;background:var(--soft);padding:14px}
+  .summary h3{margin:0 0 10px;font-size:14px}
+  .summary .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .summary .row:last-of-type{border-bottom:0}
+  .summary ol{margin:6px 0 10px;padding-left:20px;font-size:12.5px}
+  .summary textarea{width:100%;height:200px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical;background:#fff;color:var(--ink)}
+  .summary input[type=text]{width:100%;font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .btn{font:12.5px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer}
+  .btn:hover{background:var(--soft)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:#2a2b2f}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding:10px 14px;border-bottom:1px solid #eef0f4;align-items:center}
+  .prow:last-child{border-bottom:0}
+  .prow .t{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+  .prow .t b{font-size:13.5px}
+  .prow .why{grid-column:1 / -1;font-size:12.5px;color:var(--muted)}
+  .prow .meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);align-items:center}
+  .prow.locked{background:#fcfcfd}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--muted);background:#fff;white-space:normal}
+  .tag.ev3{border-color:#b7e4d4;background:#f3fbf8;color:var(--have-ink)} .tag.ev2{border-color:#c9d6e6;background:#f4f8fc;color:var(--near-ink)} .tag.ev1{border-color:#f0d9a6;background:#fff8ea;color:var(--scope-ink)} .tag.ev0{border-color:#e4c8cb;background:#fdf3f4;color:var(--gap-ink)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .seg button{font:12px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:0;background:#fff;color:var(--muted);padding:7px 10px;cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button:hover{background:var(--soft)}
+  .seg button.on.build{background:var(--have);color:var(--have-ink)}
+  .seg button.on.later{background:var(--near);color:var(--near-ink)}
+  .seg button.on.skip{background:var(--comp);color:var(--comp-ink)}
+  .prow details{grid-column:1 / -1;font-size:12.5px}
+  .prow summary{cursor:pointer;color:var(--muted);font-size:12px}
+  .prow .rn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 2px}
+  .prow .rn div{border-radius:6px;padding:8px 10px;font-size:12.5px}
+  .prow .rn .re{background:var(--comp)}
+  .prow .rn .ne{background:var(--brass-soft);border:1px dashed var(--brass)}
+  .prow .rn b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:3px}
+  .sug{font-size:11px;color:var(--muted)}
+  .sug a{color:var(--ink)}
+  .opts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 2px}
+  .opts div{border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:12.5px;background:#fff}
+  .opts div.rec{border-color:var(--brass);background:var(--brass-soft)}
+  .opts b{display:block;margin-bottom:3px}
+  .gaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+  .gap-card .card-b{display:grid;gap:12px}
+  .mock{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;justify-content:center;align-items:center;min-height:130px;background-image:radial-gradient(#eceef3 1px,transparent 1px);background-size:12px 12px}
+  .m-reuse{background:#e4e7f4;border:1px solid #c9cde0}
+  .m-new{border:1.5px dashed var(--brass);background:var(--brass-soft)}
+  .mlegend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+  .mlegend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  .ico{width:22px;height:22px;border-radius:6px;background:#c9cde0;display:inline-block;position:relative;flex:0 0 auto}
+  .ico:after{content:"";position:absolute;inset:6px;border:2px solid #fff;border-radius:50%}
+  .ico.sm{width:14px;height:14px;border-radius:4px}
+  .ico.sm:after{inset:4px;border-width:1.5px}
+  .lbl{height:9px;border-radius:5px;background:#b9bdd0;display:inline-block}
+  .mtx{display:grid;gap:6px;flex:1;min-width:0}
+  .mbtns{display:flex;gap:6px;margin-top:2px}
+  .mbtn{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;color:var(--ink)}
+  .mx{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);flex:0 0 auto}
+  .li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  .li.sel{box-shadow:inset 3px 0 0 var(--brass)}
+  .li.l1{margin-left:22px} .li.l2{margin-left:44px}
+  .chev{font-size:12px;width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink)}
+  .rm{display:grid;gap:12px} .rm .r{display:flex;align-items:center;gap:10px}
+  .cb{width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 auto}
+  .cb.on{background:var(--ink);border-color:var(--ink)} .cb.mixed{color:var(--brass)}
+  .mk-crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+  .crumb{display:inline-flex;align-items:center;gap:5px;padding:4px 6px;border-radius:5px}
+  .sep{color:var(--muted);font-size:12px}
+  .mk-side{width:240px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .mk-side .hdr{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);border-radius:6px}
+  .av{width:22px;height:22px;border-radius:50%;flex:0 0 auto}
+  .mk-drawer{width:320px;height:170px;border-radius:8px;position:relative;overflow:hidden;background:#fff!important;display:flex}
+  .mk-drawer .page{flex:1;padding:12px;display:grid;gap:8px;align-content:start}
+  .mk-drawer .sheet{width:140px;background:var(--brass-soft);border-left:1.5px dashed var(--brass);display:grid;grid-template-rows:auto 1fr auto;gap:8px;padding:10px}
+  .mk-drawer .sheet .hd{display:flex;align-items:center;gap:6px}
+  .mk-drawer .sheet .ft{display:flex;gap:6px;justify-content:flex-end}
+  .mk-tg{width:320px;border-radius:8px;overflow:hidden;background:#fff;border:1px solid #c9cde0}
+  .mk-tg .tr{display:grid;grid-template-columns:150px 1fr 1fr;border-bottom:1px solid #eef0f4}
+  .mk-tg .tr:last-child{border-bottom:0}
+  .mk-tg .td{padding:6px 8px;display:flex;align-items:center;gap:6px;font-size:10px}
+  .mk-tg .th{background:var(--soft);font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
+  .mk-tg .td.l1{padding-left:26px}
+  .mk-combo{width:260px;display:grid;gap:4px}
+  .mk-combo .dd{border-radius:8px;background:#fff;border:1px solid #c9cde0;padding:4px;display:grid;gap:2px}
+  .mk-alert{display:flex;gap:10px;padding:10px 12px;border-radius:8px;width:300px;align-items:flex-start;border-left:4px solid #8f93a8!important}
+  .mk-kv{width:300px;display:grid;gap:6px}
+  .mk-kv .kv{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  .mk-kv .field{flex:1;height:26px;border-radius:5px;border:1.5px dashed var(--brass);background:var(--brass-soft);display:flex;align-items:center;padding:0 6px}
+  .mk-comment{width:320px;display:grid;gap:8px}
+  .mk-comment .c{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:8px;border-radius:8px}
+  .mk-comment .c.reply{margin-left:32px}
+  .mk-obj{display:flex;gap:10px;align-items:center}
+  .mk-obj .o{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center}
+  .mk-obj .o i{width:12px;height:12px;border-radius:3px;background:#fff;display:block}
+  .walk td:first-child{white-space:nowrap;font-weight:600}
+  .nsum td.nm a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .nsum .mini{margin-bottom:4px}
+  .nears{display:grid;grid-template-columns:1fr;gap:16px}
+  .near-card .card-h h3{font-size:14.5px}
+  .near-b{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:14px}
+  .near-b .mock{min-height:150px}
+  table.feat th{padding:6px 8px}
+  table.feat td{font-size:12.5px;padding:5px 8px;vertical-align:middle}
+  table.feat td:first-child{font-weight:600}
+  .nbar{min-width:120px;width:140px}
+  .filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);font-size:12.5px}
+  .filters input[type=search]{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:200px;background:#fff;color:var(--ink)}
+  .filters select{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .fchip{cursor:pointer;opacity:.45;border:1px solid transparent}
+  .fchip.on{opacity:1;border-color:rgba(0,0,0,.15)}
+  .tablewrap{overflow-x:auto}
+  #all th{cursor:pointer;user-select:none}
+  #all th.sorted:after{content:" ▾";color:var(--brass)}
+  #all td.dsc{font-size:12.5px}
+  #all td.nm{font-weight:600;white-space:nowrap}
+  .count{font-size:12px;color:var(--muted);margin-left:auto}
+  footer{padding:24px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:32px}
+  @media (max-width:900px){.planner{grid-template-columns:1fr}.summary{position:static}.quad{grid-template-columns:1fr}.gaps{grid-template-columns:1fr}.prow .rn{grid-template-columns:1fr}.near-b{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>DS Next · Atlassian coverage — what changes in the program</h1>
+  <div class="tot" id="totals"></div>
+  <div class="legend">
+    <span class="chip have">have 1:1</span><span class="chip near">have, near</span><span class="chip comp">composable</span><span class="chip behav">primitive / code-only</span><span class="chip gap">gap</span><span class="chip scope">out of scope</span><span class="chip depr">deprecated</span><span class="chip re">rethink</span>
+  </div>
+</header>
+<nav class="top">
+  <a href="#overview">Overview</a><a href="#rethink">What changes in the program</a><a href="#matrix">Evidence × effort</a><a href="#decide">Decide: the planner</a><a href="#gaps">New pieces, drawn</a><a href="#shell">Navigation system, slot by slot</a><a href="#near">Near: what exactly is missing</a><a href="#all">All 89 entries</a><a href="#method">Method</a>
+</nav>
+<main>
+
+<h2 id="overview">Overview</h2>
+<p class="intro">Atlassian Design System: 89 index entries in Atlassian's own 14 groups, read live. 59 are UI components; the other 30 are primitives, libraries, tooling and five deprecated shells, listed but kept out of the denominator. Fourth pass of the series. Atlassian adds <b>no new gap</b> and has <b>no accordion at all</b>: its value is precision on things we already approved, and one nesting decision.</p>
+<div class="card"><div class="card-b">
+  <div class="bar" id="bar"></div>
+  <div class="kpis" id="kpis"></div>
+  <h3 style="margin:18px 0 6px">Coverage by Atlassian group <span class="muted small">(Atlassian's own grouping; UI components only)</span></h3>
+  <div class="tablewrap"><table class="grp" id="grp"></table></div>
+</div></div>
+
+<h2 id="rethink">What changes in the program</h2>
+<p class="intro">One real rethink (R12, navigation nesting) and a set of confirmations that sharpen approved recipes without changing them. "Build now" in the planner means "accept".</p>
+<div class="card"><div class="tablewrap"><table class="re-table">
+  <thead><tr><th>#</th><th>Approved item</th><th>Recipe so far</th><th>Atlassian insight</th><th>Proposed change</th></tr></thead>
+  <tbody>
+    <tr><td>R12</td><td>Sidebar nesting · Wave 59 (R1)</td><td class="was">Collapsible List section, sections open and close as a whole; Tree row for true hierarchies</td><td>Side nav nests with <b>Expandable menu items</b> (levels 0–2, chevron in the leading slot, no description) on top of <b>section headings</b>; the collapsed rail opens <b>Flyout menus</b> (400px popup with header, body, footer). With Ant's SubMenu, two of three peers nest by item; Lightning nests by section</td><td class="now"><b>Decision A / B / C</b>: A sections only (R1 as approved) · B expandable items only · <b>C both</b>: collapsible List section for top-level groups, the Wave 59 Tree row reused as the expandable item inside them, max three levels. Recommended C, no extra effort. Flyout = Panel <code>513:4712</code> at usage</td></tr>
+    <tr><td>R2 ✓</td><td>Drawer + Show scrim + Show back · Wave 54</td><td class="was">Placement Center | Right | Left, scrim optional, back optional</td><td><b>Drawer</b> slides from the <b>left</b> with widths narrow / medium / wide / extended / full; <b>Panel</b> is docked right, 365 default, resizable, with header actions, footer and subheader</td><td class="now">Confirmed: one master covers both. Left is a real case, widths become presets; resizing and subheader cover image are usage or behaviour</td></tr>
+    <tr><td>New</td><td>Inline edit · Wave 63</td><td class="was">Table cell State Edit + Error</td><td>Inline edit wraps <b>any field</b>: read view → edit view with confirm ✓ and cancel × buttons, validation; text field, textarea, select</td><td class="now">New candidate <b>Inline edit field</b>: Data row <code>581:89</code> State=Edit, Input in place of the value + two Button icons; ¼ wave, rides on Wave 63</td></tr>
+    <tr><td>✓</td><td>Alert dismiss + actions + Neutral / Brand · Wave 58</td><td class="was">Show close, Actions slot, Variant Neutral + Brand</td><td>Section message: information / warning / error / success / <b>discovery</b> (purple), actions, dismissible</td><td class="now">Covered. Small addition: <b>Variant AI</b> on Alert for discovery, on the Feedback-ai tokens (⅛)</td></tr>
+    <tr><td>✓</td><td>Menu item rich row · Wave 59</td><td class="was">Description line + avatar leading</td><td>Menu items carry a <b>description line</b>, icon before / after, actions on hover, lozenge after, ContainerAvatar</td><td class="now">Third peer asking for the same row. Confirmed</td></tr>
+    <tr><td>✓</td><td>Tree Grid · Wave 63</td><td class="was">Table cell Show expand icon</td><td>Table tree: chevron rows, indentation, loading skeletons</td><td class="now">Confirmed</td></tr>
+    <tr><td>✓</td><td>Pagination · Wave 52</td><td class="was">Mockup A: numbers + prev / next + ellipsis</td><td>prev / next, numbers, ellipsis, double truncation when far from both ends</td><td class="now">Confirmed as is</td></tr>
+    <tr><td>✓</td><td>Breadcrumb N levels · skipped</td><td class="was">Skip</td><td>Auto-collapse beyond 8 with an ellipsis, truncation with tooltip</td><td class="now">Skip stands</td></tr>
+    <tr><td>✓</td><td>Slider · Wave 62</td><td class="was">Range Off | On, Error, value beside or Tooltip</td><td>Range is <b>single-thumb only</b></td><td class="now">Our Range axis stays; nothing to add</td></tr>
+  </tbody>
+</table></div></div>
+
+<h2 id="matrix">Evidence × effort — new candidates and the rethink</h2>
+<p class="intro">Rethinks carry their extra effort only. Effort in waves.</p>
+<div class="quad" id="quad"></div>
+<p class="axis">Evidence: <b>proven</b> = used in the working file · <b>basic</b> = a standard CRM pattern · <b>conditional</b> = depends on a roadmap or design decision · <b>none</b> = no CRM evidence.</p>
+
+<h2 id="decide">Decide — R12 and the new candidates</h2>
+<p class="intro"><b>Apply suggestions</b> pre-fills my recommendation: R12 = C, Inline edit field now, Comment row and Object icon later, the rest skipped. Items decided in earlier passes are shown locked.</p>
+<div class="planner">
+  <div>
+    <div class="btns"><button class="btn primary" id="apply">Apply suggestions</button><button class="btn" id="reset">Reset all</button></div>
+    <div class="card"><div class="card-h"><h3>Rethink to decide</h3><span class="n">R12 · navigation nesting — Build now = accept option C · Skip = keep R1 as approved (A) · Later = defer</span></div><div id="p-re"></div></div>
+    <div class="card"><div class="card-h"><h3>New from Atlassian</h3><span class="n">masters, axes or props</span></div><div id="p-new"></div></div>
+    <div class="card"><div class="card-h"><h3>Out of scope</h3><span class="n">listed so the decision is explicit</span></div><div id="p-scope"></div></div>
+    <div class="card"><div class="card-h"><h3>Already decided (DSI + Ant + Lightning)</h3><span class="n">locked</span></div><div id="p-locked"></div></div>
+  </div>
+  <aside class="summary">
+    <h3>Your plan</h3>
+    <div id="sum-rows"></div>
+    <div style="margin-top:12px"><b class="small">Accepted / build now</b><ol id="ol-build"></ol></div>
+    <div><b class="small">Later</b><ol id="ol-later"></ol></div>
+    <label class="small muted" for="notes">Notes for the message</label>
+    <input type="text" id="notes" placeholder="e.g. R12 = B, we prefer item nesting everywhere">
+    <div class="btns"><button class="btn primary" id="copy">Copy message</button><span class="small muted" id="copied"></span></div>
+    <textarea id="msg" readonly></textarea>
+  </aside>
+</div>
+
+<h2 id="gaps">New pieces, drawn</h2>
+<p class="intro">Schematic only. Gray = existing DS master reused; brass dashed = new or changed by this pass.</p>
+<div class="mlegend" style="margin:0 0 12px"><span><i class="m-reuse"></i>existing DS master, reused</span><span><i class="m-new"></i>new or changed</span></div>
+<div class="gaps">
+  <div class="card gap-card"><div class="card-h"><h3>R12 · option C: sections + expandable items</h3><span class="n">no extra effort · Wave 59</span></div><div class="card-b">
+    <div class="mock"><div class="mk-side m-reuse"><div class="hdr m-new"><span class="chev">⌄</span><span class="lbl" style="width:70px;height:7px"></span></div><div class="li sel"><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div><div class="li m-new"><span class="chev">⌄</span><span class="lbl" style="width:70px"></span><span class="lbl" style="width:22px;margin-left:auto;background:#c0392b"></span></div><div class="li l1"><span class="lbl" style="width:60px"></span></div><div class="li l1"><span class="lbl" style="width:50px"></span></div><div class="li m-new"><span class="chev">›</span><span class="lbl" style="width:64px"></span></div><div class="hdr m-new"><span class="chev">›</span><span class="lbl" style="width:56px;height:7px"></span></div></div></div>
+    <div class="small"><b>Reuse:</b> List section <code>1090:5381</code> with the Wave 53 collapse (R1), Menu item <code>404:110</code>, the Wave 59 Tree row. <b>Changed:</b> nothing new is minted: the Tree row is allowed inside a navigation section as the expandable item (chevron before, indent per level, max three levels, no description line, as Atlassian). Flyout for the collapsed rail = Panel <code>513:4712</code> with title, content and footer.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Inline edit field</h3><span class="n">¼ wave · new candidate · Wave 63</span></div><div class="card-b">
+    <div class="mock"><div class="mk-kv"><div class="kv m-reuse"><span class="lbl" style="width:70px;height:7px"></span><span class="lbl" style="width:90px;margin-left:auto;background:#8f93a8"></span><span class="mx" style="width:14px;height:14px;font-size:10px;opacity:.5">✎</span></div><div class="kv m-reuse"><span class="lbl" style="width:60px;height:7px"></span><span class="field"><span class="lbl" style="width:80px;background:#8f93a8"></span></span><span class="mx m-new" style="width:18px;height:18px;font-size:10px">✓</span><span class="mx m-new" style="width:18px;height:18px;font-size:10px">×</span></div><div class="kv m-reuse"><span class="lbl" style="width:80px;height:7px"></span><span class="lbl" style="width:60px;margin-left:auto;background:#8f93a8"></span><span class="mx" style="width:14px;height:14px;font-size:10px;opacity:.5">✎</span></div></div></div>
+    <div class="small"><b>Reuse:</b> Data row <code>581:89</code> (Label / Value / Control), Input <code>394:5591</code>, Button icon <code>363:1417</code> XS for confirm and cancel, Input states for validation. <b>New:</b> <code>State=Read | Hover | Edit</code> on Data row: Hover shows the pencil, Edit swaps the value for a field with confirm ✓ and cancel ×. Same idea as the Table cell inline edit, for detail panels.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Comment row</h3><span class="n">¼ wave · new candidate · later</span></div><div class="card-b">
+    <div class="mock"><div class="mk-comment"><div class="c m-new"><span class="av m-reuse"></span><div class="mtx"><div style="display:flex;gap:6px;align-items:center"><span class="lbl" style="width:70px;background:#8f93a8"></span><span class="lbl" style="width:36px;height:6px"></span></div><span class="lbl" style="width:200px"></span><span class="lbl" style="width:150px"></span><div class="mbtns"><span class="lbl" style="width:30px;height:7px;background:var(--brass)"></span><span class="lbl" style="width:30px;height:7px;background:var(--brass)"></span></div></div></div><div class="c reply m-new"><span class="av m-reuse"></span><div class="mtx"><div style="display:flex;gap:6px;align-items:center"><span class="lbl" style="width:60px;background:#8f93a8"></span><span class="lbl" style="width:36px;height:6px"></span></div><span class="lbl" style="width:160px"></span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Avatar <code>512:979</code>, Body styles, Link <code>568:2</code> for Reply / Edit, Section card tokens. <b>New:</b> <code>Comment</code> row: avatar, author, time, text, actions; nested replies by indent; edited and restricted markers as booleans. <b>Evidence:</b> the product already has "Note interne / pubbliche" textareas; showing those notes is this row.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Object icon</h3><span class="n">⅛ wave · new candidate · later</span></div><div class="card-b">
+    <div class="mock"><div class="mk-obj"><span class="o m-new" style="background:#2e9e6f"><i></i></span><span class="o m-new" style="background:#3f5fa8"><i></i></span><span class="o m-new" style="background:var(--brass)"><i></i></span><span class="o m-new" style="background:#c0392b"><i></i></span><span class="lbl" style="width:90px;margin-left:10px"></span></div></div>
+    <div class="small"><b>Reuse:</b> LA glyphs and the Sector or Feedback tokens. <b>New:</b> <code>Object icon</code>: a glyph in a coloured square, 16 and 24, one variant per content type (building, unit, contact, deal, request). Lightning's standard icons and Atlassian's Object are the same idea; it would serve Combobox entity options, Tree rows and Tables.</div>
+  </div></div>
+</div>
+
+<h2 id="shell">Navigation system — the app shell, slot by slot</h2>
+<p class="intro">Atlassian formalises the shell we already have. Useful as a spec reference for widths and behaviours, not as a new master.</p>
+<div class="card"><div class="tablewrap"><table class="walk">
+  <thead><tr><th>Atlassian slot</th><th>Spec</th><th>In DS Next</th></tr></thead>
+  <tbody>
+    <tr><td>Banner</td><td>Above everything</td><td>Announcement bar <code>568:38</code></td></tr>
+    <tr><td>TopNav · 56px</td><td>Start / middle / end slots: logo, search, create, notifications, help, settings, profile</td><td>Navigation <code>428:344</code>: logo, title, search, Actions slot</td></tr>
+    <tr><td>SideNav · 320 default, 240 to 50%</td><td>Collapsible, resizable, flyout when collapsed; link, button, expandable and flyout items; sections; ContainerAvatar</td><td>Navigation rail <code>429:1191</code> + List section + Menu item; expandable = Tree row (R12); flyout = Panel <code>513:4712</code></td></tr>
+    <tr><td>Main</td><td>Fills the remaining space</td><td>Content</td></tr>
+    <tr><td>Panel · 365 default, resizable</td><td>Docked contextual panel with header actions, footer, subheader; overlays Main on small viewports</td><td>Modal Placement Right + Show scrim OFF (R2)</td></tr>
+    <tr><td>Splitters</td><td>Drag handles for SideNav and Panel; double-click collapses the side nav</td><td>Behaviour</td></tr>
+  </tbody>
+</table></div></div>
+
+<h2 id="near">Have, near — what exactly is missing</h2>
+<p class="intro">The nine Atlassian components we cover by role but not feature by feature, with feature rows from Atlassian's own examples and props. Where the missing piece is already in the program, the row says which wave.</p>
+<div class="card"><div class="tablewrap"><table id="near-sum" class="nsum"></table></div></div>
+<div class="mlegend" style="margin:0 0 12px"><span><span class="chip have">have</span></span><span><span class="chip comp">composable</span></span><span><span class="chip gap">missing</span></span><span><span class="chip scope">not for us</span></span><span style="margin-left:auto"><i class="m-reuse"></i>existing master</span><span><i class="m-new"></i>missing piece</span></div>
+<div class="nears" id="near-cards"></div>
+
+<h2 id="all">All 89 entries</h2>
+<div class="card">
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search Atlassian component, DS master or id…">
+    <select id="gsel"><option value="">All groups</option></select>
+    <span id="fchips"></span>
+    <label class="small"><input type="checkbox" id="hidecovered"> hide have / composable / primitives</label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="tablewrap"><table id="all">
+    <thead><tr><th data-k="n" class="sorted">Atlassian entry</th><th data-k="g">Group</th><th data-k="v">Verdict</th><th>DS Next equivalent (page · id)</th><th>What differs · how to build</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+</div>
+
+<h2 id="method">Method and sources</h2>
+<div class="card"><div class="card-b small">
+  <p style="margin:0 0 8px"><b>Atlassian side:</b> components index read live on 2026-09-16, 89 entries in Atlassian's 14 groups; 59 UI components form the denominator, the 30 primitives, libraries, tooling and deprecated shells are listed for completeness. Detail pages read: Drawer, Panel, Navigation system layout, side-nav items (moved to atlaskit.atlassian.com, read through the browser), Inline edit, Table tree, Section message, Inline dialog, Checkbox, Breadcrumbs, Comment, Range, Pagination, Menu, Lozenge, Object.</p>
+  <p style="margin:0 0 8px"><b>DS side:</b> the census of 2026-09-15 (masters unchanged).</p>
+  <p style="margin:0"><b>Limits:</b> comparison by role and function; runtime behaviours (resizing, virtualisation, async) marked as such. Effort in waves under the standard pipeline. Companions: <a href="https://lucar00.github.io/ds-next-confronto-dsitalia/">DSI</a> · <a href="https://lucar00.github.io/ds-next-confronto-ant/">Ant</a> · <a href="https://lucar00.github.io/ds-next-confronto-lightning/">Lightning</a> · <code>ds-next-claude/ATLASSIAN-COMPARISON.md</code>.</p>
+</div></div>
+
+</main>
+<footer>DS Next Claude · analysis of 2026-09-16 · read-only, nothing built. Series: DSI → Ant → Lightning → Atlassian → Material 3 → consolidated matrix.</footer>
+
+<script>
+const V = {have:'have 1:1', near:'have, near', comp:'composable', behav:'primitive / code-only', gap:'gap', scope:'out of scope', depr:'deprecated'};
+const ORDER = ['have','near','comp','behav','gap','scope','depr'];
+const UI_ORDER = ['have','near','comp','behav','gap','scope'];
+const ROWS = [
+ ['Button','Forms and inputs','have','Button 362:338 · Button icon 363:1417 · Link 568:2','default / primary / subtle / link / subtle-link / warning / danger → Variant × Emphasis; compact ✓ Size; loading = Spinner at usage; Split button = Button + Button icon flush.'],
+ ['Calendar','Forms and inputs','have','Date picker 564:44 + Day 564:43','Month grid, disabled dates ✓ Muted, today ✓.'],
+ ['Checkbox','Forms and inputs','near','Checkbox 389:17','Indeterminate, invalid, required ✗ → Wave 57.'],
+ ['Comment','Forms and inputs','comp','Avatar 512:979 + texts + Link 568:2 actions in a Section card','Avatar, author, time, content, actions, nested replies, edited / restricted / highlighted → Comment row candidate.'],
+ ['Date time picker','Forms and inputs','have','Input + Date picker + Timepicker presets','Date and time fields paired.'],
+ ['Dropdown menu','Forms and inputs','have','Dropdown 400:56 + Menu item 404:110','Checkbox / radio items ✓ (Show check Wave 59, Radio Wave 52); sections ✓ List section; nested = Wave 59.'],
+ ['Focus ring','Forms and inputs','behav','Focus-ring token','A token, not a component.'],
+ ['Form','Forms and inputs','comp','Input Layout Vertical / Horizontal + helper + Section card','Field, label, helper / error / valid messages ✓ Input states; fieldset, header, footer, section = layout.'],
+ ['Radio','Forms and inputs','gap','— (Wave 52)','default, invalid, required, disabled: confirms the mockup.'],
+ ['Range','Forms and inputs','gap','— (Wave 62 Slider)','Single thumb, min / max / step, disabled; ours adds Range.'],
+ ['Select','Forms and inputs','have','Input select-mode + Dropdown + Menu item + Chip','Creatable ✓ Menu item with plus; async ✓ Spinner; groups ✓; icons in options ✓; appearance subtle / none ✓ Filled.'],
+ ['Text area','Forms and inputs','have','Textarea 609:304','Resize ✓ Show resize handle.'],
+ ['Text field','Forms and inputs','have','Input 394:5591','elemBefore / After ✓ inline slot, Icon right; appearance standard / subtle ✓ Filled (none ✗ minor); compact ✗ minor.'],
+ ['Toggle','Forms and inputs','have','Toggle 390:49','regular / large ✓ S / M; icons ✓.'],
+ ['Avatar','Images and icons','have','Avatar 512:979','6 sizes vs 4; presence / status ✓ Badge swap; square ✗ skipped.'],
+ ['Avatar group','Images and icons','have','Avatar group 607:2251','Stack / grid, "+N" ✓, overflow menu = Dropdown.'],
+ ['Icon (Beta)','Images and icons','have','Line Awesome + Property glyphs','small / medium ✓ icon-size scale.'],
+ ['Image (Beta)','Images and icons','comp','Image fill + Skeleton fallback','Responsive image with fallback.'],
+ ['Logo','Images and icons','have','Logo 446:14','Product logos vs the Dils mark; sizes ✓.'],
+ ['Object','Images and icons','comp','Frame + LA icon','Content-type icon 12 / 16 → Object icon candidate.'],
+ ['Tile','Images and icons','comp','Frame + icon or logo','Object Tile 20–48 → same candidate.'],
+ ['Badge','Labels','have','Badge 391:9','added / default / important / primary / removed → Neutral / Danger (colours ✗ minor).'],
+ ['Date label','Labels','have','Body_Sm muted text','Formatted date.'],
+ ['Lozenge','Labels','have','Status chip 402:140','neutral / success / warning / danger / information / discovery ✓ (AI = discovery); bold / subtle ✓ Solid / Tint; 10 accent hues ✗ by design.'],
+ ['Tag','Labels','have','Chip 379:2205','Removable ✓, colours ✓, rounded ✓ Pill, link tags ✓, avatar before ~ sizing.'],
+ ['Tag group','Labels','have','Wrap layout','Alignment start / end.'],
+ ['Page (Caution)','Layout and structure','behav','Layout','Page container and grid, superseded.'],
+ ['Page header','Layout and structure','comp','Section card header + Breadcrumb + Data row strip','Title, breadcrumbs, actions, bottom bar.'],
+ ['Panel (Beta)','Layout and structure','near','Modal 540:3823 Placement Right + Show scrim OFF (R2) · Panel 513:4712','Docked contextual panel, 365 default, resizable, header actions, footer, subheader → Wave 54.'],
+ ['Progress bar','Loading','have','Progress bar 607:2191','success / inverse → Wave 60 colours; indeterminate → Wave 60.'],
+ ['Skeleton (Early access)','Loading','have','Skeleton 606:31','—'],
+ ['Spinner','Loading','have','Spinner 606:40','xsmall–xlarge vs S / M; invert ✓.'],
+ ['Banner','Messaging','have','Announcement bar 568:38','announcement / warning / error ✓; actions = Link.'],
+ ['Empty state','Messaging','have','Empty state 451:1001','Header, description, image, primary / secondary / tertiary actions ✓ slot.'],
+ ['Flag','Messaging','have','Toast 607:63','Title, description, icon, actions, dismiss ✓; auto-dismiss = behaviour; bold appearance ~ variants.'],
+ ['Inline message','Messaging','comp','Button icon + Tooltip 401:116 or Dropdown','Icon + title + secondary text, opens a dialog; connectivity / confirmation / info / warning / error icons.'],
+ ['Modal dialog','Messaging','have','Modal 540:3823','Widths small–x-large = resize; warning / danger appearance ✓ Show icon; scrollable ✓.'],
+ ['Spotlight','Messaging','scope','—','Onboarding spotlight, same call as Tour.'],
+ ['Section message','Messaging','near','Alert 561:54','information / warning / error / success ✓; discovery ✗ (Variant AI candidate); actions and dismiss ✗ → Wave 58.'],
+ ['Breadcrumbs','Navigation','near','Breadcrumb 580:432','N levels, auto-collapse with ellipsis, truncation → skipped by decision.'],
+ ['Link','Navigation','have','Link 568:2','default / subtle / inverse ~.'],
+ ['Menu','Navigation','have','Dropdown or Panel + List section + Menu item','Description line ✗ (Wave 59); icon before / after ✓; heading items ✓ Title; skeleton items ✓; compact density ✗ minor.'],
+ ['Navigation system','Navigation','near','Navigation 428:344 + Navigation rail 429:1191 + List section + Menu item + Panel 513:4712','Expandable menu items ✗ → R12; flyout on collapsed rail ✓ Panel; actions on hover ✓ Actions frame; lozenge after ✓; ContainerAvatar → Wave 59.'],
+ ['Pagination','Navigation','gap','— (Wave 52)','prev / next, numbers, ellipsis, double truncation ✓ mockup A.'],
+ ['Tabs','Navigation','have','Tab 398:326 + Tab group 632:443','Horizontal only in Atlassian too.'],
+ ['Blanket','Overlays and layering','have','Surface-overlay-bg scrim','—'],
+ ['Drawer','Overlays and layering','near','Modal Placement Left (Wave 54)','Slides from the left; widths narrow / medium / wide / extended / full → presets.'],
+ ['Inline dialog (Caution)','Overlays and layering','near','Tooltip Light (Wave 60) · Popup','Deprecated in favour of Popup.'],
+ ['Popup','Overlays and layering','have','Dropdown 400:56 · Panel 513:4712','Placement, arrow-less container.'],
+ ['Tooltip','Overlays and layering','have','Tooltip 401:116','—'],
+ ['Progress indicator','Status indicators','have','Indicator 405:50 · Carousel dots 406:25','Dots for carousels and onboarding.'],
+ ['Progress tracker','Status indicators','have','Stepper 562:3849 + Step 562:27','unvisited / visited / current ✓; disabled stage ✗ minor; horizontal only.'],
+ ['Code','Text and data display','scope','—','Inline code and code blocks.'],
+ ['Dynamic table','Text and data display','have','Table cell 412:90','Sortable ✓; paginated → Wave 52; loading ✓ Skeleton; rankable rows ✓ drag handle in a Slot cell; empty view ✓ Empty state.'],
+ ['Heading (Beta)','Text and data display','have','Heading_Sans_1–6 · Display styles','—'],
+ ['Inline edit','Text and data display','near','Table cell inline edit (Wave 63) · Data row 581:89','Read → edit with confirm / cancel; wraps text field / textarea / select → Inline edit field candidate.'],
+ ['Table (Caution)','Text and data display','have','Table cell 412:90','Basic table.'],
+ ['Table tree','Text and data display','near','Table cell + Show expand icon (Wave 63)','Chevron rows, indentation, loading skeleton.'],
+ ['Visually hidden','Text and data display','behav','—','Accessibility utility.'],
+ ['Box','Primitives','behav','auto-layout frame','Layout primitive.'],['Pressable','Primitives','behav','—','Interaction primitive.'],['Anchor','Primitives','behav','Link 568:2','Anchor primitive.'],['Inline','Primitives','behav','auto-layout horizontal','Layout primitive.'],['Stack','Primitives','behav','auto-layout vertical','Layout primitive.'],['Flex (Beta)','Primitives','behav','auto-layout','Layout primitive.'],['Grid (Beta)','Primitives','behav','layout grids','Layout primitive.'],['Bleed','Primitives','behav','negative margins','Layout primitive.'],['XCSS (Caution)','Primitives','behav','—','Styling API.'],['Responsive','Primitives','behav','—','Breakpoint utilities.'],['Text (Beta)','Primitives','behav','text styles','Typography primitive.'],['MetricText (Beta)','Primitives','behav','Stat block 577:110 styles','Numeric text primitive.'],['Focusable','Primitives','behav','—','Focus primitive.'],
+ ['CSS (Beta)','Libraries','behav','—','Styling library.'],['CSS reset','Libraries','behav','—','Reset stylesheet.'],['Design tokens','Libraries','behav','Applied / Semantic + Scales variables','Same role as our variable collections.'],['Motion','Libraries','behav','—','Motion library.'],['Popper','Libraries','behav','—','Positioning library.'],['Portal','Libraries','behav','—','Rendering utility.'],['Pragmatic drag and drop','Libraries','behav','Menu item drag handle (visual only)','Drag and drop library.'],
+ ['App provider (Beta)','Tooling','behav','—','React context.'],['ESLint plugin','Tooling','behav','—','Tooling.'],['Storybook addon','Tooling','behav','—','Tooling.'],['Stylelint plugin','Tooling','behav','—','Tooling.'],['UI Styling Standard','Tooling','behav','—','Tooling.'],
+ ['Atlassian navigation','Deprecated','depr','superseded by Navigation system','—'],['Layout grid','Deprecated','depr','superseded','—'],['Onboarding (spotlight)','Deprecated','depr','superseded by Spotlight','—'],['Page layout','Deprecated','depr','superseded by Navigation system','—'],['Side navigation','Deprecated','depr','superseded by Navigation system','—']
+].map(r => ({n:r[0], g:r[1], v:r[2], ds:r[3], note:r[4]}));
+const UI_GROUPS = new Set(['Forms and inputs','Images and icons','Labels','Layout and structure','Loading','Messaging','Navigation','Overlays and layering','Status indicators','Text and data display']);
+
+const EVL = ['no CRM evidence','conditional','basic','proven'];
+const PLAN = [
+ {id:'re-nesting',group:'re',kind:'re',order:1,name:'R12 · Navigation nesting: sections + expandable items (option C)',eff:0,ev:2,evNote:'Atlassian and Ant nest by item, Lightning by section',sug:'build',why:'Keep the collapsible List section for top-level groups and reuse the Wave 59 Tree row as the expandable item inside them, max three levels. Nothing new is minted; the flyout for the collapsed rail is Panel at usage.',reuse:'List section 1090:5381 (R1) · Menu item 404:110 · Wave 59 Tree row · Panel 513:4712',neu:'None; a usage rule for the Tree row inside navigation',dep:'Wave 59 scope.',opts:[['A · sections only','R1 as approved (Lightning). Deep hierarchies only via Tree, outside the nav.'],['B · expandable items only','Atlassian, Ant. Every group is an expandable item; no collapsible section title.'],['C · both','Sections for groups, expandable items for hierarchies. Recommended.']]},
+ {id:'inline-edit-field',group:'new',kind:'near',order:2,name:'Inline edit field (Data row State=Edit)',eff:2,ev:2,evNote:'detail panels edit fields in place; Salesforce and Atlassian both do',sug:'build',why:'Atlassian wraps any field in inline edit: read view, then a field with confirm and cancel. Our Data row is read-only; the Table cell inline edit of Wave 63 covers grids only.',reuse:'Data row 581:89 · Input 394:5591 · Button icon 363:1417 XS · Input states for validation',neu:'State Read | Hover | Edit on Data row',dep:'Rides on Wave 63.'},
+ {id:'comment-row',group:'new',kind:'comp',order:3,name:'Comment row',eff:2,ev:2,evNote:'the product has Note interne / pubbliche textareas',sug:'later',why:'Avatar, author, time, text, actions, nested replies. Notes exist in the product as textareas; displaying them is this row.',reuse:'Avatar 512:979 · Body styles · Link 568:2 · Section card tokens',neu:'Comment master with nested indent, edited and restricted markers'},
+ {id:'object-icon',group:'new',kind:'comp',order:4,name:'Object icon (content-type glyph in a coloured square)',eff:1,ev:1,evNote:'two peers (Lightning, Atlassian) use it for entity types',sug:'later',why:'A glyph in a coloured square that marks the content type: building, unit, contact, deal, request. Serves Combobox entity options, Tree rows and Tables.',reuse:'LA glyphs · Sector or Feedback tokens',neu:'Object icon master, 16 and 24, one variant per type'},
+ {id:'alert-ai',group:'new',kind:'have',order:5,name:'Alert: Variant AI (discovery)',eff:1,ev:1,evNote:'Section message discovery appearance',sug:'later',why:'Atlassian colours discovery messages purple; Feedback-ai tokens exist.',reuse:'Alert 561:54 · Feedback-ai tokens',neu:'Variant AI on Alert',dep:'Rides on Wave 58.'},
+ {id:'badge-appearances',group:'new',kind:'have',order:6,name:'Badge: added / removed / primary colours',eff:1,ev:0,evNote:'count badges rarely need semantics beyond neutral and danger',sug:'skip',why:'Atlassian colours count badges by meaning; ours has Neutral and Danger.',reuse:'Badge 391:9',neu:'Variant axis extension'},
+ {id:'lozenge-accents',group:'new',kind:'have',order:7,name:'Lozenge accent colours (10 hues for user labels)',eff:2,ev:0,evNote:'user-generated colour is off-token',sug:'skip',why:'Atlassian offers ten accent hues for user-created labels. Our Status chip stays on semantic tokens.',reuse:'Status chip 402:140',neu:'Ten accent variants'},
+ {id:'spotlight',group:'scope',kind:'scope',order:8,name:'Spotlight (onboarding)',eff:2,ev:0,evNote:'same call as Tour',sug:'skip',why:'Onboarding overlay with a highlighted target.',reuse:'Tooltip Light + scrim at usage',neu:'Nothing'},
+ {id:'code',group:'scope',kind:'scope',order:9,name:'Code (inline and block)',eff:1,ev:0,evNote:'no code in a CRM',sug:'skip',why:'Monospace inline code and code blocks.',reuse:'—',neu:'Nothing'}
+];
+const LOCKED = [
+ {name:'Pagination · Radio · Divider',status:'Approved · Wave 52',note:'mockup 1131:2295 parked'},
+ {name:'Accordion (Section card State)',status:'Approved · Wave 53',note:'Atlassian has no accordion at all'},
+ {name:'Drawer (Placement + Show scrim + Show back)',status:'Approved · Wave 54',note:'Atlassian Drawer (left) + Panel (docked) confirm both modes'},
+ {name:'Bottom nav · Toolbar · Stepper Mobile, Vertical, Error, Path',status:'Approved · Wave 55',note:''},
+ {name:'Timeline activity item',status:'Approved · Wave 56',note:''},
+ {name:'Checkbox · File row · Dropzone states · Choice card',status:'Approved · Wave 57',note:'Atlassian Checkbox indeterminate / invalid / required confirm'},
+ {name:'Alert dismiss + actions + Neutral / Brand',status:'Approved · Wave 58',note:'Section message actions + dismiss confirm'},
+ {name:'Menu item rich row + check · collapsible List section (R1) · Tree row',status:'Approved · Wave 59',note:'R12 decides how nesting combines'},
+ {name:'Tooltip Light + close · Progress bar',status:'Approved · Wave 60',note:'Inline dialog → Popup confirms the light popover'},
+ {name:'Hero title / text / CTA',status:'Approved · Wave 61',note:''},
+ {name:'Slider (Range, Error, value) · Filter row',status:'Approved · Wave 62',note:'Atlassian Range is single-thumb'},
+ {name:'Table cell inline edit + Show expand icon',status:'Approved · Wave 63',note:'Table tree confirms the expand icon'},
+ {name:'Breadcrumb N levels · Tabs placement / closable · Rate · Avatar square · Table density · Date picker views · Status dot colours · Cascader · Result illustrations · Modal themed header · Color Picker · Dynamic Icons',status:'Skipped (earlier passes)',note:''}
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ids = s => esc(s).replace(/(\d{2,5}:\d{1,6})/g, '<span class="id">$1</span>');
+const FR = {1:'⅛',2:'¼',3:'⅜',4:'½',5:'⅝',6:'¾',7:'⅞'};
+const waves = e => { if (!e) return '0'; const w = Math.floor(e / 8), f = e % 8; return (w ? w : '') + (f ? FR[f] : ''); };
+const wavesLabel = e => { const s = waves(e); return s === '0' ? 'no extra effort' : s + (e === 8 ? ' wave' : ' waves'); };
+const KIND = {have:'have', near:'near', comp:'comp', gap:'gap', scope:'scope', re:'re'};
+const KINDL = {have:'have 1:1', near:'have, near', comp:'composable', gap:'gap', scope:'out of scope', re:'rethink'};
+
+(function overview(){
+  const ui = ROWS.filter(r => UI_GROUPS.has(r.g)); const c = {}; UI_ORDER.forEach(k => c[k] = 0); ui.forEach(r => c[r.v]++);
+  const covered = c.have + c.near + c.comp; const denom = ui.length - c.behav; const nonUi = ROWS.length - ui.length;
+  document.getElementById('totals').innerHTML = '<b>' + ROWS.length + '</b> entries · <b>' + ui.length + '</b> UI components · <b>' + covered + '</b> reproducible today · <b>' + c.gap + '</b> gaps, none new · <b>' + c.scope + '</b> out of scope · <b>1</b> rethink';
+  document.getElementById('bar').innerHTML = UI_ORDER.map(k => '<div class="' + k + '" style="flex:' + c[k] + '" title="' + V[k] + ': ' + c[k] + '">' + c[k] + '</div>').join('');
+  document.getElementById('kpis').innerHTML =
+    '<div class="kpi"><b>' + covered + ' / ' + denom + '</b><span>real UI components reproducible today (59 minus ' + c.behav + ' primitives)</span></div>' +
+    '<div class="kpi"><b>' + c.have + '</b><span>have 1:1</span></div>' +
+    '<div class="kpi"><b>' + c.near + '</b><span>near — one extension away</span></div>' +
+    '<div class="kpi"><b>' + c.comp + '</b><span>composable at usage</span></div>' +
+    '<div class="kpi"><b>' + c.gap + '</b><span>gaps — all already approved</span></div>' +
+    '<div class="kpi"><b>' + nonUi + '</b><span>primitives, libraries, tooling, deprecated — no design counterpart needed</span></div>';
+  const groups = [...new Set(ui.map(r => r.g))];
+  let h = '<thead><tr><th>Group</th><th>Atlassian</th><th>Reproducible</th><th>Mix</th><th>Near</th><th>Gaps · scope</th></tr></thead><tbody>';
+  groups.forEach(g => { const rs = ui.filter(r => r.g === g); const gc = {}; UI_ORDER.forEach(k => gc[k] = rs.filter(r => r.v === k).length); const cov = gc.have + gc.near + gc.comp; const d = rs.length - gc.behav;
+    h += '<tr><td>' + esc(g) + '</td><td>' + rs.length + '</td><td>' + (d ? cov + ' / ' + d : '—') + '</td><td><div class="mini">' + UI_ORDER.map(k => gc[k] ? '<div style="flex:' + gc[k] + ';background:var(--' + k + ')" title="' + V[k] + ' ' + gc[k] + '"></div>' : '').join('') + '</div></td><td>' + (gc.near ? rs.filter(r => r.v === 'near').map(r => esc(r.n)).join(', ') : '—') + '</td><td>' + (gc.gap + gc.scope ? rs.filter(r => r.v === 'gap' || r.v === 'scope').map(r => esc(r.n)).join(', ') : '—') + '</td></tr>'; });
+  document.getElementById('grp').innerHTML = h + '</tbody>';
+})();
+
+(function quad(){
+  const Q = [
+    {k:'first', t:'Do first — strong evidence, cheap', f:p => p.ev >= 2 && p.eff <= 2},
+    {k:'wave', t:'Plan a wave — strong evidence, half a wave or more', f:p => p.ev >= 2 && p.eff > 2},
+    {k:'cheap', t:'Cheap, when a screen asks for it — weak evidence, low cost', f:p => p.ev < 2 && p.eff <= 2},
+    {k:'road', t:'Only with a roadmap reason — weak evidence, real cost', f:p => p.ev < 2 && p.eff > 2}
+  ];
+  const col = {gap:'var(--gap-ink)', near:'var(--near-ink)', comp:'var(--comp-ink)', have:'var(--have-ink)', scope:'var(--scope-ink)', re:'var(--brass)'};
+  const cand = PLAN.filter(p => p.group !== 'scope');
+  document.getElementById('quad').innerHTML = Q.map(q => '<div class="q ' + (q.k === 'first' ? 'first' : '') + '"><h4>' + q.t + '</h4>' + cand.filter(q.f).sort((a, b) => b.ev - a.ev || a.eff - b.eff).map(p => '<span class="qi" title="' + esc(p.evNote) + '"><span class="dot" style="background:' + col[p.kind] + '"></span>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></span>').join('') + '</div>').join('');
+})();
+
+const KEY = 'atlassian-plan-v1';
+let state = {choices:{}, notes:''};
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.choices) state = s; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const CH = {build:'Build now', later:'Later', skip:'Skip'};
+const CHRE = {build:'Accept C', later:'Later', skip:'Keep A'};
+const NEAR_LINK = {'re-nesting':'navigation-system','inline-edit-field':'inline-edit','alert-ai':'section-message'};
+function rowHTML(p){
+  const ch = state.choices[p.id] || ''; const L = p.kind === 're' ? CHRE : CH;
+  return '<div class="prow" id="plan-' + p.id + '" data-id="' + p.id + '">' +
+    '<div class="t"><b>' + esc(p.name) + '</b><span class="chip ' + KIND[p.kind] + '">' + KINDL[p.kind] + '</span><span class="meta"><span class="tag">' + (p.kind === 're' ? 'extra: ' : '') + wavesLabel(p.eff) + '</span><span class="tag ev' + p.ev + '">' + EVL[p.ev] + ' · ' + esc(p.evNote) + '</span></span></div>' +
+    '<div><div class="seg">' + ['build','later','skip'].map(c => '<button class="' + c + (ch === c ? ' on' : '') + '" data-c="' + c + '">' + L[c] + '</button>').join('') + '</div><div class="sug">suggested: ' + L[p.sug] + (NEAR_LINK[p.id] ? ' · <a href="#near-' + NEAR_LINK[p.id] + '">what is missing ↑</a>' : '') + '</div></div>' +
+    '<div class="why">' + esc(p.why) + (p.dep ? ' <b>Depends on:</b> ' + esc(p.dep) : '') + '</div>' +
+    (p.opts ? '<div class="opts" style="grid-column:1 / -1">' + p.opts.map((o, i) => '<div class="' + (i === 2 ? 'rec' : '') + '"><b>' + esc(o[0]) + '</b>' + esc(o[1]) + '</div>').join('') + '</div>' : '') +
+    '<details><summary>Reused vs new</summary><div class="rn"><div class="re"><b>Reused DS masters</b>' + ids(p.reuse) + '</div><div class="ne"><b>New or changed</b>' + ids(p.neu) + '</div></div></details>' +
+  '</div>';
+}
+function renderPlanner(){
+  ['re','new','scope'].forEach(g => { document.getElementById('p-' + g).innerHTML = PLAN.filter(p => p.group === g).sort((a, b) => a.order - b.order).map(rowHTML).join(''); });
+  document.getElementById('p-locked').innerHTML = LOCKED.map(l => '<div class="prow locked"><div class="t"><b>' + esc(l.name) + '</b><span class="chip lock">' + esc(l.status) + '</span></div><div class="small muted">' + esc(l.note) + '</div></div>').join('');
+  renderSummary();
+}
+function renderSummary(){
+  const by = c => PLAN.filter(p => state.choices[p.id] === c).sort((a, b) => a.order - b.order);
+  const eff = arr => arr.reduce((s, p) => s + p.eff, 0);
+  const B = by('build'), L = by('later'), S = by('skip'); const U = PLAN.length - B.length - L.length - S.length;
+  document.getElementById('sum-rows').innerHTML =
+    '<div class="row"><span>Accepted / build now</span><b>' + B.length + ' · ' + wavesLabel(eff(B)) + '</b></div>' +
+    '<div class="row"><span>Later</span><b>' + L.length + ' · ' + wavesLabel(eff(L)) + '</b></div>' +
+    '<div class="row"><span>Skip / keep as approved</span><b>' + S.length + '</b></div>' +
+    '<div class="row"><span>Undecided</span><b>' + U + '</b></div>';
+  document.getElementById('ol-build').innerHTML = B.length ? B.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  document.getElementById('ol-later').innerHTML = L.length ? L.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  const line = (label, arr) => label + (arr.length ? ' (' + wavesLabel(eff(arr)) + '): ' + arr.map(p => p.name).join(' · ') : ': —');
+  const re = state.choices['re-nesting']; const reLine = re === 'build' ? 'R12 = C (sections + expandable items)' : re === 'skip' ? 'R12 = A (keep R1: sections only)' : re === 'later' ? 'R12 deferred' : 'R12 undecided';
+  let msg = 'Vai — Atlassian pass: rethink and additions (' + new Date().toISOString().slice(0, 10) + ')\n' + reLine + '\n' +
+    line('Accepted / build now', B.filter(p => p.id !== 're-nesting')) + '\n' + line('Later', L) + '\n' + 'Skip / keep as approved: ' + (S.filter(p => p.id !== 're-nesting').length ? S.filter(p => p.id !== 're-nesting').map(p => p.name).join(' · ') : '—') + '\n' +
+    (U ? 'Undecided: ' + PLAN.filter(p => !state.choices[p.id]).map(p => p.name).join(' · ') + '\n' : '') +
+    (state.notes ? 'Notes: ' + state.notes + '\n' : '') +
+    'Program otherwise unchanged. Build starts only after the series closes.';
+  document.getElementById('msg').value = msg;
+  document.getElementById('notes').value = state.notes || '';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.seg button'); if (!b) return;
+  const id = b.closest('.prow').dataset.id; const c = b.dataset.c;
+  state.choices[id] = (state.choices[id] === c) ? '' : c; save();
+  const seg = b.closest('.seg'); seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.c === state.choices[id]));
+  renderSummary();
+});
+document.getElementById('apply').onclick = () => { PLAN.forEach(p => state.choices[p.id] = p.sug); save(); renderPlanner(); };
+document.getElementById('reset').onclick = () => { state.choices = {}; state.notes = ''; save(); renderPlanner(); };
+document.getElementById('notes').addEventListener('input', e => { state.notes = e.target.value; save(); renderSummary(); });
+document.getElementById('copy').onclick = async () => {
+  const t = document.getElementById('msg'); const ok = document.getElementById('copied');
+  try { await navigator.clipboard.writeText(t.value); ok.textContent = 'copied'; }
+  catch (e) { t.focus(); t.select(); try { document.execCommand('copy'); ok.textContent = 'copied'; } catch (e2) { ok.textContent = 'select the text and copy'; } }
+  setTimeout(() => ok.textContent = '', 2000);
+};
+renderPlanner();
+
+// Near deep-dive
+const FS = {have:['have','have'], comp:['comp','composable'], miss:['gap','missing'], skip:['scope','not for us']};
+const MOCK = {
+ nav:'<div class="mk-side m-reuse"><div class="hdr m-new"><span class="chev">⌄</span><span class="lbl" style="width:70px;height:7px"></span></div><div class="li sel"><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div><div class="li m-new"><span class="chev">⌄</span><span class="lbl" style="width:70px"></span><span class="lbl" style="width:22px;margin-left:auto;background:#c0392b"></span></div><div class="li l1"><span class="lbl" style="width:60px"></span></div><div class="li l1"><span class="lbl" style="width:50px"></span></div><div class="li"><span class="av"></span><div class="mtx"><span class="lbl" style="width:80px"></span><span class="lbl m-new" style="width:110px;height:6px"></span></div></div></div>',
+ panel:'<div class="mk-drawer m-reuse"><div class="page"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span><span class="lbl" style="width:100px"></span></div><div class="sheet"><div class="hd"><span class="lbl" style="width:50px;background:#8f93a8"></span><span class="mx m-reuse" style="margin-left:auto;width:16px;height:16px;font-size:10px">⋯</span><span class="mx m-reuse" style="width:16px;height:16px;font-size:10px">×</span></div><div class="mtx"><span class="lbl m-reuse" style="width:100%"></span><span class="lbl m-reuse" style="width:80%"></span></div><div class="ft"><span class="mbtn m-reuse" style="background:#3f4254;color:#fff;border-color:#3f4254">Salva</span></div></div></div>',
+ drawer:'<div class="mk-drawer m-reuse" style="flex-direction:row-reverse"><div class="page"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="sheet" style="border-left:0;border-right:1.5px dashed var(--brass)"><div class="hd"><span class="mx m-reuse" style="width:16px;height:16px;font-size:10px">×</span><span class="lbl" style="width:50px;background:#8f93a8"></span></div><div class="mtx"><span class="lbl m-reuse" style="width:100%"></span><span class="lbl m-reuse" style="width:80%"></span><span class="lbl m-reuse" style="width:60%"></span></div><span></span></div></div>',
+ inlineedit:'<div class="mk-kv"><div class="kv m-reuse"><span class="lbl" style="width:70px;height:7px"></span><span class="lbl" style="width:90px;margin-left:auto;background:#8f93a8"></span><span class="mx" style="width:14px;height:14px;font-size:10px;opacity:.5">✎</span></div><div class="kv m-reuse"><span class="lbl" style="width:60px;height:7px"></span><span class="field"><span class="lbl" style="width:80px;background:#8f93a8"></span></span><span class="mx m-new" style="width:18px;height:18px;font-size:10px">✓</span><span class="mx m-new" style="width:18px;height:18px;font-size:10px">×</span></div></div>',
+ tabletree:'<div class="mk-tg"><div class="tr"><div class="td th">Name</div><div class="td th">Type</div><div class="td th">Area</div></div><div class="tr"><div class="td"><span class="chev m-new">⌄</span><span class="ico sm"></span><span class="lbl" style="width:60px"></span></div><div class="td"><span class="lbl" style="width:40px"></span></div><div class="td"><span class="lbl" style="width:30px"></span></div></div><div class="tr"><div class="td l1"><span class="chev m-new">›</span><span class="lbl" style="width:56px"></span></div><div class="td"><span class="lbl" style="width:36px"></span></div><div class="td"><span class="lbl" style="width:26px"></span></div></div></div>',
+ section:'<div class="mk-alert m-reuse" style="border-left-color:#7a5fb5!important"><span class="ico" style="background:#7a5fb5"></span><div class="mtx"><span class="lbl" style="width:90px;background:#8f93a8"></span><span class="lbl" style="width:170px"></span><div class="mbtns"><span class="mbtn m-new">Action</span><span class="mbtn m-new">Action</span></div></div><span class="mx m-new">×</span></div>',
+ dialog:'<div style="display:flex;gap:18px;align-items:flex-start"><div class="mk-alert m-reuse" style="width:170px;border-left:1px solid #c9cde0!important;background:#3f4254!important;border-color:#3f4254!important"><div class="mtx"><span class="lbl" style="width:70px;background:#fff"></span><span class="lbl" style="width:100px;background:#9aa0b8"></span></div></div><div class="mk-alert m-new" style="width:170px;border-left:1.5px dashed var(--brass)!important"><div class="mtx"><span class="lbl" style="width:70px;background:#8f93a8"></span><span class="lbl" style="width:100px"></span><div class="mbtns"><span class="mbtn m-reuse">OK</span></div></div></div></div>',
+ checkbox:'<div class="rm"><div class="r"><span class="cb m-reuse on">✓</span><span class="lbl m-reuse" style="width:100px"></span></div><div class="r"><span class="cb m-new mixed">–</span><span class="lbl m-reuse" style="width:90px"></span></div><div class="r"><span class="cb m-new" style="border-color:#c0392b"></span><div class="mtx"><span class="lbl m-reuse" style="width:70px"></span><span class="lbl" style="width:100px;height:7px;background:#c0392b"></span></div></div></div>',
+ crumb:'<div class="mk-crumb"><span class="crumb m-new"><span class="lbl" style="width:22px"></span></span><span class="sep">/</span><span class="crumb m-new">…</span><span class="sep">/</span><span class="crumb m-reuse"><span class="ico sm"></span><span class="lbl" style="width:50px"></span></span><span class="sep">/</span><span class="crumb m-reuse"><span class="lbl" style="width:56px;background:#8f93a8"></span></span></div>'
+};
+const NEAR = [
+ {id:'navigation-system', dsi:'Navigation system', oursShort:'Navigation 428:344 + Navigation rail 429:1191 + List section + Menu item', ours:'Navigation 428:344 — top bar: logo, title, search, Actions slot · Navigation rail 429:1191 — Sector × Collapsed | Expanded, Items slot · List section 1090:5381 · Menu item 404:110 · Panel 513:4712 (flyout)', dsiVars:'Layout: Banner, TopNav 56, SideNav 320 (240–50%, collapsible, resizable, flyout when collapsed), Main, Panel 365 (resizable), splitters. Side nav items: link, button, expandable (levels 0–2, chevron before, no description), flyout (400px popup with header / body / footer); elemBefore icon / ContainerAvatar / app tile, description underneath, actions and actionsOnHover, elemAfter lozenge, selected, disabled; section headings', mock:'nav', prog:'',
+  feats:[['Top nav with logo, search, actions','have','Navigation 428:344'],['Side nav sections with headings','have','List section Title'],['Link / button items with icon','have','Menu item + Icon left'],['Description underneath the item','miss','Rich row — Wave 59'],['Actions and actions on hover','have','Actions frame (Delete / Open)'],['Lozenge after the label','have','Number prop / Status chip at usage'],['ContainerAvatar before the label','miss','Avatar leading — Wave 59'],['Expandable menu items, levels 0–2','miss','R12: Tree row inside navigation'],['Flyout menu on the collapsed rail (400px)','comp','Panel 513:4712 with title, content, footer'],['Collapsible / resizable side nav','have','Rail Collapsed | Expanded; resizing = behaviour'],['Docked Panel 365','have','Modal Placement Right + Show scrim OFF (R2)']],
+  missing:'Nesting by expandable items: the R12 decision.'},
+ {id:'panel', dsi:'Panel (Beta)', oursShort:'Modal 540:3823 (R2) · Panel 513:4712', ours:'Modal 540:3823 with the approved Placement axis, Show scrim, Show back (Wave 54) · Panel 513:4712 — floating flyout, Title + Content slot', dsiVars:'Docked surface for contextual information beside Main: PanelHeader (title, icon, actions), PanelContent, PanelFooter (primary actions), PanelSubheader (cover image); expandable / collapsible, resizable width (default 365), loading skeleton, panel manager', mock:'panel', prog:'',
+  feats:[['Docked beside the content, no mask','miss','Show scrim OFF — Wave 54 (R2)'],['Header with title, icon, actions','have','Modal Title + Show icon; actions = Button icons in the Title row'],['Footer with primary actions','have','Modal Actions slot'],['Subheader with cover image','comp','Usage'],['Resizable width, default 365','comp','Width preset; resizing = behaviour'],['Loading skeleton','have','Skeleton 606:31 in the slot'],['Collapsible / closable','have','Modal close (Wave 54)']],
+  missing:'Nothing beyond R2, which it confirms.'},
+ {id:'drawer', dsi:'Drawer', oursShort:'Modal Placement Left (Wave 54)', ours:'Modal 540:3823 with Placement Center | Right | Left (Wave 54)', dsiVars:'Slides in from the left; widths narrow / medium / wide / extended / full; label, isOpen, onClose; examples: default, width, customization, surface detection', mock:'drawer', prog:'Wave 54',
+  feats:[['Slides from the left edge','miss','Placement Left — Wave 54'],['Five widths','comp','Presets at usage'],['Close button','have','Modal close (Wave 54)'],['Surface detection (elevation tokens)','comp','Shadow_Overlay'],['Over a blanket','have','Surface-overlay scrim']],
+  missing:'Placement Left, already in Wave 54.'},
+ {id:'inline-edit', dsi:'Inline edit', oursShort:'Data row 581:89 · Table cell 412:90', ours:'Data row 581:89 — Label, Value, Show control, Control swap · Table cell 412:90 with the Wave 63 inline edit', dsiVars:'Read view → edit view on the same page; confirm and cancel buttons (hideActionButtons); validation messages; required; stateless; wraps Text field, Text area, Select; start with edit view', mock:'inlineedit', prog:'',
+  feats:[['Editable table cell','miss','Table cell State Edit — Wave 63'],['Editable field in a detail panel (read view → edit view)','miss','Inline edit field candidate: Data row State=Edit'],['Confirm and cancel buttons','miss','Two Button icon XS in the Edit state'],['Validation message','have','Input State Error + helper'],['Wraps text field / textarea / select','have','Input, Textarea, Input select-mode'],['Hide action buttons (auto-save)','comp','Boolean at usage']],
+  missing:'The field-level pattern; the table-level one is already in Wave 63.'},
+ {id:'table-tree', dsi:'Table tree', oursShort:'Table cell 412:90', ours:'Table cell 412:90 — Type Header | Text | Chip | Slot × Background; Label, Subtext, icons, slot', dsiVars:'Expandable / collapsible rows with chevron, nested indentation, header row, loading skeletons, custom children (empty states), expand on row click', mock:'tabletree', prog:'Wave 63',
+  feats:[['Chevron in the first cell','miss','Show expand icon — Wave 63'],['Indented child rows','comp','Padding at usage'],['Header row','have','Type=Header'],['Loading skeleton rows','have','Skeleton recipe'],['Empty state as child','have','Empty state 451:1001']],
+  missing:'The expand chevron, already in Wave 63.'},
+ {id:'section-message', dsi:'Section message', oursShort:'Alert 561:54', ours:'Alert 561:54 — Variant Warning | Danger | Info | Success · Layout Banner | Inline | Mini banner · Size M | S · Title, Content, Show icon, Show title', dsiVars:'Appearances information / warning / error / success / discovery; title, body, actions; isDismissible; examples: editing restricted, cannot connect, file uploaded, account deleted, managed accounts', mock:'section', prog:'',
+  feats:[['Information / warning / error / success','have','Variant axis'],['Discovery (purple)','miss','Variant AI candidate (Feedback-ai tokens)'],['Title + body','have','Show title + Content'],['Actions','miss','Actions slot — Wave 58'],['Dismissible','miss','Show close — Wave 58'],['Icon per appearance','have','Show icon']],
+  missing:'Actions and dismiss (Wave 58) and the discovery colour.'},
+ {id:'inline-dialog', dsi:'Inline dialog (Caution)', oursShort:'Tooltip 401:116 · Dropdown 400:56', ours:'Tooltip 401:116 — dark bubble with title + slot; Dropdown / Panel as light containers', dsiVars:'Small popup container with controls, placements top / bottom / left / right + 3 each, auto placement, onClose; being deprecated for Popup', mock:'dialog', prog:'Wave 60',
+  feats:[['Light popup with controls','miss','Tooltip Light — Wave 60'],['Placements','have','Arrow axis + offset at usage'],['Close on outside click','comp','Behaviour'],['Replaced by Popup','have','Dropdown 400:56 / Panel 513:4712']],
+  missing:'The light surface, already in Wave 60.'},
+ {id:'checkbox', dsi:'Checkbox', oursShort:'Checkbox 389:17', ours:'Checkbox 389:17 — State On | Off | Disabled; Show label, Label', dsiVars:'Default, controlled, uncontrolled, disabled, invalid, indeterminate, required', mock:'checkbox', prog:'Wave 57',
+  feats:[['Selected / unselected / disabled','have','States'],['Indeterminate','miss','State Indeterminate — Wave 57'],['Invalid','miss','State Error — Wave 57'],['Required marker','comp','Label text at usage']],
+  missing:'Indeterminate and invalid, both in Wave 57.'},
+ {id:'breadcrumbs', dsi:'Breadcrumbs', oursShort:'Breadcrumb 580:432', ours:'Breadcrumb 580:432 — Parent, Current, Show icon, Show parent, Show chevron', dsiVars:'Default, long breadcrumbs, max items (auto-collapse beyond 8 with ellipsis), expanded overflow, items before / after collapse, icon before / after, truncation width with tooltip', mock:'crumb', prog:'skipped (DSI plan)',
+  feats:[['Parent › current','have','Parent + Current'],['N levels with auto-collapse','miss','Items slot — skipped in the DSI plan'],['Truncation with tooltip','comp','Tooltip at usage'],['Icon before / after','have','Show icon']],
+  missing:'Depth, skipped by decision.'}
+];
+(function near(){
+  const counts = n => { const c = {have:0, comp:0, miss:0, skip:0}; n.feats.forEach(f => c[f[1]]++); return c; };
+  const bar = c => '<div class="mini nbar">' + ['have','comp','miss','skip'].map(k => c[k] ? '<div style="flex:' + c[k] + ';background:var(--' + FS[k][0] + ')" title="' + FS[k][1] + ' ' + c[k] + '"></div>' : '').join('') + '</div>';
+  const link = {'navigation-system':'re-nesting','inline-edit':'inline-edit-field','section-message':'alert-ai'};
+  const planById = Object.fromEntries(PLAN.map(p => [p.id, p]));
+  const sorted = [...NEAR].sort((a, b) => counts(b).miss - counts(a).miss || a.dsi.localeCompare(b.dsi));
+  const statusOf = n => { const p = planById[link[n.id]]; if (p) return '<span class="chip ' + (p.kind === 're' ? 're' : 'near') + '">' + (p.kind === 're' ? 'rethink' : 'new decision') + '</span>'; return '<span class="chip lock">' + esc(n.prog || 'confirms R2') + '</span>'; };
+  let h = '<thead><tr><th>Atlassian</th><th>Our master</th><th>Features</th><th>Missing</th><th>Status</th><th></th></tr></thead><tbody>';
+  sorted.forEach(n => { const c = counts(n), p = planById[link[n.id]];
+    h += '<tr><td class="nm"><a href="#near-' + n.id + '">' + esc(n.dsi) + '</a></td><td class="dsc">' + ids(n.oursShort) + '</td><td>' + bar(c) + '<span class="small muted">' + c.have + ' have · ' + c.comp + ' composable · <b>' + c.miss + ' missing</b> · ' + c.skip + ' not for us</span></td><td class="dsc">' + (c.miss ? n.feats.filter(f => f[1] === 'miss').map(f => esc(f[0])).join(' · ') : '—') + '</td><td>' + statusOf(n) + (p ? '<div class="small muted">' + (p.kind === 're' ? 'extra ' : '') + wavesLabel(p.eff) + '</div>' : '') + '</td><td>' + (p ? '<a class="small" href="#plan-' + p.id + '" style="color:var(--ink)">decide ↑</a>' : '') + '</td></tr>'; });
+  document.getElementById('near-sum').innerHTML = h + '</tbody>';
+  document.getElementById('near-cards').innerHTML = sorted.map(n => { const c = counts(n), p = planById[link[n.id]];
+    return '<div class="card near-card" id="near-' + n.id + '"><div class="card-h"><h3>' + esc(n.dsi) + ' <span class="muted">→</span> ' + ids(n.oursShort) + '</h3><span class="n">' + (p ? (p.kind === 're' ? 'rethink · extra ' : 'new decision · ') + wavesLabel(p.eff) : 'status: ' + esc(n.prog || 'confirms R2, Wave 54')) + '</span><span class="n" style="margin-left:auto">' + bar(c) + '</span></div>' +
+      '<div class="near-b"><div><p class="small muted" style="margin:0 0 8px"><b>Atlassian offers:</b> ' + esc(n.dsiVars) + '</p><p class="small muted" style="margin:0 0 10px"><b>Ours:</b> ' + ids(n.ours) + '</p>' +
+      '<table class="feat"><thead><tr><th>Atlassian feature</th><th>Status</th><th>How we cover or close it</th></tr></thead><tbody>' + n.feats.map(f => '<tr><td>' + esc(f[0]) + '</td><td><span class="chip ' + FS[f[1]][0] + '">' + FS[f[1]][1] + '</span></td><td class="dsc">' + ids(f[2]) + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<div><div class="mock">' + MOCK[n.mock] + '</div><p class="small" style="margin:10px 0"><b>Missing, in one line:</b> ' + esc(n.missing) + '</p>' + (p ? '<a class="btn" href="#plan-' + p.id + '" style="display:inline-block;text-decoration:none">Decide in the planner ↑</a>' : '<span class="small muted">Decided earlier: ' + esc(n.prog || 'confirms R2 (Wave 54)') + '</span>') + '</div></div></div>'; }).join('');
+})();
+
+(function table(){
+  const f = {q:'', g:'', v:new Set(ORDER), sort:'n', dir:1, hide:false};
+  const gsel = document.getElementById('gsel'); [...new Set(ROWS.map(r => r.g))].forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; gsel.appendChild(o); });
+  document.getElementById('fchips').innerHTML = ORDER.map(k => '<span class="chip ' + k + ' fchip on" data-v="' + k + '">' + V[k] + '</span>').join(' ');
+  const tb = document.getElementById('tb'), cnt = document.getElementById('count');
+  function draw(){
+    let rs = ROWS.filter(r => f.v.has(r.v) && (!f.g || r.g === f.g) && (!f.hide || ['near','gap','scope'].includes(r.v)));
+    if (f.q) { const q = f.q.toLowerCase(); rs = rs.filter(r => (r.n + ' ' + r.ds + ' ' + r.note + ' ' + r.g).toLowerCase().includes(q)); }
+    rs.sort((a, b) => { const ka = f.sort === 'v' ? ORDER.indexOf(a.v) : a[f.sort], kb = f.sort === 'v' ? ORDER.indexOf(b.v) : b[f.sort]; return (ka > kb ? 1 : ka < kb ? -1 : a.n.localeCompare(b.n)) * f.dir; });
+    tb.innerHTML = rs.map(r => '<tr><td class="nm">' + esc(r.n) + '</td><td class="muted small">' + esc(r.g) + '</td><td><span class="chip ' + r.v + '">' + V[r.v] + '</span></td><td class="dsc">' + ids(r.ds) + '</td><td class="dsc">' + esc(r.note) + '</td></tr>').join('');
+    cnt.textContent = rs.length + ' of ' + ROWS.length;
+  }
+  document.getElementById('q').addEventListener('input', e => { f.q = e.target.value; draw(); });
+  gsel.addEventListener('change', e => { f.g = e.target.value; draw(); });
+  document.getElementById('hidecovered').addEventListener('change', e => { f.hide = e.target.checked; draw(); });
+  document.getElementById('fchips').addEventListener('click', e => { const c = e.target.closest('.fchip'); if (!c) return; const v = c.dataset.v; if (f.v.has(v)) f.v.delete(v); else f.v.add(v); c.classList.toggle('on', f.v.has(v)); draw(); });
+  document.querySelectorAll('#all th[data-k]').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; if (f.sort === k) f.dir *= -1; else { f.sort = k; f.dir = 1; } document.querySelectorAll('#all th').forEach(x => x.classList.toggle('sorted', x === th)); draw(); }));
+  draw();
+})();
+</script>
+</body>
+</html>
