@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS Next · Lightning coverage — what changes in the program</title>
+<style>
+  :root{--bg:#ffffff;--ink:#3f4254;--muted:#656876;--line:#d3d3db;--soft:#f6f7fb;--brass:#ae9142;--brass-soft:#fbf7ea;
+    --have:#cef1e6;--have-ink:#076e4f;--near:#d2deec;--near-ink:#113760;--comp:#e4e7f4;--comp-ink:#2a2b2f;--behav:#f1f1f4;--behav-ink:#656876;
+    --gap:#f8d7da;--gap-ink:#842029;--scope:#ffeecc;--scope-ink:#664300}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  header .tot{color:var(--muted);font-size:13px}
+  header .tot b{color:var(--ink)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;white-space:nowrap}
+  .chip.have{background:var(--have);color:var(--have-ink)}
+  .chip.near{background:var(--near);color:var(--near-ink)}
+  .chip.comp{background:var(--comp);color:var(--comp-ink)}
+  .chip.behav{background:var(--behav);color:var(--behav-ink);border:1px dashed #c3c5cf}
+  .chip.gap{background:var(--gap);color:var(--gap-ink)}
+  .chip.scope{background:var(--scope);color:var(--scope-ink)}
+  .chip.lock{background:#fff;color:var(--muted);border:1px solid var(--line)}
+  .chip.re{background:var(--brass-soft);color:#6b5620;border:1px dashed var(--brass)}
+  nav.top{padding:10px 24px;border-bottom:1px solid var(--line);background:var(--soft);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  nav.top a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:15px;margin:36px 0 8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  h2:first-child{margin-top:8px}
+  h3{font-size:15px;margin:0}
+  .intro{color:var(--muted);font-size:13px;max-width:900px;margin:0 0 12px}
+  .intro a,.small a{color:var(--ink)}
+  .card{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;margin:0 0 16px}
+  .card-h{display:flex;align-items:baseline;gap:14px;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .card-h .n{color:var(--muted);font-size:12px}
+  .card-b{padding:14px}
+  code,.id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--muted);background:var(--soft);padding:0 4px;border-radius:3px}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  .bar{display:flex;height:28px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin:8px 0 6px}
+  .bar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.2px}
+  .bar .have{background:var(--have);color:var(--have-ink)} .bar .near{background:var(--near);color:var(--near-ink)} .bar .comp{background:var(--comp);color:var(--comp-ink)}
+  .bar .behav{background:var(--behav);color:var(--behav-ink)} .bar .gap{background:var(--gap);color:var(--gap-ink)} .bar .scope{background:var(--scope);color:var(--scope-ink)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 0}
+  .kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
+  .kpi b{display:block;font-size:22px;line-height:1.1}
+  .kpi span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:7px 12px;border-bottom:1px solid #eef0f4;vertical-align:top;font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .grp td:first-child{white-space:nowrap;font-weight:600}
+  .mini{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line);min-width:160px}
+  .mini div{height:100%}
+  .re-table td:first-child{white-space:nowrap;font-weight:600}
+  .re-table td.was{color:var(--muted)}
+  .re-table td.now{background:var(--brass-soft)}
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .q{border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:110px;background:#fff}
+  .q h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .q .qi{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;font-size:12px;margin:0 6px 6px 0;background:#fff}
+  .q .qi .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .q.first{background:#f3fbf8;border-color:#b7e4d4}
+  .axis{font-size:11px;color:var(--muted);margin:6px 0 0}
+  .planner{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .summary{position:sticky;top:76px;border:1px solid var(--line);border-radius:8px;background:var(--soft);padding:14px}
+  .summary h3{margin:0 0 10px;font-size:14px}
+  .summary .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .summary .row:last-of-type{border-bottom:0}
+  .summary ol{margin:6px 0 10px;padding-left:20px;font-size:12.5px}
+  .summary textarea{width:100%;height:200px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical;background:#fff;color:var(--ink)}
+  .summary input[type=text]{width:100%;font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .btn{font:12.5px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer}
+  .btn:hover{background:var(--soft)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:#2a2b2f}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding:10px 14px;border-bottom:1px solid #eef0f4;align-items:center}
+  .prow:last-child{border-bottom:0}
+  .prow .t{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+  .prow .t b{font-size:13.5px}
+  .prow .why{grid-column:1 / -1;font-size:12.5px;color:var(--muted)}
+  .prow .meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);align-items:center}
+  .prow.locked{background:#fcfcfd}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--muted);background:#fff;white-space:nowrap}
+  .tag.ev3{border-color:#b7e4d4;background:#f3fbf8;color:var(--have-ink)} .tag.ev2{border-color:#c9d6e6;background:#f4f8fc;color:var(--near-ink)} .tag.ev1{border-color:#f0d9a6;background:#fff8ea;color:var(--scope-ink)} .tag.ev0{border-color:#e4c8cb;background:#fdf3f4;color:var(--gap-ink)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .seg button{font:12px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:0;background:#fff;color:var(--muted);padding:7px 10px;cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button:hover{background:var(--soft)}
+  .seg button.on.build{background:var(--have);color:var(--have-ink)}
+  .seg button.on.later{background:var(--near);color:var(--near-ink)}
+  .seg button.on.skip{background:var(--comp);color:var(--comp-ink)}
+  .prow details{grid-column:1 / -1;font-size:12.5px}
+  .prow summary{cursor:pointer;color:var(--muted);font-size:12px}
+  .prow .rn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 2px}
+  .prow .rn div{border-radius:6px;padding:8px 10px;font-size:12.5px}
+  .prow .rn .re{background:var(--comp)}
+  .prow .rn .ne{background:var(--brass-soft);border:1px dashed var(--brass)}
+  .prow .rn b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:3px}
+  .sug{font-size:11px;color:var(--muted)}
+  .sug a{color:var(--ink)}
+  .gaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+  .gap-card .card-b{display:grid;gap:12px}
+  .mock{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;justify-content:center;align-items:center;min-height:130px;background-image:radial-gradient(#eceef3 1px,transparent 1px);background-size:12px 12px}
+  .m-reuse{background:#e4e7f4;border:1px solid #c9cde0}
+  .m-new{border:1.5px dashed var(--brass);background:var(--brass-soft)}
+  .mlegend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+  .mlegend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  .ico{width:22px;height:22px;border-radius:6px;background:#c9cde0;display:inline-block;position:relative;flex:0 0 auto}
+  .ico:after{content:"";position:absolute;inset:6px;border:2px solid #fff;border-radius:50%}
+  .ico.sm{width:14px;height:14px;border-radius:4px}
+  .ico.sm:after{inset:4px;border-width:1.5px}
+  .lbl{height:9px;border-radius:5px;background:#b9bdd0;display:inline-block}
+  .mtx{display:grid;gap:6px;flex:1;min-width:0}
+  .mbtns{display:flex;gap:6px;margin-top:2px}
+  .mbtn{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;color:var(--ink)}
+  .mx{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);flex:0 0 auto}
+  .li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  .li.sel{box-shadow:inset 3px 0 0 var(--brass)}
+  .li.sub{margin-left:28px}
+  .chev{font-size:12px;width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;color:var(--ink)}
+  .rm{display:grid;gap:12px} .rm .r{display:flex;align-items:center;gap:10px}
+  .cb{width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 auto}
+  .cb.on{background:var(--ink);border-color:var(--ink)} .cb.mixed{color:var(--brass)}
+  .mk-crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+  .crumb{display:inline-flex;align-items:center;gap:5px;padding:4px 6px;border-radius:5px}
+  .sep{color:var(--muted);font-size:12px}
+  .mk-side{width:230px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .mk-side .hdr{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);border-radius:6px}
+  .num{width:18px;height:18px;border-radius:50%;background:#fff;border:1px solid #8f93a8;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;color:var(--ink);flex:0 0 auto}
+  .num.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .num.err{border-color:#c0392b;color:#c0392b}
+  .path{display:flex;gap:2px;width:320px}
+  .path .stg{flex:1;height:26px;position:relative;display:flex;align-items:center;justify-content:center;background:#e4e7f4;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,10px 50%)}
+  .path .stg:first-child{clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%)}
+  .path .stg.done{background:#2e9e6f} .path .stg.cur{background:var(--ink)} .path .stg.lost{background:#c0392b}
+  .path .stg .lbl{background:rgba(255,255,255,.85)}
+  .mk-tree{width:260px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .mk-tree .li{gap:6px}
+  .mk-tree .li.l1{margin-left:22px} .mk-tree .li.l2{margin-left:44px}
+  .mk-tg{width:320px;border-radius:8px;overflow:hidden;background:#fff;border:1px solid #c9cde0}
+  .mk-tg .tr{display:grid;grid-template-columns:150px 1fr 1fr;border-bottom:1px solid #eef0f4}
+  .mk-tg .tr:last-child{border-bottom:0}
+  .mk-tg .td{padding:6px 8px;display:flex;align-items:center;gap:6px;font-size:10px}
+  .mk-tg .th{background:var(--soft);font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
+  .mk-tg .td.l1{padding-left:26px}
+  .mk-drawer{width:320px;height:170px;border-radius:8px;position:relative;overflow:hidden;background:#fff!important;display:flex}
+  .mk-drawer .page{flex:1;padding:12px;display:grid;gap:8px;align-content:start}
+  .mk-drawer .sheet{width:140px;background:var(--brass-soft);border-left:1.5px dashed var(--brass);display:grid;grid-template-rows:auto 1fr auto;gap:8px;padding:10px}
+  .mk-drawer .sheet .hd{display:flex;align-items:center;gap:6px}
+  .mk-drawer .sheet .ft{display:flex;gap:6px;justify-content:flex-end}
+  .tm{display:grid;gap:0}
+  .tm .ev{display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:6px 8px;border-radius:6px;align-items:start}
+  .tm .mk{display:flex;flex-direction:column;align-items:center}
+  .tm .mk .ln{flex:1;width:2px;background:#c9cde0;margin-top:2px}
+  .tm .tx{display:grid;gap:4px;padding-bottom:8px}
+  .mk-combo{width:260px;display:grid;gap:4px}
+  .mk-combo .field{height:30px;border-radius:6px;background:#fff;border:1px solid #c9cde0;display:flex;align-items:center;padding:0 8px;gap:6px}
+  .mk-combo .dd{border-radius:8px;background:#fff;border:1px solid #c9cde0;padding:4px;display:grid;gap:2px}
+  .mk-prompt{width:280px;border-radius:8px;overflow:hidden;background:#fff;border:1px solid #c9cde0}
+  .mk-prompt .ph{padding:10px 12px;display:flex;align-items:center;gap:8px}
+  .mk-prompt .pb2{padding:12px;display:grid;gap:6px}
+  .mk-prompt .pf{padding:10px 12px;display:flex;gap:6px;justify-content:flex-end;border-top:1px solid #eef0f4}
+  .walk td:first-child{white-space:nowrap;font-weight:600}
+  .nsum td.nm a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .nsum .mini{margin-bottom:4px}
+  .nears{display:grid;grid-template-columns:1fr;gap:16px}
+  .near-card .card-h h3{font-size:14.5px}
+  .near-b{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:14px}
+  .near-b .mock{min-height:150px}
+  table.feat th{padding:6px 8px}
+  table.feat td{font-size:12.5px;padding:5px 8px;vertical-align:middle}
+  table.feat td:first-child{font-weight:600}
+  .nbar{min-width:120px;width:140px}
+  .filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);font-size:12.5px}
+  .filters input[type=search]{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:200px;background:#fff;color:var(--ink)}
+  .filters select{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .fchip{cursor:pointer;opacity:.45;border:1px solid transparent}
+  .fchip.on{opacity:1;border-color:rgba(0,0,0,.15)}
+  .tablewrap{overflow-x:auto}
+  #all th{cursor:pointer;user-select:none}
+  #all th.sorted:after{content:" ▾";color:var(--brass)}
+  #all td.dsc{font-size:12.5px}
+  #all td.nm{font-weight:600;white-space:nowrap}
+  .count{font-size:12px;color:var(--muted);margin-left:auto}
+  footer{padding:24px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:32px}
+  @media (max-width:900px){.planner{grid-template-columns:1fr}.summary{position:static}.quad{grid-template-columns:1fr}.gaps{grid-template-columns:1fr}.prow .rn{grid-template-columns:1fr}.near-b{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>DS Next · Lightning coverage — what changes in the program</h1>
+  <div class="tot" id="totals"></div>
+  <div class="legend">
+    <span class="chip have">have 1:1</span><span class="chip near">have, near</span><span class="chip comp">composable</span><span class="chip gap">gap</span><span class="chip scope">out of scope</span><span class="chip re">rethink</span>
+  </div>
+</header>
+<nav class="top">
+  <a href="#overview">Overview</a><a href="#rethink">What changes in the program</a><a href="#matrix">Evidence × effort</a><a href="#decide">Decide: the planner</a><a href="#gaps">New pieces, drawn</a><a href="#patterns">Lightning CRM patterns</a><a href="#near">Near: what exactly is missing</a><a href="#all">All 48 components</a><a href="#method">Method</a>
+</nav>
+<main>
+
+<h2 id="overview">Overview</h2>
+<p class="intro">Lightning Design System 2 (Summer '26, 3.3.1): a curated, flat list of 48 components, read live, against the DS Next Claude census of 2026-09-15. Lightning is the CRM peer of the series. It adds <b>no new gap</b>: the three it exposes are already approved. Its value is in how it would build five items we approved, and in one strong new candidate, the Path stage indicator. Third pass, written under the analysis-first rule.</p>
+<div class="card"><div class="card-b">
+  <div class="bar" id="bar"></div>
+  <div class="kpis" id="kpis"></div>
+  <h3 style="margin:18px 0 6px">Coverage by role group <span class="muted small">(SLDS 2 lists components flat; grouping is mine)</span></h3>
+  <div class="tablewrap"><table class="grp" id="grp"></table></div>
+</div></div>
+
+<h2 id="rethink">What changes in the program — the rethinks</h2>
+<p class="intro">Your rule: when a later source offers a better solution for a gap we already found, the recipe is reopened. Lightning reopens five, confirms four and refines two. Each row is a decision in the planner below; "Build now" there means "accept the change into its wave".</p>
+<div class="card"><div class="tablewrap"><table class="re-table">
+  <thead><tr><th>#</th><th>Approved item</th><th>Recipe so far</th><th>Lightning insight</th><th>Proposed change</th></tr></thead>
+  <tbody>
+    <tr><td>R1</td><td>Sidebar nested items · Wave 59</td><td class="was">Indented sub-items under a Menu item</td><td>Vertical Navigation nests by <b>collapsible sections</b>, never by indented items. "If deep nesting is required, use a Tree"</td><td class="now"><b>Collapsible List section</b> <code>1090:5381</code>: Title row + chevron + State Expanded | Collapsed, the same collapse mechanism as Accordion on Section card. True hierarchies go to the Tree row</td></tr>
+    <tr><td>R2</td><td>Drawer · Wave 54</td><td class="was">Placement axis on Modal, always over a scrim</td><td>Panels come <b>docked</b> (push content, no mask), as drawers (overlay) and <b>drilled-in</b> (back button); filtering panels are the classic use</td><td class="now">Placement axis as approved <b>+ Show scrim</b> (modal vs docked) <b>+ Show back</b> in the header</td></tr>
+    <tr><td>R3</td><td>Stepper vertical + Error · Wave 55</td><td class="was">Orientation axis + Error state</td><td>Confirmed. Separately, <b>Path</b>: chevron stages with Complete / Current / Incomplete / <b>Won / Lost</b> and a coaching panel, the pipeline indicator of every Salesforce record</td><td class="now">New candidate: <b>Type=Base | Path</b> on Stepper. Path stages on Feedback tokens, Won = success, Lost = danger; coaching = Section card at usage</td></tr>
+    <tr><td>R4</td><td>Timeline · Wave 56</td><td class="was">Marker + rail + date + title + text</td><td>Activity Timeline: <b>icon per activity type</b> (call, email, event, task), <b>expandable details</b>, actions button, timestamp right</td><td class="now">Timeline/Event gets an <b>Icon swap</b> on the marker, <b>Show details</b> (expanded state with a Content slot) and an <b>Actions slot</b>; ¼ wave more</td></tr>
+    <tr><td>R5</td><td>Tree row · Wave 59</td><td class="was">Nested Menu item + expand chevron + checkbox</td><td>Tree selects by highlight, <b>no checkboxes by default</b>; rows carry a <b>metatext</b> line and icons; Tree Grid puts the chevron in the first table cell</td><td class="now">Tree row = nested Menu item + Show expand icon + <b>the same description line</b> as the rich row; <b>Show checkbox optional</b>. Tree Grid = Table cell <code>412:90</code> + Show expand icon (new minor)</td></tr>
+    <tr><td>R6</td><td>Menu item rich row · Wave 59</td><td class="was">Description line + avatar leading, for lists</td><td>Combobox <b>entity options</b> and Lookups show icon + title + meta; selected options show a <b>checkmark</b></td><td class="now">Confirmed and widened to Combobox. New minor: <b>Show check</b> on Menu item Selected</td></tr>
+    <tr><td>R7</td><td>Radio · Wave 52</td><td class="was">Mockup 1131:2295, model B2 recommended</td><td>Radio Group: base, required, error, wrapping labels; <b>Visual Picker</b> = radio / checkbox as a card with icon, text, checkmark</td><td class="now">B2 with Error confirmed. New candidate, later: a neutral <b>Choice card</b>; AI option button <code>545:84</code> is the tinted precedent</td></tr>
+    <tr><td>R8</td><td>Pagination · Wave 52</td><td class="was">Numbers + prev / next, Compact variant</td><td>Lightning has <b>no pagination</b>: lists use "load more" and infinite scroll</td><td class="now">Keep ours (31 uses in the working file); the Compact variant becomes optional</td></tr>
+    <tr><td>R9</td><td>Accordion · Wave 53</td><td class="was">Section card State + Show chevron</td><td>Chevron on the <b>left</b> of the title; multiple sections open; nested accordions; action overflow menu in the header</td><td class="now">The mockup must show chevron left (Lightning) vs right (Ant, DSI); nesting = Section card inside the Content slot</td></tr>
+    <tr><td>R10</td><td>Slider · Wave 62</td><td class="was">Track, fill, handles, marks, value Tooltip</td><td>Value label <b>beside</b> the track, an <b>Error</b> state, widths, vertical</td><td class="now">Add State Error; Show value as inline text (Lightning) or Tooltip (Ant): decide in the mockup</td></tr>
+    <tr><td>R11</td><td>Alert · Wave 58</td><td class="was">Dismiss × + actions slot + Neutral / Brand</td><td>Scoped Notifications = region-bound inline notice; <b>Prompt</b> has themed headers (Info / Success / Warning / Error / Offline / Inverse)</td><td class="now">Inline layout already covers scoped notifications. New minor: a <b>themed header Variant on Modal</b> for critical prompts</td></tr>
+  </tbody>
+</table></div></div>
+
+<h2 id="matrix">Evidence × effort — new candidates and rethinks</h2>
+<p class="intro">Rethinks carry their extra effort only; a rethink that costs nothing more sits at zero. Effort in waves.</p>
+<div class="quad" id="quad"></div>
+<p class="axis">Evidence: <b>proven</b> = used in the working file · <b>basic</b> = a standard CRM pattern · <b>conditional</b> = depends on a roadmap or design decision · <b>none</b> = no CRM evidence.</p>
+
+<h2 id="decide">Decide — accept the rethinks, mark the new candidates</h2>
+<p class="intro"><b>Apply suggestions</b> pre-fills my recommendation: accept all five rethinks, build Path and the Menu item check now, keep the rest for later. Items decided in the DSI and Ant passes are shown locked. The summary writes the message to paste back.</p>
+<div class="planner">
+  <div>
+    <div class="btns"><button class="btn primary" id="apply">Apply suggestions</button><button class="btn" id="reset">Reset all</button></div>
+    <div class="card"><div class="card-h"><h3>Rethinks to confirm</h3><span class="n">Build now = accept the change into its wave · Skip = keep the recipe as approved</span></div><div id="p-re"></div></div>
+    <div class="card"><div class="card-h"><h3>New from Lightning</h3><span class="n">new masters, axes or props</span></div><div id="p-new"></div></div>
+    <div class="card"><div class="card-h"><h3>Out of scope</h3><span class="n">listed so the decision is explicit</span></div><div id="p-scope"></div></div>
+    <div class="card"><div class="card-h"><h3>Already decided (DSI + Ant passes)</h3><span class="n">locked</span></div><div id="p-locked"></div></div>
+  </div>
+  <aside class="summary">
+    <h3>Your plan</h3>
+    <div id="sum-rows"></div>
+    <div style="margin-top:12px"><b class="small">Accepted / build now</b><ol id="ol-build"></ol></div>
+    <div><b class="small">Later</b><ol id="ol-later"></ol></div>
+    <label class="small muted" for="notes">Notes for the message</label>
+    <input type="text" id="notes" placeholder="e.g. pipeline stages confirmed for deals → Path now">
+    <div class="btns"><button class="btn primary" id="copy">Copy message</button><span class="small muted" id="copied"></span></div>
+    <textarea id="msg" readonly></textarea>
+  </aside>
+</div>
+
+<h2 id="gaps">New pieces, drawn</h2>
+<p class="intro">Schematic only. Gray = existing DS master reused; brass dashed = new or changed by this pass.</p>
+<div class="mlegend" style="margin:0 0 12px"><span><i class="m-reuse"></i>existing DS master, reused</span><span><i class="m-new"></i>new or changed</span></div>
+<div class="gaps">
+  <div class="card gap-card"><div class="card-h"><h3>Stepper Type=Path</h3><span class="n">½ wave · new candidate · R3</span></div><div class="card-b">
+    <div class="mock"><div class="mtx" style="gap:10px;align-items:center"><div class="path m-new" style="padding:6px;border-radius:8px"><div class="stg done"><span class="lbl" style="width:30px"></span></div><div class="stg done"><span class="lbl" style="width:30px"></span></div><div class="stg cur"><span class="lbl" style="width:34px"></span></div><div class="stg"><span class="lbl" style="width:30px"></span></div><div class="stg"><span class="lbl" style="width:26px"></span></div></div><div class="path" style="width:200px"><div class="stg done" style="clip-path:none;border-radius:4px"><span class="lbl" style="width:26px"></span></div><div class="stg lost" style="clip-path:none;border-radius:4px"><span class="lbl" style="width:26px;background:rgba(255,255,255,.9)"></span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Stepper <code>562:3849</code> Items slot and Step <code>562:27</code> states; Feedback success / danger tokens for Won / Lost; Section card <code>923:752</code> as the coaching panel at usage. <b>New:</b> <code>Type=Base | Path</code> on Stepper: chevron-shaped stages, states Complete / Current / Incomplete + Won / Lost. <b>Evidence:</b> the product already has a pipeline concept (the CE "Seleziona pipeline" pattern); deals and requests move through stages. Salesforce puts a Path on every record page.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Docked drawer</h3><span class="n">⅛ wave more · R2 on Wave 54</span></div><div class="card-b">
+    <div class="mock"><div class="mk-drawer m-reuse"><div class="page"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span><span class="lbl" style="width:100px"></span></div><div class="sheet"><div class="hd"><span class="chev m-new">‹</span><span class="lbl" style="width:50px;background:#8f93a8"></span><span class="mx m-reuse" style="margin-left:auto;width:16px;height:16px;font-size:10px">×</span></div><div class="mtx"><span class="lbl m-reuse" style="width:100%"></span><span class="lbl m-reuse" style="width:80%"></span></div><div class="ft"><span class="mbtn m-reuse" style="background:#3f4254;color:#fff;border-color:#3f4254">Applica</span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> everything Wave 54 already has from Modal <code>540:3823</code>. <b>Changed:</b> <code>Show scrim</code> off = a docked panel that sits beside the content with no mask (Lightning filtering panels); <code>Show back</code> = the drilled-in header with a back chevron. Same master, two booleans.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Activity timeline item</h3><span class="n">¼ wave more · R4 on Wave 56</span></div><div class="card-b">
+    <div class="mock"><div class="tm"><div class="ev m-new"><div class="mk"><span class="ico sm m-new" style="border-radius:50%"></span><span class="ln"></span></div><div class="tx"><span class="lbl" style="width:130px;background:#8f93a8"></span><span class="lbl" style="width:170px"></span><div class="mtx m-new" style="padding:6px;border-radius:6px;margin-top:4px"><span class="lbl" style="width:140px;height:7px"></span><span class="lbl" style="width:110px;height:7px"></span></div></div><div style="display:grid;gap:6px;justify-items:end"><span class="lbl" style="width:40px;height:7px"></span><span class="mx m-new">⋯</span></div></div><div class="ev m-new"><div class="mk"><span class="ico sm m-new" style="border-radius:50%"></span><span class="ln"></span></div><div class="tx"><span class="lbl" style="width:110px;background:#8f93a8"></span><span class="lbl" style="width:150px"></span></div><span class="lbl" style="width:40px;height:7px"></span></div><div class="ev m-new"><div class="mk"><span class="ico sm m-new" style="border-radius:50%"></span></div><div class="tx"><span class="lbl" style="width:120px;background:#8f93a8"></span></div><span class="lbl" style="width:40px;height:7px"></span></div></div></div>
+    <div class="small"><b>Reuse:</b> Status dot <code>537:14</code> stays the default marker; LA icons for activity types; Button icon for the actions menu. <b>Changed:</b> Timeline/Event gets an <code>Icon</code> swap on the marker (call, email, event, task, note), <code>Show details</code> with a Content slot for the expanded body, and an <code>Actions</code> slot. Timestamp aligned right as in Lightning.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Collapsible List section</h3><span class="n">no extra effort · R1 replaces the Wave 59 nesting recipe</span></div><div class="card-b">
+    <div class="mock"><div class="mk-side m-reuse"><div class="hdr m-new"><span class="chev">⌄</span><span class="lbl" style="width:70px;height:7px"></span></div><div class="li sel"><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:60px"></span><span class="lbl" style="width:14px;margin-left:auto;background:#c0392b"></span></div><div class="hdr m-new"><span class="chev">›</span><span class="lbl" style="width:56px;height:7px"></span></div><div class="hdr m-new"><span class="chev">⌄</span><span class="lbl" style="width:64px;height:7px"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:90px"></span></div></div></div>
+    <div class="small"><b>Reuse:</b> List section <code>1090:5381</code> (Title + Items slot) and Menu item <code>404:110</code> unchanged. <b>Changed:</b> the Title row gets a chevron and <code>State=Expanded | Collapsed</code>, the same mechanism Wave 53 puts on Section card. No Level axis, no indented items: a group opens or closes as a whole, exactly Lightning's Vertical Navigation. Deep hierarchies use the Tree row instead.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Tree row and Tree Grid</h3><span class="n">⅛ wave more · R5 on Wave 59</span></div><div class="card-b">
+    <div class="mock"><div style="display:grid;gap:12px"><div class="mk-tree m-reuse" style="width:300px"><div class="li"><span class="chev m-new">⌄</span><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:90px"></span><span class="lbl m-new" style="width:120px;height:6px"></span></div></div><div class="li l1 sel"><span class="chev m-new">⌄</span><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:70px"></span><span class="lbl m-new" style="width:100px;height:6px"></span></div></div><div class="li l2"><span class="chev" style="opacity:0">⌄</span><span class="lbl" style="width:60px"></span></div></div><div class="mk-tg"><div class="tr"><div class="td th">Name</div><div class="td th">Type</div><div class="td th">Area</div></div><div class="tr"><div class="td"><span class="chev m-new">⌄</span><span class="ico sm"></span><span class="lbl" style="width:60px"></span></div><div class="td"><span class="lbl" style="width:40px"></span></div><div class="td"><span class="lbl" style="width:30px"></span></div></div><div class="tr"><div class="td l1"><span class="chev m-new">›</span><span class="lbl" style="width:56px"></span></div><div class="td"><span class="lbl" style="width:36px"></span></div><div class="td"><span class="lbl" style="width:26px"></span></div></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Menu item <code>404:110</code> with Wave 59 nesting and its description line; Table cell <code>412:90</code>. <b>Changed:</b> Tree row = <code>Show expand icon</code> + metatext = the rich row's description; checkbox becomes optional (Ant) rather than default (Lightning selects by highlight). Tree Grid = Table cell gets <code>Show expand icon</code> in the first column: a table that opens rows, no new master.</div>
+  </div></div>
+</div>
+
+<h2 id="patterns">Lightning's CRM patterns — where they land</h2>
+<p class="intro">SLDS 2 curated 48 components; the CRM patterns Salesforce actually runs on live in SLDS 1 and are still linked as related components. They are the most instructive part of this pass.</p>
+<div class="card"><div class="tablewrap"><table class="walk">
+  <thead><tr><th>Pattern</th><th>What it is</th><th>In DS Next</th></tr></thead>
+  <tbody>
+    <tr><td>Path</td><td>Pipeline stage indicator: chevron stages, Won / Lost, coaching panel with key fields</td><td>New candidate: Stepper Type=Path</td></tr>
+    <tr><td>Activity Timeline</td><td>Typed activity markers, expandable details, actions, timestamps</td><td>Timeline/Event with Icon swap, Show details, Actions (R4)</td></tr>
+    <tr><td>Panels</td><td>Docked, drawer and drilled-in side panels; filtering panels</td><td>Modal Placement + Show scrim + Show back (R2)</td></tr>
+    <tr><td>Page Headers</td><td>Record and object home headers: icon, title, meta, actions, detail row</td><td>Composable: Section card header + Data row strip; a pattern page, not a master</td></tr>
+    <tr><td>Split View</td><td>List panel with detail region, unread indicators, collapse toggle</td><td>Composable: List section Type=Card + Section card</td></tr>
+    <tr><td>Visual Picker</td><td>Radio or checkbox rendered as a card with icon, text and checkmark; sizes</td><td>New candidate: Choice card</td></tr>
+    <tr><td>Summary Detail</td><td>One collapsible section with a chevron</td><td>= Section card collapsed state (Wave 53)</td></tr>
+    <tr><td>Scoped Notifications</td><td>Region-bound inline notice, light / dark / semantic</td><td>= Alert Layout=Inline</td></tr>
+    <tr><td>Lookups</td><td>Autocomplete against records: entity options with icon + meta, recent items, "create new"</td><td>Input + Dropdown + rich Menu item (R6); "create new" = Menu item with plus icon</td></tr>
+    <tr><td>Expression</td><td>Filter builder: resource · operator · value rows, groups, custom logic</td><td>New candidate: Filter row, with the filter UI and Slider</td></tr>
+  </tbody>
+</table></div></div>
+
+<h2 id="near">Have, near — what exactly is missing</h2>
+<p class="intro">The eight Lightning components we cover by role but not feature by feature. Feature rows come from the SLDS 2 anatomy and states and the SLDS 1 variant inventories. Where the missing piece is already in the program, the row says which wave.</p>
+<div class="card"><div class="tablewrap"><table id="near-sum" class="nsum"></table></div></div>
+<div class="mlegend" style="margin:0 0 12px"><span><span class="chip have">have</span></span><span><span class="chip comp">composable</span></span><span><span class="chip gap">missing</span></span><span><span class="chip scope">not for us</span></span><span style="margin-left:auto"><i class="m-reuse"></i>existing master</span><span><i class="m-new"></i>missing piece</span></div>
+<div class="nears" id="near-cards"></div>
+
+<h2 id="all">All 48 components</h2>
+<div class="card">
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search Lightning component, DS master or id…">
+    <select id="gsel"><option value="">All groups</option></select>
+    <span id="fchips"></span>
+    <label class="small"><input type="checkbox" id="hidecovered"> hide have / composable</label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="tablewrap"><table id="all">
+    <thead><tr><th data-k="n" class="sorted">Lightning component</th><th data-k="g">Group</th><th data-k="v">Verdict</th><th>DS Next equivalent (page · id)</th><th>What differs · how to build</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+</div>
+
+<h2 id="method">Method and sources</h2>
+<div class="card"><div class="card-b small">
+  <p style="margin:0 0 8px"><b>Lightning side:</b> SLDS 2 (Summer '26, 3.3.1) components index read live in the browser on 2026-09-16: a flat list of 48. SLDS 2 pages are usage-level (overview, anatomy, states, interactions) and their side navigation is not exposed in the DOM, so pages were reached by URL slug; six were read in full (Vertical Navigation, Tree, Tree Grid, Progress Indicator, Combobox, Prompt). Variant inventories come from the SLDS 1 blueprints (v1.lightningdesignsystem.com, 16 pages), which SLDS 2 still links as related components. The ten CRM patterns exist only in SLDS 1 and are an appendix, not part of the 48. The SLDS 2 Patterns section could not be indexed.</p>
+  <p style="margin:0 0 8px"><b>DS side:</b> the census of 2026-09-15 (masters unchanged). Evidence: the product carries a pipeline concept (the CE "Seleziona pipeline" pattern, rebuilt as Input + Dropdown), the natural home of Path.</p>
+  <p style="margin:0"><b>Limits:</b> comparison by role and function, not prop by prop; runtime behaviours are marked as such. Effort in waves under the standard pipeline. Companion documents: <code>ds-next-claude/LIGHTNING-COMPARISON.md</code>, the <a href="https://lucar00.github.io/ds-next-confronto-dsitalia/">DSI page</a> and the <a href="https://lucar00.github.io/ds-next-confronto-ant/">Ant page</a>.</p>
+</div></div>
+
+</main>
+<footer>DS Next Claude · analysis of 2026-09-16 · read-only, nothing built. Series: DSI → Ant → Lightning → Atlassian → Material 3 → consolidated matrix.</footer>
+
+<script>
+const V = {have:'have 1:1', near:'have, near', comp:'composable', behav:'behaviour', gap:'gap', scope:'out of scope'};
+const ORDER = ['have','near','comp','gap','scope'];
+const ROWS = [
+ ['Button','Actions','have','Button 362:338 · Button icon 363:1417 · Link 568:2','neutral / brand / outline-brand / destructive / text-destructive / success / inverse → Variant × Emphasis; stateful ✓ Selected; stretch = FILL; loading = Spinner at usage.'],
+ ['Button Groups','Actions','have','Button group 364:219','With overflow menu = Button icon + Dropdown at usage; inverse ✓ tokens.'],
+ ['Button Icons','Actions','have','Button icon 363:1417','bare / container / border / border-filled / brand / inverse / stateful ✓ Emphasis + State; with dropdown = + Dropdown.'],
+ ['Checkbox','Forms','near','Checkbox 389:17','Indeterminate, error, help text ✗ → Wave 57; group / stacked / RTL = layout.'],
+ ['Checkbox Button','Forms','have','Button group Segment · Chip Selected','A checkbox styled as a button.'],
+ ['Checkbox Toggle','Forms','have','Toggle 390:49','"Enabled / Disabled" state text ✗ minor.'],
+ ['Color Picker','Forms','scope','—','Swatches + custom hex; the CRM sets no colours.'],
+ ['Combobox','Forms','near','Input select-mode 394:5591 + Dropdown 400:56 + Menu item 404:110 + Chip + Search bar','Picklist ✓, lookup ✓, grouped ✓ List section, multi-select pills ✓ Chips, inline / stacked label ✓; entity options (icon + title + meta) ✗ Wave 59; selected checkmark ✗ new minor.'],
+ ['Datepicker','Forms','have','Input Show action + Date picker 564:44 + Day 564:43','Single, range ✓ In range; month nav + year select ✓ Input select-mode; Today link = Link.'],
+ ['Datetime Picker','Forms','comp','Two Inputs (date + time presets) side by side','A date and a time field paired at usage.'],
+ ['Dual Listbox','Forms','comp','Two List section Type=Card + Menu items + Button icon arrows','Move and reorder buttons; locked / disabled options = States.'],
+ ['File Selector','Forms','have','Dropzone 610:128 + Button','Files and images variants; drag-over highlight ✗ minor (Wave 57 Uploading).'],
+ ['Form Element','Forms','comp','Input Layout Vertical / Horizontal + helper + Section card','Required asterisk = label text; help icon ✓ Show info icon; compound fields = layout; read-only = Data row 581:89.'],
+ ['Input','Forms','have','Input 394:5591 · Input group 562:3886 · Textarea 609:304 · Search bar 399:3479','Fixed text addon ✓; inline icons ✓; counter ✗ minor; read-only static text → Data row.'],
+ ['Radio Button Group','Forms','have','Button group 364:219 / Segment 364:182','Segmented single-select.'],
+ ['Radio Group','Forms','gap','— (Wave 52 mockup 1131:2295)','Base, required, error, wrapping labels: confirms the B2 model with Error.'],
+ ['Rich Text Editor','Forms','comp','Toolbar 407:29 + Textarea 609:304','Format groups as Button icons; a master only if rich notes recur.'],
+ ['Select','Forms','have','Input select-mode','Native select look; multiple = listbox at usage.'],
+ ['Slider','Forms','gap','— (Wave 62)','Base, min / max with steps, widths, error, vertical; value label beside the track → R10.'],
+ ['Textarea','Forms','have','Textarea 609:304','1:1.'],
+ ['Timepicker','Forms','have','Input Show action (clock) + Dropdown + Menu item presets','Lightning Timepicker is a combobox with a time list: exactly the Wave 50 approach.'],
+ ['Breadcrumbs','Navigation','near','Breadcrumb 580:432','N levels and overflow menu ✗ (skipped in the DSI plan).'],
+ ['Menu','Navigation','have','Dropdown 400:56 + Menu item 404:110 + List section','Sub heading ✓ Title; icons left / right ✓; overflow with actions ✓; alert items ✓ icon swap; checkable items ✗ new minor Show check; submenus → Wave 59.'],
+ ['Tabs','Navigation','have','Tab 398:326 + Tab group 632:443','With icons ✓, nested ✓, overflow "more" = Dropdown at usage, sizes ✓.'],
+ ['Scoped Tabs','Navigation','have','Tab Emphasis Outline','Card-scoped tabs.'],
+ ['Vertical Navigation','Navigation','near','Navigation rail 429:1191 + List section 1090:5381 + Menu item 404:110','Group headers ✓ Title; icons ✓; notification count ✓ Number; collapsible sections ✗ → R1; overflow "show more" = Button Ghost; quickfind ✓ Search bar; shaded ✓ Sector tints; radio-group variant ✓ Selected.'],
+ ['Progress Indicator','Navigation','near','Stepper 562:3849 + Step 562:27','Completed / current / uncompleted ✓; error ✗ (Wave 55); vertical ✗ (Wave 55); hover tooltip label = usage; Path type ✗ → R3, new candidate.'],
+ ['Tree','Navigation','near','Menu item 404:110 + Wave 59 nesting','Group header ✓; chevron ✗ Tree row; left / right icons ✓; linked label ✓; metatext ✗ = rich row; selection by highlight ✓ → R5.'],
+ ['Tree Grid','Data display','near','Table cell 412:90','Chevron in the first cell ✗ new minor; preceding icon ✓; text link ✓; action menu ✓ Slot; selected row ✓ Subtle.'],
+ ['Avatar','Data display','have','Avatar 512:979','5 sizes vs 4; square entity avatars ✗ (skipped); initials ✓; fallback icon ✓.'],
+ ['Badge','Data display','have','Status chip 402:140 · Badge 391:9','Label + icon, themes default / inverse / lightest / success / warning / error ✓ variants.'],
+ ['Cards','Data display','have','Section card 923:752','Header icon + title + actions ✓; footer "View all" = Link at usage; nested / wrapped ✓.'],
+ ['Carousel','Data display','comp','Carousel dots 406:25 + Indicator 405:50 + Carousel arrows 406:35','Image + caption panels at usage.'],
+ ['Data Table','Data display','have','Table cell 412:90','Striped ✓ Subtle; no hover / vertical borders / headless ✓ usage; truncated / wrapped ✓; header icon + menu ✓; cell icon ✓; product listing ✓ Slot; radio rows ~ (after Wave 52); resizable = behaviour; inline edit ✗ new candidate.'],
+ ['Dynamic Icons','Data display','scope','—','Animated glyphs (ellie, eq, score, strength, trend, typing); strength ≈ Level bar 407:77.'],
+ ['Empty State','Data display','have','Empty state 451:1001 + Illustration 588:34 / 589:36','20+ scenario illustrations vs 2: content, not component (the Result illustrations skip stands).'],
+ ['Icons','Data display','have','Line Awesome + Property glyphs','action / custom / doctype / standard / utility sets; coloured object icons ✗ minor (Section tile sector colours are the analogue).'],
+ ['Map','Data display','comp','Map marker 593:38 on a map frame + List section','Embedded map + marker list.'],
+ ['Pills','Data display','have','Chip 379:2205','With icon ✓; with avatar ~ sizing; truncated ✓; error ✗ minor; pill container = wrap layout; listbox of pills ✓ Chips in Input Content=Slot.'],
+ ['Tiles','Data display','comp','Data row 581:89 stack + Avatar + Button icon menu · Opportunity card 478:4993 Type=List','base / with icon / with avatar / task / article / board.'],
+ ['Modals','Feedback','have','Modal 540:3823','small / medium / large = resize; tagline ✓ Intro; headless / footless ✓ booleans; directional footer ✓ Actions layout.'],
+ ['Prompt','Feedback','near','Modal 540:3823','Alert / Confirm / Prompt types ✓ booleans; themed header (Info / Success / Warning / Error / Offline / Inverse) ✗ new minor.'],
+ ['Toast','Feedback','have','Toast 607:63','info / success / warning / error ✓; small column ✓; with link ✓ Action; sticky = behaviour.'],
+ ['Tooltip','Feedback','have','Tooltip 401:116','12 nubbin positions → 4 arrows + None; learn-more link ✓ slot; feature-discovery style = light popover (Wave 60).'],
+ ['Spinners','Feedback','have','Spinner 606:40','xx-small–large vs S / M; brand / inverse ✓; with container = scrim at usage.'],
+ ['Progress Bar','Feedback','have','Progress bar 607:2191','Thickness ✗ minor; success theme → Wave 60 colours.'],
+ ['Progress Ring','Feedback','have','Donut chart 563:51','Themes warning / expired / complete-with-check ✗ minor (Wave 60 colours could extend to Donut).'],
+ ['Accordion','Content','gap','— (Wave 53)','Chevron left; multiple open; nested; action overflow in header → R9.']
+].map(r => ({n:r[0], g:r[1], v:r[2], ds:r[3], note:r[4]}));
+
+// Planner. eff = eighths of a wave (rethinks: extra effort only). ev: 3 proven · 2 basic · 1 conditional · 0 none.
+const EVL = ['no CRM evidence','conditional','basic','proven'];
+const PLAN = [
+ {id:'re-sidebar',group:'re',kind:'re',order:1,name:'R1 · Sidebar nesting → collapsible List section',eff:0,ev:2,evNote:'Lightning Vertical Navigation; same mechanism as Accordion',sug:'build',why:'Replace indented sub-items with a Title row that opens or closes its group. One collapse law for Section card and List section; the Level axis stays dead; hierarchies go to the Tree row.',reuse:'List section 1090:5381 · Menu item 404:110 · the Wave 53 collapse mechanism',neu:'Chevron + State Expanded | Collapsed on the List section title row',dep:'Wave 59 scope changes; Wave 53 mockup decides the chevron side.'},
+ {id:'re-drawer',group:'re',kind:'re',order:2,name:'R2 · Drawer + Show scrim + Show back',eff:1,ev:2,evNote:'SLDS Panels: docked, drawer, drilled-in',sug:'build',why:'A docked filtering panel that pushes content is as common in CRMs as the modal drawer; the drilled-in back button covers panel-in-panel navigation.',reuse:'Modal 540:3823 parts, Button icon chevron',neu:'Show scrim (modal vs docked) · Show back in the header',dep:'Rides on Wave 54.'},
+ {id:'re-timeline',group:'re',kind:'re',order:3,name:'R4 · Timeline/Event as an activity item',eff:2,ev:2,evNote:'SLDS Activity Timeline; deal activity history',sug:'build',why:'Typed markers (call, email, event, task), expandable details and an actions menu turn the timeline into the activity feed a CRM record needs.',reuse:'Status dot 537:14 default marker · LA icons · Button icon · Content slot pattern',neu:'Icon swap on the marker · Show details with Content slot · Actions slot',dep:'Rides on Wave 56.'},
+ {id:'re-tree',group:'re',kind:'re',order:4,name:'R5 · Tree row: metatext, checkbox optional; Tree Grid via Table cell',eff:1,ev:1,evNote:'SLDS Tree selects by highlight; Tree Grid chevron in first cell',sug:'build',why:'The tree row reuses the rich row description line and gets its chevron; the checkbox becomes an option. Tree Grid needs only an expand icon on Table cell.',reuse:'Menu item 404:110 + Wave 59 nesting and description · Table cell 412:90',neu:'Show expand icon on Menu item and Table cell; Show checkbox optional',dep:'Rides on Wave 59.'},
+ {id:'re-slider',group:'re',kind:'re',order:5,name:'R10 · Slider: Error state, value beside the track',eff:0,ev:1,evNote:'SLDS Slider variants',sug:'build',why:'Lightning shows the value beside the track and has an error state; both belong in the Wave 62 mockup as options.',reuse:'Slider recipe as approved',neu:'State Error · Show value as inline text or Tooltip (mockup decision)',dep:'Rides on Wave 62.'},
+ {id:'stepper-path',group:'new',kind:'near',order:6,name:'Stepper Type=Path (pipeline stages, Won / Lost)',eff:4,ev:2,evNote:'pipeline concept exists in the product; every Salesforce record has a Path',sug:'build',why:'Chevron-shaped stages with Complete / Current / Incomplete plus Won and Lost, the way deals and requests move through a pipeline. Our Stepper only knows wizards.',reuse:'Stepper 562:3849 · Step 562:27 · Feedback success / danger tokens · Section card as coaching panel',neu:'Type=Base | Path on Stepper; Won / Lost states on Step',dep:'Rides on Wave 55.'},
+ {id:'menu-check',group:'new',kind:'have',order:7,name:'Menu item: Show check on Selected',eff:1,ev:2,evNote:'multi-select menus, Combobox picklists',sug:'build',why:'Lightning marks selected options with a checkmark in menus and comboboxes; our Selected state is a tint only.',reuse:'Menu item 404:110 · check-solid 350:4315',neu:'Show check boolean on the Selected state',dep:'Rides on Wave 59.'},
+ {id:'table-inline-edit',group:'new',kind:'have',order:8,name:'Table cell: inline edit (State Edit + Error)',eff:2,ev:2,evNote:'Salesforce list views edit inline',sug:'later',why:'CRM users edit fields in the grid; Table cell has no edit affordance, editing state or cell error.',reuse:'Table cell 412:90 · Input field styling · Feedback-danger tokens',neu:'State Edit (pencil affordance, editable field) + Error on Table cell'},
+ {id:'table-expand',group:'new',kind:'have',order:9,name:'Table cell: Show expand icon (Tree Grid)',eff:1,ev:1,evNote:'building → floor → unit tables',sug:'later',why:'A chevron in the first cell turns a table into a Tree Grid.',reuse:'Table cell 412:90 · Button icon chevron',neu:'Show expand icon on Table cell',dep:'With Wave 59.'},
+ {id:'modal-theme',group:'new',kind:'have',order:10,name:'Modal: themed header (Prompt)',eff:1,ev:1,evNote:'critical prompts',sug:'later',why:'Lightning Prompt colours the header by theme (Info / Success / Warning / Error / Offline). Ours signals with an icon and intro only.',reuse:'Modal 540:3823 · Feedback tokens',neu:'Variant on the Modal header'},
+ {id:'choice-card',group:'new',kind:'near',order:11,name:'Choice card (Visual Picker)',eff:4,ev:1,evNote:'type-selection and onboarding screens',sug:'later',why:'Radio or checkbox rendered as a card with icon, text and checkmark. AI option button 545:84 is the tinted precedent; a neutral version would serve forms.',reuse:'Radio (Wave 52) · Checkbox 389:17 · Section card tokens · check-solid',neu:'Choice card master: Type Radio | Checkbox × State, sizes S / M / L'},
+ {id:'filter-row',group:'new',kind:'comp',order:12,name:'Filter row (Expression)',eff:2,ev:1,evNote:'filter UI not designed yet',sug:'later',why:'Resource · operator · value rows with add and remove, groups and custom logic: the declarative filter builder. Pairs with Slider when the filter UI is designed.',reuse:'Input select-mode · Input · Button icon · Section card',neu:'Filter row sub-component',dep:'The filter UI.'},
+ {id:'colorpicker',group:'scope',kind:'scope',order:13,name:'Color Picker',eff:4,ev:0,evNote:'the CRM sets no colours',sug:'skip',why:'Swatches and custom hex.',reuse:'—',neu:'A whole picker'},
+ {id:'dynamic-icons',group:'scope',kind:'scope',order:14,name:'Dynamic Icons',eff:2,ev:0,evNote:'animated glyphs',sug:'skip',why:'ellie, eq, score, strength, trend, typing, waffle: motion glyphs; strength ≈ Level bar.',reuse:'Level bar 407:77 · LA icons',neu:'Nothing'}
+];
+const LOCKED = [
+ {name:'Pagination · Radio · Divider',status:'Approved · Wave 52',note:'mockup 1131:2295 parked until the series closes'},
+ {name:'Accordion (Section card State)',status:'Approved · Wave 53',note:'R9: chevron side decided in the mockup'},
+ {name:'Drawer (Modal Placement)',status:'Approved · Wave 54',note:'R2 proposes Show scrim + Show back'},
+ {name:'Bottom nav · Toolbar · Stepper Mobile + vertical + Error',status:'Approved · Wave 55',note:'R3 proposes Type=Path here'},
+ {name:'Timeline',status:'Approved · Wave 56',note:'R4 proposes the activity item'},
+ {name:'Checkbox · File row · Dropzone states',status:'Approved · Wave 57',note:''},
+ {name:'Alert dismiss + actions + Neutral / Brand',status:'Approved · Wave 58',note:'R11: scoped notifications covered'},
+ {name:'Menu item rich row · Sidebar nesting · Tree row',status:'Approved · Wave 59',note:'R1, R5, R6 reshape this wave'},
+ {name:'Tooltip Light + close · Progress bar',status:'Approved · Wave 60',note:''},
+ {name:'Hero title / text / CTA',status:'Approved · Wave 61',note:''},
+ {name:'Slider',status:'Approved · Wave 62',note:'R10 refines the mockup'},
+ {name:'Breadcrumb N levels · Tabs placement / closable · Rate · Avatar square · Table density · Date picker views · Status dot colours · Cascader · Result illustrations',status:'Skipped (DSI + Ant)',note:''}
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ids = s => esc(s).replace(/(\d{2,5}:\d{1,6})/g, '<span class="id">$1</span>');
+const FR = {1:'⅛',2:'¼',3:'⅜',4:'½',5:'⅝',6:'¾',7:'⅞'};
+const waves = e => { if (!e) return '0'; const w = Math.floor(e / 8), f = e % 8; return (w ? w : '') + (f ? FR[f] : ''); };
+const wavesLabel = e => { const s = waves(e); return s === '0' ? 'no extra effort' : s + (e === 8 ? ' wave' : ' waves'); };
+const KIND = {have:'have', near:'near', comp:'comp', gap:'gap', scope:'scope', re:'re'};
+const KINDL = {have:'have 1:1', near:'have, near', comp:'composable', gap:'gap', scope:'out of scope', re:'rethink'};
+
+// Overview
+(function overview(){
+  const c = {}; ORDER.forEach(k => c[k] = 0); ROWS.forEach(r => c[r.v]++);
+  const covered = c.have + c.near + c.comp;
+  document.getElementById('totals').innerHTML = '<b>' + ROWS.length + '</b> Lightning components · <b>' + covered + '</b> reproducible today · <b>' + c.gap + '</b> gaps, none new · <b>' + c.scope + '</b> out of scope · <b>5</b> rethinks';
+  document.getElementById('bar').innerHTML = ORDER.map(k => '<div class="' + k + '" style="flex:' + c[k] + '" title="' + V[k] + ': ' + c[k] + '">' + c[k] + '</div>').join('');
+  document.getElementById('kpis').innerHTML =
+    '<div class="kpi"><b>' + covered + ' / ' + ROWS.length + '</b><span>reproducible today</span></div>' +
+    '<div class="kpi"><b>' + c.have + '</b><span>have 1:1</span></div>' +
+    '<div class="kpi"><b>' + c.near + '</b><span>near — one extension away</span></div>' +
+    '<div class="kpi"><b>' + c.comp + '</b><span>composable at usage</span></div>' +
+    '<div class="kpi"><b>' + c.gap + '</b><span>gaps — all already approved</span></div>' +
+    '<div class="kpi"><b>5 + 7</b><span>rethinks of approved recipes + new candidates</span></div>';
+  const groups = [...new Set(ROWS.map(r => r.g))];
+  let h = '<thead><tr><th>Group</th><th>Lightning</th><th>Reproducible</th><th>Mix</th><th>Near</th><th>Gaps · scope</th></tr></thead><tbody>';
+  groups.forEach(g => {
+    const rs = ROWS.filter(r => r.g === g); const gc = {}; ORDER.forEach(k => gc[k] = rs.filter(r => r.v === k).length);
+    const cov = gc.have + gc.near + gc.comp;
+    h += '<tr><td>' + esc(g) + '</td><td>' + rs.length + '</td><td>' + cov + ' / ' + rs.length + '</td><td><div class="mini">' + ORDER.map(k => gc[k] ? '<div style="flex:' + gc[k] + ';background:var(--' + k + ')" title="' + V[k] + ' ' + gc[k] + '"></div>' : '').join('') + '</div></td><td>' + (gc.near ? rs.filter(r => r.v === 'near').map(r => esc(r.n)).join(', ') : '—') + '</td><td>' + (gc.gap + gc.scope ? rs.filter(r => r.v === 'gap' || r.v === 'scope').map(r => esc(r.n)).join(', ') : '—') + '</td></tr>';
+  });
+  document.getElementById('grp').innerHTML = h + '</tbody>';
+})();
+
+// Quadrants
+(function quad(){
+  const Q = [
+    {k:'first', t:'Do first — strong evidence, cheap', f:p => p.ev >= 2 && p.eff <= 2},
+    {k:'wave', t:'Plan a wave — strong evidence, half a wave or more', f:p => p.ev >= 2 && p.eff > 2},
+    {k:'cheap', t:'Cheap, when a screen asks for it — weak evidence, low cost', f:p => p.ev < 2 && p.eff <= 2},
+    {k:'road', t:'Only with a roadmap reason — weak evidence, real cost', f:p => p.ev < 2 && p.eff > 2}
+  ];
+  const col = {gap:'var(--gap-ink)', near:'var(--near-ink)', comp:'var(--comp-ink)', have:'var(--have-ink)', scope:'var(--scope-ink)', re:'var(--brass)'};
+  const cand = PLAN.filter(p => p.group !== 'scope');
+  document.getElementById('quad').innerHTML = Q.map(q => '<div class="q ' + (q.k === 'first' ? 'first' : '') + '"><h4>' + q.t + '</h4>' +
+    cand.filter(q.f).sort((a, b) => b.ev - a.ev || a.eff - b.eff).map(p => '<span class="qi" title="' + esc(p.evNote) + '"><span class="dot" style="background:' + col[p.kind] + '"></span>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></span>').join('') + '</div>').join('');
+})();
+
+// Planner
+const KEY = 'lightning-plan-v1';
+let state = {choices:{}, notes:''};
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.choices) state = s; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const CH = {build:'Build now', later:'Later', skip:'Skip'};
+const CHRE = {build:'Accept', later:'Later', skip:'Keep as approved'};
+const NEAR_IDS = new Set(['re-sidebar','re-tree','stepper-path','menu-check','table-expand','modal-theme']);
+const NEAR_LINK = {'re-sidebar':'vertical-navigation','re-tree':'tree','stepper-path':'progress-indicator','menu-check':'combobox','table-expand':'tree-grid','modal-theme':'prompt'};
+function rowHTML(p){
+  const ch = state.choices[p.id] || ''; const L = p.kind === 're' ? CHRE : CH;
+  return '<div class="prow" id="plan-' + p.id + '" data-id="' + p.id + '">' +
+    '<div class="t"><b>' + esc(p.name) + '</b><span class="chip ' + KIND[p.kind] + '">' + KINDL[p.kind] + '</span><span class="meta"><span class="tag">' + (p.kind === 're' ? 'extra: ' : '') + wavesLabel(p.eff) + '</span><span class="tag ev' + p.ev + '">' + EVL[p.ev] + ' · ' + esc(p.evNote) + '</span></span></div>' +
+    '<div><div class="seg">' + ['build','later','skip'].map(c => '<button class="' + c + (ch === c ? ' on' : '') + '" data-c="' + c + '">' + L[c] + '</button>').join('') + '</div><div class="sug">suggested: ' + L[p.sug] + (NEAR_IDS.has(p.id) ? ' · <a href="#near-' + NEAR_LINK[p.id] + '">what is missing ↑</a>' : '') + '</div></div>' +
+    '<div class="why">' + esc(p.why) + (p.dep ? ' <b>Depends on:</b> ' + esc(p.dep) : '') + '</div>' +
+    '<details><summary>Reused vs new</summary><div class="rn"><div class="re"><b>Reused DS masters</b>' + ids(p.reuse) + '</div><div class="ne"><b>New or changed</b>' + ids(p.neu) + '</div></div></details>' +
+  '</div>';
+}
+function renderPlanner(){
+  ['re','new','scope'].forEach(g => { document.getElementById('p-' + g).innerHTML = PLAN.filter(p => p.group === g).sort((a, b) => a.order - b.order).map(rowHTML).join(''); });
+  document.getElementById('p-locked').innerHTML = LOCKED.map(l => '<div class="prow locked"><div class="t"><b>' + esc(l.name) + '</b><span class="chip lock">' + esc(l.status) + '</span></div><div class="small muted">' + esc(l.note) + '</div></div>').join('');
+  renderSummary();
+}
+function renderSummary(){
+  const by = c => PLAN.filter(p => state.choices[p.id] === c).sort((a, b) => a.order - b.order);
+  const eff = arr => arr.reduce((s, p) => s + p.eff, 0);
+  const B = by('build'), L = by('later'), S = by('skip'); const U = PLAN.length - B.length - L.length - S.length;
+  document.getElementById('sum-rows').innerHTML =
+    '<div class="row"><span>Accepted / build now</span><b>' + B.length + ' · ' + wavesLabel(eff(B)) + '</b></div>' +
+    '<div class="row"><span>Later</span><b>' + L.length + ' · ' + wavesLabel(eff(L)) + '</b></div>' +
+    '<div class="row"><span>Skip / keep as approved</span><b>' + S.length + '</b></div>' +
+    '<div class="row"><span>Undecided</span><b>' + U + '</b></div>';
+  document.getElementById('ol-build').innerHTML = B.length ? B.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  document.getElementById('ol-later').innerHTML = L.length ? L.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  const line = (label, arr) => label + (arr.length ? ' (' + wavesLabel(eff(arr)) + '): ' + arr.map(p => p.name).join(' · ') : ': —');
+  let msg = 'Vai — Lightning pass: rethinks and additions (' + new Date().toISOString().slice(0, 10) + ')\n' +
+    line('Accepted / build now', B) + '\n' + line('Later', L) + '\n' + 'Skip / keep as approved: ' + (S.length ? S.map(p => p.name).join(' · ') : '—') + '\n' +
+    (U ? 'Undecided: ' + PLAN.filter(p => !state.choices[p.id]).map(p => p.name).join(' · ') + '\n' : '') +
+    (state.notes ? 'Notes: ' + state.notes + '\n' : '') +
+    'Program otherwise unchanged (DSI + Ant approvals). Build starts only after the series closes.';
+  document.getElementById('msg').value = msg;
+  document.getElementById('notes').value = state.notes || '';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.seg button'); if (!b) return;
+  const id = b.closest('.prow').dataset.id; const c = b.dataset.c;
+  state.choices[id] = (state.choices[id] === c) ? '' : c; save();
+  const seg = b.closest('.seg'); seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.c === state.choices[id]));
+  renderSummary();
+});
+document.getElementById('apply').onclick = () => { PLAN.forEach(p => state.choices[p.id] = p.sug); save(); renderPlanner(); };
+document.getElementById('reset').onclick = () => { state.choices = {}; state.notes = ''; save(); renderPlanner(); };
+document.getElementById('notes').addEventListener('input', e => { state.notes = e.target.value; save(); renderSummary(); });
+document.getElementById('copy').onclick = async () => {
+  const t = document.getElementById('msg'); const ok = document.getElementById('copied');
+  try { await navigator.clipboard.writeText(t.value); ok.textContent = 'copied'; }
+  catch (e) { t.focus(); t.select(); try { document.execCommand('copy'); ok.textContent = 'copied'; } catch (e2) { ok.textContent = 'select the text and copy'; } }
+  setTimeout(() => ok.textContent = '', 2000);
+};
+renderPlanner();
+
+// Near deep-dive
+const FS = {have:['have','have'], comp:['comp','composable'], miss:['gap','missing'], skip:['scope','not for us']};
+const MOCK = {
+ checkbox:'<div class="rm"><div class="r"><span class="cb m-reuse on">✓</span><span class="lbl m-reuse" style="width:100px"></span></div><div class="r"><span class="cb m-new mixed">–</span><span class="lbl m-reuse" style="width:90px"></span></div><div class="r"><span class="cb m-new" style="border-color:#c0392b"></span><div class="mtx"><span class="lbl m-reuse" style="width:70px"></span><span class="lbl" style="width:100px;height:7px;background:#c0392b"></span></div></div></div>',
+ combobox:'<div class="mk-combo"><div class="field m-reuse"><span class="lbl" style="width:90px;background:#8f93a8"></span><span class="chev" style="margin-left:auto">⌄</span></div><div class="dd m-reuse"><div class="li sel"><span class="mx m-new" style="width:14px;height:14px;font-size:10px">✓</span><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:90px"></span><span class="lbl m-new" style="width:120px;height:6px"></span></div></div><div class="li"><span class="mx" style="width:14px;height:14px;opacity:0">✓</span><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:70px"></span><span class="lbl m-new" style="width:100px;height:6px"></span></div></div><div class="li"><span class="mx" style="width:14px;height:14px;opacity:0">✓</span><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div></div></div>',
+ crumb:'<div class="mk-crumb"><span class="crumb m-new"><span class="lbl" style="width:22px"></span></span><span class="sep">›</span><span class="crumb m-new">…</span><span class="sep">›</span><span class="crumb m-reuse"><span class="ico sm"></span><span class="lbl" style="width:50px"></span></span><span class="sep">›</span><span class="crumb m-reuse"><span class="lbl" style="width:56px;background:#8f93a8"></span></span></div>',
+ vnav:'<div class="mk-side m-reuse"><div class="hdr m-new"><span class="chev">⌄</span><span class="lbl" style="width:70px;height:7px"></span></div><div class="li sel"><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:60px"></span><span class="lbl" style="width:14px;margin-left:auto;background:#c0392b"></span></div><div class="hdr m-new"><span class="chev">›</span><span class="lbl" style="width:56px;height:7px"></span></div><div class="li" style="justify-content:center"><span class="lbl" style="width:60px;height:7px;background:var(--brass)"></span></div></div>',
+ steps:'<div class="mtx" style="gap:12px;width:300px"><div class="path m-new" style="padding:6px;border-radius:8px;width:auto"><div class="stg done"><span class="lbl" style="width:26px"></span></div><div class="stg cur"><span class="lbl" style="width:30px"></span></div><div class="stg"><span class="lbl" style="width:26px"></span></div><div class="stg lost"><span class="lbl" style="width:26px;background:rgba(255,255,255,.9)"></span></div></div><div style="display:flex;gap:8px"><div class="li m-reuse" style="flex:1"><span class="num on">1</span><span class="lbl" style="width:40px"></span></div><div class="li m-reuse" style="flex:1"><span class="num err m-new">!</span><span class="lbl" style="width:40px"></span></div><div class="li m-reuse" style="flex:1"><span class="num">3</span><span class="lbl" style="width:36px"></span></div></div></div>',
+ tree:'<div class="mk-tree m-reuse"><div class="li"><span class="chev m-new">⌄</span><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:90px"></span><span class="lbl m-new" style="width:120px;height:6px"></span></div></div><div class="li l1 sel"><span class="chev m-new">⌄</span><span class="ico sm"></span><div class="mtx"><span class="lbl" style="width:70px"></span><span class="lbl m-new" style="width:100px;height:6px"></span></div></div><div class="li l2"><span class="chev" style="opacity:0">⌄</span><span class="lbl" style="width:60px"></span></div><div class="li l1"><span class="chev m-new">›</span><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div></div>',
+ treegrid:'<div class="mk-tg"><div class="tr"><div class="td th">Name</div><div class="td th">Type</div><div class="td th">Area</div></div><div class="tr"><div class="td"><span class="chev m-new">⌄</span><span class="ico sm"></span><span class="lbl" style="width:60px"></span></div><div class="td"><span class="lbl" style="width:40px"></span></div><div class="td"><span class="lbl" style="width:30px"></span></div></div><div class="tr"><div class="td l1"><span class="chev m-new">›</span><span class="lbl" style="width:56px"></span></div><div class="td"><span class="lbl" style="width:36px"></span></div><div class="td"><span class="lbl" style="width:26px"></span></div></div><div class="tr"><div class="td l1"><span class="chev m-new">›</span><span class="lbl" style="width:48px"></span></div><div class="td"><span class="lbl" style="width:30px"></span></div><div class="td"><span class="lbl" style="width:28px"></span></div></div></div>',
+ prompt:'<div class="mk-prompt m-reuse"><div class="ph m-new" style="background:#fdf3f4;border-bottom:1px dashed var(--brass)"><span class="ico sm" style="background:#c0392b"></span><span class="lbl" style="width:90px;background:#8f93a8"></span></div><div class="pb2"><span class="lbl" style="width:200px"></span><span class="lbl" style="width:160px"></span></div><div class="pf"><span class="mbtn m-reuse">Annulla</span><span class="mbtn m-reuse" style="background:#3f4254;color:#fff;border-color:#3f4254">Conferma</span></div></div>'
+};
+const NEAR = [
+ {id:'vertical-navigation', dsi:'Vertical Navigation', oursShort:'Navigation rail 429:1191 + List section 1090:5381 + Menu item', ours:'Navigation rail 429:1191 — Sector × Collapsed | Expanded, Items slot · List section 1090:5381 — Type, Title, Items · Menu item 404:110 — State ×5, Label, Number, icons', dsiVars:'SLDS 2: sections and items, collapsible groups, icons, notification badge, overflow section, quickfind, compact; states default / hover / active / disabled / focus. SLDS 1: list, compact, items with icon, items with notification, shaded background, quickfind, radio group', mock:'vnav', prog:'',
+  feats:[['Sections with group headers','have','List section Title'],['Items with icons','have','Show icon left'],['Notification count on an item','have','Number prop (badge pill ✗ minor)'],['Collapsible sections (expand / collapse)','miss','R1: chevron + State on the List section title row'],['Overflow "show more" section','comp','Button Ghost at usage'],['Quickfind filter','have','Search bar 399:3479 above the list'],['Compact spacing','skip','Density fixed by design'],['Shaded background','have','Sector tints on the rail'],['Radio-group variant (nav as filter)','have','State Selected'],['Active / hover / disabled / focus','have','States; focus ring at usage']],
+  missing:'Collapsible sections: the rethink R1 replaces indented sub-items with a group that opens and closes.'},
+ {id:'progress-indicator', dsi:'Progress Indicator (+ Path)', oursShort:'Stepper 562:3849 + Step 562:27', ours:'Stepper 562:3849 — Items slot · Stepper/Step 562:27 — State Current | Complete | Upcoming; Number, Label', dsiVars:'SLDS 2: horizontal or vertical track, completed / current / uncompleted / error, tooltip label on hover; SLDS 1: base, in a modal, on gray, legacy markers, list-bordered, vertical, vertical with success check, varying stage sizes. Path (SLDS 1): stages incomplete / complete / current / won / lost, coaching panel, compact', mock:'steps', prog:'',
+  feats:[['Completed / current / uncompleted steps','have','Complete / Current / Upcoming'],['Error step','miss','State Error — Wave 55 (Ant addition)'],['Vertical track','miss','Orientation axis — Wave 55 (Ant addition)'],['Step label as tooltip on hover','comp','Tooltip 401:116 at usage'],['Progress bar under the dots','have','Step Bar'],['In a modal / on gray background','comp','Usage'],['Path: chevron stages','miss','Type=Path — new candidate'],['Path: Won / Lost stages','miss','Won / Lost states on Step (Feedback tokens)'],['Path: coaching panel','comp','Section card 923:752 under the path'],['Path: compact scroller','skip','Behaviour']],
+  missing:'Vertical and Error are already approved; Path, with Won and Lost, is the new piece.'},
+ {id:'tree', dsi:'Tree', oursShort:'Menu item 404:110 (+ Wave 59 nesting)', ours:'Menu item 404:110 — State ×5; Label, Number, Show icon left, Show drag handle, Show remove / delete / open icons · List section 1090:5381', dsiVars:'SLDS 2 anatomy: group header, chevron button icon, left icon, label, linked label, right icon, metatext; states default / hover / active / disabled / focus; selection follows focus. SLDS 1: base, filterable tree, filtered tree', mock:'tree', prog:'',
+  feats:[['Group header','have','List section Title'],['Expand / collapse chevron','miss','Show expand icon — R5'],['Indented children','miss','Nesting — Wave 59'],['Left / right icons','have','Icon left · Actions frame'],['Linked label','have','Label as Link at usage'],['Metatext (secondary line)','miss','The rich row description line — Wave 59'],['Selection by highlight','have','State Selected / Current'],['Filterable tree','have','Search bar above'],['Checkboxes on nodes','skip','Not in Lightning; optional via Ant (Show checkbox)']],
+  missing:'Chevron and metatext, both already in Wave 59 once R5 is accepted.'},
+ {id:'tree-grid', dsi:'Tree Grid', oursShort:'Table cell 412:90', ours:'Table cell 412:90 — Type Header | Text | Chip | Slot × Background Base | Subtle; Label, Subtext, sort icon, status dot, icons, Content slot', dsiVars:'SLDS 2 anatomy: header row, row, selected row, column, header label, wrap / clip toggle, cell, cell label, chevron button icon, preceding icon, text link, action menu, row divider; first-column types button, button-icon, currency, date, number, percent, text, url; other columns add action and boolean', mock:'treegrid', prog:'',
+  feats:[['Header row with labels','have','Table cell Type=Header'],['Chevron in the first cell','miss','Show expand icon on Table cell — new minor'],['Indented child rows','comp','Left padding at usage'],['Preceding icon in a cell','have','Show icon left'],['Text link cell','have','Link in a Slot cell'],['Row action menu','have','Slot cell with Button icon + Dropdown'],['Selected row','have','Background Subtle'],['Boolean cell (check icon)','have','Icon in cell'],['Wrap / clip toggle in header','skip','Behaviour'],['Currency / date / number formats','comp','Content']],
+  missing:'One chevron in the first cell.'},
+ {id:'combobox', dsi:'Combobox (+ Lookups)', oursShort:'Input select-mode + Dropdown 400:56 + Menu item', ours:'Input 394:5591 select-mode · Dropdown 400:56 · Menu item 404:110 · Chip 379:2205 (multi-select values) · Search bar 399:3479', dsiVars:'SLDS 2: picklist and lookup types; label hidden / inline / stacked; states default, with selection (checkmark on selected options), focus, disabled; loading spinner; validation. SLDS 1: base, autocomplete, readonly, icon only, with selection, dialog, grouped. Lookups: entity options with icon + meta, recent items, create new, pills', mock:'combobox', prog:'',
+  feats:[['Picklist (read-only select)','have','Input select-mode + Dropdown'],['Lookup (type to filter)','have','Input + Dropdown; filtering = behaviour'],['Grouped options','have','List section Title'],['Selected option with checkmark','miss','Show check on Menu item Selected — new minor'],['Entity options: icon + title + meta','miss','Rich row — Wave 59'],['Multi-select with pills','have','Chips in Input Content=Slot'],['Recent items / create new','have','List section + Menu item with plus icon'],['Loading spinner','have','Spinner 606:40 in the panel'],['Validation message','have','Input State Error + helper'],['Dialog variant (picker in a popover)','comp','Panel 513:4712 at usage']],
+  missing:'The checkmark on selected options and the entity row, the latter already in Wave 59.'},
+ {id:'prompt', dsi:'Prompt', oursShort:'Modal 540:3823', ours:'Modal 540:3823 — standalone; Title, Show title, Show icon, Intro, Content slot, Actions slot, Show Actions', dsiVars:'Types: Alert (header + one button), Confirm (headerless + two), Prompt (header + two). Header themes: Default, Shade, Info, Offline, Inverse, Alt-inverse, Success, Warning, Error. Anatomy: title, header, body, footer, outline + brand buttons. Close via footer or Escape; centered', mock:'prompt', prog:'',
+  feats:[['Alert type (header + one action)','have','Modal with Show Actions and one Button'],['Confirm type (no header, two actions)','have','Show title off + two Buttons'],['Prompt type (header + two actions)','have','Modal as is'],['Themed header (Info / Success / Warning / Error)','miss','Variant on the Modal header — new minor'],['Offline / Inverse themes','skip','Not for us'],['Centered, closes on Escape','comp','Behaviour'],['Validation inside the prompt','have','Input states in the Content slot']],
+  missing:'A coloured header for critical prompts.'},
+ {id:'checkbox', dsi:'Checkbox', oursShort:'Checkbox 389:17', ours:'Checkbox 389:17 — State On | Off | Disabled; Show label, Label', dsiVars:'SLDS 1: base, wrapping text, required, group, group required, group with error, group disabled, stacked, RTL, form-element standalone, with help text icon; states checked / unchecked, indeterminate, required, disabled, error', mock:'checkbox', prog:'Wave 57',
+  feats:[['Checked / unchecked / disabled','have','States'],['Indeterminate','miss','State Indeterminate — Wave 57'],['Error (group with error)','miss','State Error — Wave 57'],['Help text icon on the label','miss','Show description / info icon — Wave 57'],['Required marker','comp','Label text at usage'],['Group, stacked, inline','comp','Layout']],
+  missing:'Indeterminate, error and help text, all in Wave 57.'},
+ {id:'breadcrumbs', dsi:'Breadcrumbs', oursShort:'Breadcrumb 580:432', ours:'Breadcrumb 580:432 — standalone; Parent, Current, Show icon, Show parent, Show chevron', dsiVars:'SLDS 1: base, base (Kinetics), with overflow menu (Kinetics). Purpose: note the path of a record and navigate back to the parent', mock:'crumb', prog:'skipped (DSI plan)',
+  feats:[['Parent › current','have','Parent + Current'],['N levels','miss','Items slot — skipped in the DSI plan'],['Overflow menu for collapsed levels','miss','Dropdown on an ellipsis crumb — skipped with N levels'],['Record icon','have','Show icon']],
+  missing:'Depth and its overflow menu, both skipped by decision.'}
+];
+(function near(){
+  const counts = n => { const c = {have:0, comp:0, miss:0, skip:0}; n.feats.forEach(f => c[f[1]]++); return c; };
+  const bar = c => '<div class="mini nbar">' + ['have','comp','miss','skip'].map(k => c[k] ? '<div style="flex:' + c[k] + ';background:var(--' + FS[k][0] + ')" title="' + FS[k][1] + ' ' + c[k] + '"></div>' : '').join('') + '</div>';
+  const link = {'vertical-navigation':'re-sidebar','progress-indicator':'stepper-path','tree':'re-tree','tree-grid':'table-expand','combobox':'menu-check','prompt':'modal-theme'};
+  const planById = Object.fromEntries(PLAN.map(p => [p.id, p]));
+  const sorted = [...NEAR].sort((a, b) => counts(b).miss - counts(a).miss || a.dsi.localeCompare(b.dsi));
+  const statusOf = n => { const p = planById[link[n.id]]; if (p) return '<span class="chip ' + (p.kind === 're' ? 're' : 'near') + '">' + (p.kind === 're' ? 'rethink' : 'new decision') + '</span>'; return '<span class="chip lock">' + esc(n.prog) + '</span>'; };
+  let h = '<thead><tr><th>Lightning</th><th>Our master</th><th>Features</th><th>Missing</th><th>Status</th><th></th></tr></thead><tbody>';
+  sorted.forEach(n => { const c = counts(n), p = planById[link[n.id]];
+    h += '<tr><td class="nm"><a href="#near-' + n.id + '">' + esc(n.dsi) + '</a></td><td class="dsc">' + ids(n.oursShort) + '</td><td>' + bar(c) + '<span class="small muted">' + c.have + ' have · ' + c.comp + ' composable · <b>' + c.miss + ' missing</b> · ' + c.skip + ' not for us</span></td><td class="dsc">' + (c.miss ? n.feats.filter(f => f[1] === 'miss').map(f => esc(f[0])).join(' · ') : '—') + '</td><td>' + statusOf(n) + (p ? '<div class="small muted">' + (p.kind === 're' ? 'extra ' : '') + wavesLabel(p.eff) + ' · suggested ' + (p.kind === 're' ? CHRE[p.sug] : CH[p.sug]) + '</div>' : '') + '</td><td>' + (p ? '<a class="small" href="#plan-' + p.id + '" style="color:var(--ink)">decide ↑</a>' : '') + '</td></tr>'; });
+  document.getElementById('near-sum').innerHTML = h + '</tbody>';
+  document.getElementById('near-cards').innerHTML = sorted.map(n => { const c = counts(n), p = planById[link[n.id]];
+    return '<div class="card near-card" id="near-' + n.id + '"><div class="card-h"><h3>' + esc(n.dsi) + ' <span class="muted">→</span> ' + ids(n.oursShort) + '</h3><span class="n">' + (p ? (p.kind === 're' ? 'rethink · extra ' : 'new decision · ') + wavesLabel(p.eff) : 'status: ' + esc(n.prog)) + '</span><span class="n" style="margin-left:auto">' + bar(c) + '</span></div>' +
+      '<div class="near-b"><div><p class="small muted" style="margin:0 0 8px"><b>Lightning offers:</b> ' + esc(n.dsiVars) + '</p><p class="small muted" style="margin:0 0 10px"><b>Ours:</b> ' + ids(n.ours) + '</p>' +
+      '<table class="feat"><thead><tr><th>Lightning feature</th><th>Status</th><th>How we cover or close it</th></tr></thead><tbody>' + n.feats.map(f => '<tr><td>' + esc(f[0]) + '</td><td><span class="chip ' + FS[f[1]][0] + '">' + FS[f[1]][1] + '</span></td><td class="dsc">' + ids(f[2]) + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<div><div class="mock">' + MOCK[n.mock] + '</div><p class="small" style="margin:10px 0"><b>Missing, in one line:</b> ' + esc(n.missing) + '</p>' + (p ? '<a class="btn" href="#plan-' + p.id + '" style="display:inline-block;text-decoration:none">Decide in the planner ↑</a>' : '<span class="small muted">Decided earlier: ' + esc(n.prog) + '</span>') + '</div></div></div>'; }).join('');
+})();
+
+// Full table
+(function table(){
+  const f = {q:'', g:'', v:new Set(ORDER), sort:'n', dir:1, hide:false};
+  const gsel = document.getElementById('gsel'); [...new Set(ROWS.map(r => r.g))].forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; gsel.appendChild(o); });
+  document.getElementById('fchips').innerHTML = ORDER.map(k => '<span class="chip ' + k + ' fchip on" data-v="' + k + '">' + V[k] + '</span>').join(' ');
+  const tb = document.getElementById('tb'), cnt = document.getElementById('count');
+  function draw(){
+    let rs = ROWS.filter(r => f.v.has(r.v) && (!f.g || r.g === f.g) && (!f.hide || ['near','gap','scope'].includes(r.v)));
+    if (f.q) { const q = f.q.toLowerCase(); rs = rs.filter(r => (r.n + ' ' + r.ds + ' ' + r.note + ' ' + r.g).toLowerCase().includes(q)); }
+    rs.sort((a, b) => { const ka = f.sort === 'v' ? ORDER.indexOf(a.v) : a[f.sort], kb = f.sort === 'v' ? ORDER.indexOf(b.v) : b[f.sort]; return (ka > kb ? 1 : ka < kb ? -1 : a.n.localeCompare(b.n)) * f.dir; });
+    tb.innerHTML = rs.map(r => '<tr><td class="nm">' + esc(r.n) + '</td><td class="muted small">' + esc(r.g) + '</td><td><span class="chip ' + r.v + '">' + V[r.v] + '</span></td><td class="dsc">' + ids(r.ds) + '</td><td class="dsc">' + esc(r.note) + '</td></tr>').join('');
+    cnt.textContent = rs.length + ' of ' + ROWS.length;
+  }
+  document.getElementById('q').addEventListener('input', e => { f.q = e.target.value; draw(); });
+  gsel.addEventListener('change', e => { f.g = e.target.value; draw(); });
+  document.getElementById('hidecovered').addEventListener('change', e => { f.hide = e.target.checked; draw(); });
+  document.getElementById('fchips').addEventListener('click', e => { const c = e.target.closest('.fchip'); if (!c) return; const v = c.dataset.v; if (f.v.has(v)) f.v.delete(v); else f.v.add(v); c.classList.toggle('on', f.v.has(v)); draw(); });
+  document.querySelectorAll('#all th[data-k]').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; if (f.sort === k) f.dir *= -1; else { f.sort = k; f.dir = 1; } document.querySelectorAll('#all th').forEach(x => x.classList.toggle('sorted', x === th)); draw(); }));
+  draw();
+})();
+</script>
+</body>
+</html>
