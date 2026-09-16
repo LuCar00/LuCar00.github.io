@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS Next · Material 3 coverage — the mobile shell</title>
+<style>
+  :root{--bg:#ffffff;--ink:#3f4254;--muted:#656876;--line:#d3d3db;--soft:#f6f7fb;--brass:#ae9142;--brass-soft:#fbf7ea;
+    --have:#cef1e6;--have-ink:#076e4f;--near:#d2deec;--near-ink:#113760;--comp:#e4e7f4;--comp-ink:#2a2b2f;--behav:#f1f1f4;--behav-ink:#656876;
+    --gap:#f8d7da;--gap-ink:#842029;--scope:#ffeecc;--scope-ink:#664300}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  header .tot{color:var(--muted);font-size:13px}
+  header .tot b{color:var(--ink)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.2px;text-transform:uppercase;white-space:nowrap}
+  .chip.have{background:var(--have);color:var(--have-ink)}
+  .chip.near{background:var(--near);color:var(--near-ink)}
+  .chip.comp{background:var(--comp);color:var(--comp-ink)}
+  .chip.gap{background:var(--gap);color:var(--gap-ink)}
+  .chip.scope{background:var(--scope);color:var(--scope-ink)}
+  .chip.lock{background:#fff;color:var(--muted);border:1px solid var(--line)}
+  .chip.re{background:var(--brass-soft);color:#6b5620;border:1px dashed var(--brass)}
+  nav.top{padding:10px 24px;border-bottom:1px solid var(--line);background:var(--soft);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 14px}
+  nav.top a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h2{font-size:15px;margin:36px 0 8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  h2:first-child{margin-top:8px}
+  h3{font-size:15px;margin:0}
+  .intro{color:var(--muted);font-size:13px;max-width:900px;margin:0 0 12px}
+  .intro a,.small a{color:var(--ink)}
+  .card{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;margin:0 0 16px}
+  .card-h{display:flex;align-items:baseline;gap:14px;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .card-h .n{color:var(--muted);font-size:12px}
+  .card-b{padding:14px}
+  code,.id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--muted);background:var(--soft);padding:0 4px;border-radius:3px}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  .bar{display:flex;height:28px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin:8px 0 6px}
+  .bar div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.2px}
+  .bar .have{background:var(--have);color:var(--have-ink)} .bar .near{background:var(--near);color:var(--near-ink)} .bar .comp{background:var(--comp);color:var(--comp-ink)} .bar .gap{background:var(--gap);color:var(--gap-ink)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 0}
+  .kpi{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fff}
+  .kpi b{display:block;font-size:22px;line-height:1.1}
+  .kpi span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:7px 12px;border-bottom:1px solid #eef0f4;vertical-align:top;font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .grp td:first-child{white-space:nowrap;font-weight:600}
+  .mini{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid var(--line);min-width:160px}
+  .mini div{height:100%}
+  .re-table td:first-child{white-space:nowrap;font-weight:600}
+  .re-table td.was{color:var(--muted)}
+  .re-table td.now{background:var(--brass-soft)}
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .q{border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:110px;background:#fff}
+  .q h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .q .qi{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 4px;font-size:12px;margin:0 6px 6px 0;background:#fff}
+  .q .qi .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .q.first{background:#f3fbf8;border-color:#b7e4d4}
+  .axis{font-size:11px;color:var(--muted);margin:6px 0 0}
+  .planner{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+  .summary{position:sticky;top:76px;border:1px solid var(--line);border-radius:8px;background:var(--soft);padding:14px}
+  .summary h3{margin:0 0 10px;font-size:14px}
+  .summary .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .summary .row:last-of-type{border-bottom:0}
+  .summary ol{margin:6px 0 10px;padding-left:20px;font-size:12.5px}
+  .summary textarea{width:100%;height:200px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:6px;padding:8px;resize:vertical;background:#fff;color:var(--ink)}
+  .summary input[type=text]{width:100%;font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .btn{font:12.5px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer}
+  .btn:hover{background:var(--soft)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{background:#2a2b2f}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding:10px 14px;border-bottom:1px solid #eef0f4;align-items:center}
+  .prow:last-child{border-bottom:0}
+  .prow .t{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+  .prow .t b{font-size:13.5px}
+  .prow .why{grid-column:1 / -1;font-size:12.5px;color:var(--muted)}
+  .prow .meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);align-items:center}
+  .prow.locked{background:#fcfcfd}
+  .tag{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--muted);background:#fff;white-space:normal}
+  .tag.ev3{border-color:#b7e4d4;background:#f3fbf8;color:var(--have-ink)} .tag.ev2{border-color:#c9d6e6;background:#f4f8fc;color:var(--near-ink)} .tag.ev1{border-color:#f0d9a6;background:#fff8ea;color:var(--scope-ink)} .tag.ev0{border-color:#e4c8cb;background:#fdf3f4;color:var(--gap-ink)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .seg button{font:12px/1 "Nunito Sans",system-ui,sans-serif;font-weight:700;border:0;background:#fff;color:var(--muted);padding:7px 10px;cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button:hover{background:var(--soft)}
+  .seg button.on.build{background:var(--have);color:var(--have-ink)}
+  .seg button.on.later{background:var(--near);color:var(--near-ink)}
+  .seg button.on.skip{background:var(--comp);color:var(--comp-ink)}
+  .prow details{grid-column:1 / -1;font-size:12.5px}
+  .prow summary{cursor:pointer;color:var(--muted);font-size:12px}
+  .prow .rn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 2px}
+  .prow .rn div{border-radius:6px;padding:8px 10px;font-size:12.5px}
+  .prow .rn .re{background:var(--comp)}
+  .prow .rn .ne{background:var(--brass-soft);border:1px dashed var(--brass)}
+  .prow .rn b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);margin-bottom:3px}
+  .sug{font-size:11px;color:var(--muted)}
+  .sug a{color:var(--ink)}
+  .gaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:16px}
+  .gap-card .card-b{display:grid;gap:12px}
+  .mock{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;justify-content:center;align-items:center;min-height:130px;background-image:radial-gradient(#eceef3 1px,transparent 1px);background-size:12px 12px}
+  .m-reuse{background:#e4e7f4;border:1px solid #c9cde0}
+  .m-new{border:1.5px dashed var(--brass);background:var(--brass-soft)}
+  .mlegend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+  .mlegend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  .ico{width:22px;height:22px;border-radius:6px;background:#c9cde0;display:inline-block;position:relative;flex:0 0 auto}
+  .ico:after{content:"";position:absolute;inset:6px;border:2px solid #fff;border-radius:50%}
+  .ico.sm{width:14px;height:14px;border-radius:4px}
+  .ico.sm:after{inset:4px;border-width:1.5px}
+  .ico.solid:after{background:#fff;border-width:0;inset:6px}
+  .lbl{height:9px;border-radius:5px;background:#b9bdd0;display:inline-block}
+  .mtx{display:grid;gap:6px;flex:1;min-width:0}
+  .mbtns{display:flex;gap:6px;margin-top:2px}
+  .mbtn{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;color:var(--ink)}
+  .mx{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink);flex:0 0 auto}
+  .li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:#fff}
+  .phone{width:200px;height:300px;border-radius:14px;background:#fff;border:1px solid #c9cde0;position:relative;overflow:hidden;display:flex;flex-direction:column}
+  .phone .content{flex:1;padding:10px;display:grid;gap:8px;align-content:start}
+  .phone .appbar{height:40px;display:flex;align-items:center;gap:8px;padding:0 10px;border-bottom:1px solid #eef0f4}
+  .phone .navbar{height:56px;display:flex;justify-content:space-around;align-items:center;padding:0 6px;border-top:1px solid #eef0f4}
+  .navit{display:flex;flex-direction:column;align-items:center;gap:3px;width:44px;position:relative}
+  .navit .pill{width:36px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+  .navit .badge{position:absolute;top:-4px;right:2px;background:#c0392b;color:#fff;font-size:8px;font-weight:700;border-radius:999px;padding:1px 4px;line-height:1.2}
+  .navit .dotb{position:absolute;top:0;right:8px;width:6px;height:6px;border-radius:50%;background:#c0392b}
+  .railm{width:60px;height:220px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 0}
+  .railm .fab{width:36px;height:36px;border-radius:10px;background:var(--brass)}
+  .sheet-b{position:absolute;left:0;right:0;bottom:0;height:46%;border-radius:14px 14px 0 0;padding:8px 10px;display:grid;gap:8px;align-content:start}
+  .sheet-b .handle{width:32px;height:4px;border-radius:2px;background:#b9bdd0;margin:0 auto 4px}
+  .scrim{position:absolute;inset:0;background:rgba(63,66,84,.35)}
+  .tbdock{position:absolute;left:0;right:0;bottom:0;height:52px;display:flex;justify-content:space-around;align-items:center}
+  .tbfloat{position:absolute;left:24px;right:24px;bottom:14px;height:44px;border-radius:22px;display:flex;justify-content:space-around;align-items:center}
+  .mk-list{width:270px;border-radius:8px;padding:6px;display:grid;gap:2px}
+  .av{width:24px;height:24px;border-radius:50%;flex:0 0 auto}
+  .mk-drawer{width:320px;height:170px;border-radius:8px;position:relative;overflow:hidden;background:#fff!important;display:flex}
+  .mk-drawer .page{flex:1;padding:12px;display:grid;gap:8px;align-content:start}
+  .mk-drawer .sheet{width:140px;background:var(--brass-soft);border-left:1.5px dashed var(--brass);display:grid;grid-template-rows:auto 1fr auto;gap:8px;padding:10px}
+  .mk-drawer .sheet .hd{display:flex;align-items:center;gap:6px}
+  .mk-drawer .sheet .ft{display:flex;gap:6px;justify-content:flex-end}
+  .pb{height:10px;border-radius:5px;overflow:hidden;position:relative}
+  .fill{height:100%;width:55%;background:var(--brass);border-radius:5px}
+  .fill.ind{width:30%;margin-left:35%;background:repeating-linear-gradient(45deg,var(--brass) 0 6px,#e5d7a8 6px 12px)}
+  .mk-prog{width:280px;display:grid;gap:10px}
+  .rm{display:grid;gap:12px} .rm .r{display:flex;align-items:center;gap:10px}
+  .cb{width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 auto}
+  .cb.on{background:var(--ink);border-color:var(--ink)} .cb.mixed{color:var(--brass)}
+  .walk td:first-child{white-space:nowrap;font-weight:600}
+  .nsum td.nm a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .nsum .mini{margin-bottom:4px}
+  .nears{display:grid;grid-template-columns:1fr;gap:16px}
+  .near-card .card-h h3{font-size:14.5px}
+  .near-b{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:14px}
+  .near-b .mock{min-height:150px}
+  table.feat th{padding:6px 8px}
+  table.feat td{font-size:12.5px;padding:5px 8px;vertical-align:middle}
+  table.feat td:first-child{font-weight:600}
+  .nbar{min-width:120px;width:140px}
+  .filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 14px;background:var(--soft);border-bottom:1px solid var(--line);font-size:12.5px}
+  .filters input[type=search]{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 9px;min-width:200px;background:#fff;color:var(--ink)}
+  .filters select{font:13px "Nunito Sans",system-ui,sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;color:var(--ink)}
+  .fchip{cursor:pointer;opacity:.45;border:1px solid transparent}
+  .fchip.on{opacity:1;border-color:rgba(0,0,0,.15)}
+  .tablewrap{overflow-x:auto}
+  #all th{cursor:pointer;user-select:none}
+  #all th.sorted:after{content:" ▾";color:var(--brass)}
+  #all td.dsc{font-size:12.5px}
+  #all td.nm{font-weight:600;white-space:nowrap}
+  .count{font-size:12px;color:var(--muted);margin-left:auto}
+  footer{padding:24px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:32px}
+  @media (max-width:900px){.planner{grid-template-columns:1fr}.summary{position:static}.quad{grid-template-columns:1fr}.gaps{grid-template-columns:1fr}.prow .rn{grid-template-columns:1fr}.near-b{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>DS Next · Material 3 coverage — the mobile shell</h1>
+  <div class="tot" id="totals"></div>
+  <div class="legend">
+    <span class="chip have">have 1:1</span><span class="chip near">have, near</span><span class="chip comp">composable</span><span class="chip gap">gap</span><span class="chip re">rethink</span>
+  </div>
+</header>
+<nav class="top">
+  <a href="#overview">Overview</a><a href="#rethink">What changes in the program</a><a href="#matrix">Evidence × effort</a><a href="#decide">Decide: the planner</a><a href="#gaps">New pieces, drawn</a><a href="#shell">Mobile shell, slot by slot</a><a href="#near">Near: what exactly is missing</a><a href="#all">All 36 components</a><a href="#method">Method</a>
+</nav>
+<main>
+
+<h2 id="overview">Overview</h2>
+<p class="intro">Material Design 3 (Expressive update): 36 components in Material's six groups, read live. Fifth and last pass of the series, run as a <b>targeted pass</b>: full table at role level, deep-dive only on navigation, sheets, toolbars, app bars, lists and search, the areas that touch the mobile shell you approved with the Bottom nav. One new gap, the bottom sheet, and one unifying idea: Material uses <b>one navigation item</b> everywhere.</p>
+<div class="card"><div class="card-b">
+  <div class="bar" id="bar"></div>
+  <div class="kpis" id="kpis"></div>
+  <h3 style="margin:18px 0 6px">Coverage by Material group <span class="muted small">(Material's own grouping)</span></h3>
+  <div class="tablewrap"><table class="grp" id="grp"></table></div>
+</div></div>
+
+<h2 id="rethink">What changes in the program</h2>
+<p class="intro">Five rethinks, all on the mobile family, plus confirmations. "Build now" in the planner means "accept".</p>
+<div class="card"><div class="tablewrap"><table class="re-table">
+  <thead><tr><th>#</th><th>Approved item</th><th>Recipe so far</th><th>Material 3 insight</th><th>Proposed change</th></tr></thead>
+  <tbody>
+    <tr><td>R13</td><td>Bottom nav item · Wave 55</td><td class="was">Icon over label, Badge overlay, three states</td><td>Navigation bar: 3–5 destinations, <b>active indicator pill</b> behind the icon (around icon + label in the horizontal item), <b>filled icon when active, outlined when inactive</b>, large badge with count and small dot badge, vertical items on compact windows and <b>horizontal items on medium</b></td><td class="now">Item gets <code>Layout=Vertical | Horizontal</code>, an active indicator (Selected law: open emphasis fills to bg), icon swap Solid ↔ Regular by state, Badge <code>391:9</code> or Status dot <code>537:14</code> through the Tab-style badge swap</td></tr>
+    <tr><td>R14</td><td>Navigation rail <code>429:1191</code> + Bottom nav item</td><td class="was">Rail Collapsed = Button icons, Expanded = List sections; Bottom nav item separate</td><td>The rail uses the <b>same navigation item</b> as the bar: icon-only collapsed (3–7 items), icon + label expanded; menu toggle on top, optional FAB above the items, badges on items, standard vs modal expanded rail; the <b>drawer is deprecated</b> in favour of the expanded rail</td><td class="now">One <b>Nav item</b> master serves bar and rail (<code>Layout=Vertical | Horizontal | Icon-only</code>); rail gets <code>Show menu toggle</code> and a <code>FAB</code> slot later; modal expanded rail = scrim at usage. Our single rail with Collapsed | Expanded is exactly Material's current model</td></tr>
+    <tr><td>R15</td><td>Drawer = Modal Placement axis · Wave 54</td><td class="was">Center | Right | Left, Show scrim, Show back</td><td><b>Bottom sheets</b> standard or modal, drag handle, initial height ≤ 50%, list or grid content; <b>side sheets</b> standard (docked, body shrinks) or modal (scrim), back and close icon buttons, action buttons, divider, inset 16</td><td class="now">Placement grows to <code>Center | Right | Left | Bottom</code> with <code>Show drag handle</code>; side sheets confirm R2 exactly. Full-screen dialog = <code>Placement=Full</code>, later</td></tr>
+    <tr><td>R16</td><td>Toolbar labeled + vertical · Wave 55</td><td class="was">Items slot, labeled items from the Nav item, orientation axis</td><td>Toolbars are <b>docked</b> (full width at the bottom, straight corners, global actions) or <b>floating</b> (rounded, contextual); <b>standard</b> or <b>vibrant</b> colour; never together with a navigation bar</td><td class="now">Toolbar <code>407:29</code> gets <code>Variant=Floating | Docked</code> and <code>Emphasis=Standard | Vibrant</code>; Docked is the mobile action bar on secondary pages</td></tr>
+    <tr><td>R17</td><td>Navigation top bar <code>428:344</code></td><td class="was">Desktop bar: logo, title, search, Actions slot</td><td>App bars: <b>search app bar</b> (search field instead of heading, logo leading, up to two trailing icons + avatar), <b>small</b> (leading nav icon, title, one or two actions), medium and large flexible headlines</td><td class="now">Navigation gets <code>Breakpoint=Mobile</code>: leading icon (back or menu), title, ≤ 2 actions, optional search field. Flexible headlines not for us</td></tr>
+    <tr><td>✓</td><td>Menu item rich row + check · Wave 59</td><td class="was">Description line, avatar leading, check on Selected</td><td>List item: label + <b>supporting text 1–3 lines</b>, leading avatar / icon / media, trailing text / icon / <b>selection control</b>; Menus mark selected items</td><td class="now">Fourth confirmation; the trailing selection control = Data row <code>581:89</code> Control swap</td></tr>
+    <tr><td>✓</td><td>Slider · Wave 62</td><td class="was">Value beside (Lightning) or Tooltip (Ant): mockup decision</td><td>Value indicator label <b>above the handle</b>, stops and ticks, sizes, centered variant, range</td><td class="now">Two of three peers favour the indicator above the handle: the mockup should lead with the Tooltip option</td></tr>
+    <tr><td>✓</td><td>Divider · Wave 52</td><td class="was">Orientation × Emphasis, Show label</td><td>Full, inset, middle-inset, vertical</td><td class="now">Confirmed; inset = padding at usage</td></tr>
+    <tr><td>✓</td><td>Toast <code>607:63</code></td><td class="was">Icon optional</td><td>Snackbar: one action, optional close, <b>no icons</b>, one or two lines</td><td class="now">Keep Show icon, default off on mobile</td></tr>
+    <tr><td>✓</td><td>Time picker · Wave 50 decision</td><td class="was">Presets in a Dropdown</td><td>Dial and input pickers</td><td class="now">Presets stay</td></tr>
+  </tbody>
+</table></div></div>
+
+<h2 id="matrix">Evidence × effort — the mobile candidates</h2>
+<p class="intro">All candidates ride on waves already approved; effort shown is the extra. Evidence is "basic" wherever the approved Bottom nav implies a mobile shell.</p>
+<div class="quad" id="quad"></div>
+<p class="axis">Evidence: <b>proven</b> = used in the working file · <b>basic</b> = a standard pattern of the shell you approved · <b>conditional</b> = depends on a further decision · <b>none</b> = no CRM evidence.</p>
+
+<h2 id="decide">Decide — the mobile family</h2>
+<p class="intro"><b>Apply suggestions</b> pre-fills my recommendation: the four mobile pieces now (one wave in total), rail extras and full-screen dialog later, the style variants skipped. Items decided in earlier passes are shown locked.</p>
+<div class="planner">
+  <div>
+    <div class="btns"><button class="btn primary" id="apply">Apply suggestions</button><button class="btn" id="reset">Reset all</button></div>
+    <div class="card"><div class="card-h"><h3>Rethinks and additions · mobile family</h3><span class="n">Build now = accept into the wave named</span></div><div id="p-new"></div></div>
+    <div class="card"><div class="card-h"><h3>Small style variants</h3><span class="n">listed so the decision is explicit</span></div><div id="p-minor"></div></div>
+    <div class="card"><div class="card-h"><h3>Already decided (four earlier passes)</h3><span class="n">locked</span></div><div id="p-locked"></div></div>
+  </div>
+  <aside class="summary">
+    <h3>Your plan</h3>
+    <div id="sum-rows"></div>
+    <div style="margin-top:12px"><b class="small">Accepted / build now</b><ol id="ol-build"></ol></div>
+    <div><b class="small">Later</b><ol id="ol-later"></ol></div>
+    <label class="small muted" for="notes">Notes for the message</label>
+    <input type="text" id="notes" placeholder="e.g. tablet layout not needed → drop the horizontal nav item">
+    <div class="btns"><button class="btn primary" id="copy">Copy message</button><span class="small muted" id="copied"></span></div>
+    <textarea id="msg" readonly></textarea>
+  </aside>
+</div>
+
+<h2 id="gaps">New pieces, drawn</h2>
+<p class="intro">Schematic only. Gray = existing DS master reused; brass dashed = new or changed by this pass.</p>
+<div class="mlegend" style="margin:0 0 12px"><span><i class="m-reuse"></i>existing DS master, reused</span><span><i class="m-new"></i>new or changed</span></div>
+<div class="gaps">
+  <div class="card gap-card"><div class="card-h"><h3>Nav item — one master for bar and rail</h3><span class="n">¼ wave more · R13 + R14 · Wave 55</span></div><div class="card-b">
+    <div class="mock"><div style="display:flex;gap:18px;align-items:flex-end"><div class="phone m-reuse"><div class="content"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="navbar m-new" style="border-top:1.5px dashed var(--brass)"><div class="navit"><span class="pill m-reuse" style="background:#c9cde0"><span class="ico sm solid"></span></span><span class="lbl" style="width:24px;height:6px;background:var(--ink)"></span></div><div class="navit"><span class="pill"><span class="ico sm"></span></span><span class="lbl" style="width:28px;height:6px"></span><span class="badge">3</span></div><div class="navit"><span class="pill"><span class="ico sm"></span></span><span class="lbl" style="width:22px;height:6px"></span><span class="dotb"></span></div><div class="navit"><span class="pill"><span class="ico sm"></span></span><span class="lbl" style="width:26px;height:6px"></span></div></div></div><div class="railm m-reuse"><span class="mx" style="font-size:12px">≡</span><span class="fab"></span><div class="navit m-new" style="width:48px;padding:2px;border-radius:8px"><span class="pill m-reuse" style="background:#c9cde0"><span class="ico sm solid"></span></span><span class="lbl" style="width:22px;height:5px"></span></div><div class="navit" style="width:48px"><span class="pill"><span class="ico sm"></span></span><span class="badge" style="right:6px">3</span></div><div class="navit" style="width:48px"><span class="pill"><span class="ico sm"></span></span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> the Items-slot pattern, Badge <code>391:9</code> and Status dot <code>537:14</code> via the Tab-style badge swap, LA icons in solid and regular weights, Body_Xs, Surface tokens; Navigation rail <code>429:1191</code> and FAB <code>570:36</code>. <b>Changed:</b> <code>Nav item</code>: <code>Layout=Vertical | Horizontal | Icon-only</code> × State Default / Selected / Disabled, active indicator pill, icon Solid ↔ Regular by state, Show badge + Badge swap. The bar hosts 3–5 vertical items on phones and horizontal items on tablets; the collapsed rail hosts the icon-only item. Rail extras (menu toggle, FAB slot) can follow later.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Bottom sheet</h3><span class="n">¼ wave more · R15 · Wave 54</span></div><div class="card-b">
+    <div class="mock"><div style="display:flex;gap:18px"><div class="phone m-reuse"><div class="content"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="scrim"></div><div class="sheet-b m-new"><div class="handle"></div><span class="lbl" style="width:90px;background:#8f93a8"></span><div class="li" style="padding:4px 6px"><span class="ico sm"></span><span class="lbl" style="width:80px"></span></div><div class="li" style="padding:4px 6px"><span class="ico sm"></span><span class="lbl" style="width:60px"></span></div><div class="li" style="padding:4px 6px"><span class="ico sm"></span><span class="lbl" style="width:70px"></span></div></div></div><div class="phone m-reuse"><div class="content"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span></div><div class="sheet-b m-new" style="height:36%"><div class="handle"></div><span class="lbl" style="width:100px;background:#8f93a8"></span><div class="mbtns"><span class="mbtn m-reuse">Filtri</span><span class="mbtn m-reuse" style="background:#3f4254;color:#fff;border-color:#3f4254">Applica</span></div></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Modal <code>540:3823</code> with the Wave 54 axis, the Surface-overlay scrim, Menu items or any content in the slot, Actions slot. <b>Changed:</b> <code>Placement=Bottom</code> with <code>Show drag handle</code>; modal (left, with scrim, ≤ 50% initial height) or standard (right, no scrim, co-exists with the page). The mobile counterpart of the drawer, not a new master.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Docked toolbar</h3><span class="n">¼ wave more · R16 · Wave 55</span></div><div class="card-b">
+    <div class="mock"><div style="display:flex;gap:18px"><div class="phone m-reuse"><div class="content"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="tbdock m-new" style="border-radius:0;border-left:0;border-right:0;border-bottom:0"><span class="ico"></span><span class="ico"></span><span class="ico"></span><span class="ico"></span></div></div><div class="phone m-reuse"><div class="content"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="tbfloat m-reuse" style="background:#3f4254;border-color:#3f4254"><span class="ico" style="background:#fff"></span><span class="ico" style="background:#fff"></span><span class="ico" style="background:#fff"></span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Toolbar <code>407:29</code> as it is for the floating variant (today inverse and floating), Button icon items, the Nav item for labeled ones. <b>Changed:</b> <code>Variant=Floating | Docked</code> (docked = full width, straight corners, bottom-anchored) and <code>Emphasis=Standard | Vibrant</code> (Surface-base vs Action-primary or inverse). Never on screen together with the Bottom nav: one or the other per page.</div>
+  </div></div>
+  <div class="card gap-card"><div class="card-h"><h3>Mobile app bar</h3><span class="n">¼ wave · R17 · Navigation 428:344</span></div><div class="card-b">
+    <div class="mock"><div style="display:flex;gap:18px"><div class="phone m-reuse" style="height:120px"><div class="appbar m-new" style="border-radius:0;border-left:0;border-right:0;border-top:0"><span class="mx" style="font-size:12px">‹</span><span class="lbl" style="width:80px;background:#8f93a8"></span><span style="flex:1"></span><span class="ico sm"></span><span class="ico sm"></span></div><div class="content"><span class="lbl" style="width:120px"></span></div></div><div class="phone m-reuse" style="height:120px"><div class="appbar m-new" style="border-radius:0;border-left:0;border-right:0;border-top:0"><span class="ico sm"></span><span class="lbl m-reuse" style="width:100px;height:18px;border-radius:9px;background:#fff"></span><span style="flex:1"></span><span class="av" style="width:20px;height:20px;background:#c9cde0"></span></div><div class="content"><span class="lbl" style="width:120px"></span></div></div></div></div>
+    <div class="small"><b>Reuse:</b> Navigation <code>428:344</code> parts (logo, title, Search bar, Actions slot), Button icon for the leading icon, Avatar for the trailing profile. <b>Changed:</b> <code>Breakpoint=Mobile</code> on Navigation: leading back or menu icon, title, up to two actions; the search app bar variant puts the Search bar in place of the title. Medium and large flexible headlines are not for us.</div>
+  </div></div>
+</div>
+
+<h2 id="shell">The mobile shell, slot by slot</h2>
+<p class="intro">Material's window classes and the components it puts in each slot, mapped to ours. Compact = phone, medium = tablet, expanded = desktop.</p>
+<div class="card"><div class="tablewrap"><table class="walk">
+  <thead><tr><th>Slot</th><th>Compact (phone)</th><th>Medium (tablet)</th><th>Expanded (desktop)</th><th>In DS Next</th></tr></thead>
+  <tbody>
+    <tr><td>Primary navigation</td><td>Navigation bar, 3–5 vertical items</td><td>Navigation bar with horizontal items, or collapsed rail</td><td>Navigation rail collapsed or expanded (drawer deprecated)</td><td>Bottom nav + Navigation rail <code>429:1191</code>, both on the Nav item (R13, R14)</td></tr>
+    <tr><td>Top of the page</td><td>Small app bar or search app bar</td><td>Same</td><td>Top bar</td><td>Navigation <code>428:344</code> + Breakpoint=Mobile (R17)</td></tr>
+    <tr><td>Page actions</td><td>Docked toolbar (secondary pages), floating toolbar (contextual)</td><td>Floating toolbar</td><td>Floating toolbar or buttons</td><td>Toolbar <code>407:29</code> Floating | Docked (R16)</td></tr>
+    <tr><td>Secondary content</td><td>Modal bottom sheet, modal side sheet</td><td>Standard side sheet</td><td>Standard side sheet</td><td>Modal Placement Right | Left | Bottom, Show scrim (R2, R15)</td></tr>
+    <tr><td>Dialogs</td><td>Basic or full-screen dialog</td><td>Basic dialog</td><td>Basic dialog</td><td>Modal <code>540:3823</code>; Placement=Full later</td></tr>
+    <tr><td>Feedback</td><td>Snackbar, one action, no icon</td><td>Snackbar</td><td>Snackbar</td><td>Toast <code>607:63</code></td></tr>
+    <tr><td>Key action</td><td>FAB</td><td>FAB in the rail</td><td>FAB in the rail or extended FAB</td><td>FAB <code>570:36</code>; rail FAB slot later</td></tr>
+  </tbody>
+</table></div></div>
+
+<h2 id="near">Have, near — what exactly is missing</h2>
+<p class="intro">The seven Material components we cover by role but not feature by feature, with feature rows from the guidelines. Where the missing piece is already in the program, the row says which wave.</p>
+<div class="card"><div class="tablewrap"><table id="near-sum" class="nsum"></table></div></div>
+<div class="mlegend" style="margin:0 0 12px"><span><span class="chip have">have</span></span><span><span class="chip comp">composable</span></span><span><span class="chip gap">missing</span></span><span><span class="chip scope">not for us</span></span><span style="margin-left:auto"><i class="m-reuse"></i>existing master</span><span><i class="m-new"></i>missing piece</span></div>
+<div class="nears" id="near-cards"></div>
+
+<h2 id="all">All 36 components</h2>
+<div class="card">
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search Material component, DS master or id…">
+    <select id="gsel"><option value="">All groups</option></select>
+    <span id="fchips"></span>
+    <label class="small"><input type="checkbox" id="hidecovered"> hide have / composable</label>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="tablewrap"><table id="all">
+    <thead><tr><th data-k="n" class="sorted">Material 3 component</th><th data-k="g">Group</th><th data-k="v">Verdict</th><th>DS Next equivalent (page · id)</th><th>What differs · how to build</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+</div>
+
+<h2 id="method">Method and sources</h2>
+<div class="card"><div class="card-b small">
+  <p style="margin:0 0 8px"><b>Material side:</b> m3.material.io components index read live on 2026-09-16 (36 components, Material's six groups, Expressive update). Guidelines read in full through the browser (the site is client-rendered): Navigation bar, Navigation rail, Navigation drawer, Bottom sheets, Side sheets, Snackbar, Toolbars, App bars, Lists, Search. The other 26 components were mapped at role level.</p>
+  <p style="margin:0 0 8px"><b>DS side:</b> the census of 2026-09-15 (masters unchanged).</p>
+  <p style="margin:0"><b>Limits:</b> targeted pass by agreement; effort in waves under the standard pipeline. Companions: <a href="https://lucar00.github.io/ds-next-confronto-dsitalia/">DSI</a> · <a href="https://lucar00.github.io/ds-next-confronto-ant/">Ant</a> · <a href="https://lucar00.github.io/ds-next-confronto-lightning/">Lightning</a> · <a href="https://lucar00.github.io/ds-next-confronto-atlassian/">Atlassian</a> · <code>ds-next-claude/MATERIAL3-COMPARISON.md</code>.</p>
+</div></div>
+
+</main>
+<footer>DS Next Claude · analysis of 2026-09-16 · read-only, nothing built. Series complete: next the consolidated matrix and the recipe review.</footer>
+
+<script>
+const V = {have:'have 1:1', near:'have, near', comp:'composable', gap:'gap'};
+const ORDER = ['have','near','comp','gap'];
+const ROWS = [
+ ['Button groups','Buttons','have','Button group 364:219','Standard and connected groups ✓ Position joins.'],
+ ['Buttons','Buttons','have','Button 362:338','filled / tonal / outlined / text ✓ Solid / Muted / Outline / Ghost; elevated ✗ minor; sizes XS–XL ✓; round / square shapes ~.'],
+ ['Extended FABs','Buttons','comp','Button 362:338 Primary Solid L with icon + Shadow_Floating','FAB with a label.'],
+ ['FAB menu','Buttons','comp','FAB 570:36 + a stack of labeled Buttons','A FAB that opens a menu of actions (Expressive).'],
+ ['FABs','Buttons','have','FAB 570:36','Sizes small / medium / large ✗ minor.'],
+ ['Icon buttons','Buttons','have','Button icon 363:1417','standard / filled / tonal / outlined ✓ Emphasis; toggle ✓ Selected; sizes ✓.'],
+ ['Segmented buttons','Buttons','have','Button group Segment 364:182','Single / multi select ✓ Selected; icons ✓.'],
+ ['Split buttons','Buttons','comp','Button + Button icon flush + Dropdown','Leading action + trailing menu (Expressive).'],
+ ['Date pickers','Date & time pickers','have','Input + Date picker 564:44 + Day 564:43','Docked ✓ (popover grid), modal ~ (Modal at usage), input ✓, range ✓.'],
+ ['Time pickers','Date & time pickers','have','Input Show action + Dropdown presets','Dial / input pickers vs presets: the Wave 50 decision stands.'],
+ ['Loading indicator','Loading & progress','have','Spinner 606:40','Expressive shape-morph indicator = motion.'],
+ ['Progress indicators','Loading & progress','near','Progress bar 607:2191 · Donut 563:51','Linear / circular ✓; indeterminate → Wave 60; wavy ✗ skip.'],
+ ['Navigation bar','Navigation','gap','— (Wave 55 Bottom nav)','3–5 destinations, icon + label, active indicator, filled icon when active, badges, vertical / horizontal items → R13.'],
+ ['Navigation drawer','Navigation','comp','Navigation rail 429:1191 Expanded (+ scrim for modal)','Deprecated in Expressive; standard = our Expanded rail, modal = scrim at usage.'],
+ ['Navigation rail','Navigation','near','Navigation rail 429:1191','Collapsed / Expanded ✓; menu toggle ✗, FAB slot ✗, item badges ✗ → R14; standard / modal expanded ✓ at usage.'],
+ ['Bottom sheets','Sheets','gap','— (new)','Standard / modal, drag handle, ≤ 50% initial height → R15: Modal Placement=Bottom.'],
+ ['Side sheets','Sheets','near','Modal Placement Right (Wave 54)','Standard (docked, body shrinks) / modal (scrim), back + close, actions, divider → confirms R2.'],
+ ['App bars','All other components','near','Navigation 428:344','Search app bar ✓ Show search; small (back / menu, title, ≤ 2 actions) ✗ → R17; medium / large flexible ✗ skip.'],
+ ['Badges','All other components','have','Badge 391:9 · Status dot 537:14','Large with count, small dot.'],
+ ['Cards','All other components','have','Section card 923:752 + domain cards','elevated / filled / outlined ✓ by tokens.'],
+ ['Carousel','All other components','comp','Carousel dots 406:25 + arrows + cards','multi-browse / hero / full-screen = layout.'],
+ ['Checkbox','All other components','near','Checkbox 389:17','Indeterminate, error → Wave 57.'],
+ ['Chips','All other components','have','Chip 379:2205','assist / filter / input / suggestion ✓ variants; elevated ✗ minor.'],
+ ['Dialogs','All other components','have','Modal 540:3823','Basic ✓; full-screen (compact) ✗ → later candidate Placement=Full.'],
+ ['Divider','All other components','gap','— (Wave 52)','full / inset / middle-inset / vertical → Orientation ✓, inset at usage.'],
+ ['Lists','All other components','near','Menu item 404:110 + List section + Data row 581:89','Supporting text 1–3 lines, leading avatar / media → Wave 59; trailing selection control ✓ Data row.'],
+ ['Menus','All other components','have','Dropdown 400:56 + Menu item','Leading / trailing icons ✓, dividers ✓ (Divider Wave 52), submenus → Wave 59, selected check → Wave 59.'],
+ ['Radio button','All other components','gap','— (Wave 52)','—'],
+ ['Search','All other components','have','Search bar 399:3479 + Dropdown + Menu items','Search bar ✓, search view docked / full-screen ✓ at usage, search app bar → R17.'],
+ ['Sliders','All other components','gap','— (Wave 62)','Value indicator label, stops, sizes, centered, range → confirms the Tooltip option.'],
+ ['Snackbar','All other components','have','Toast 607:63','One action, optional close, no icons, 1–2 lines.'],
+ ['Switch','All other components','have','Toggle 390:49','Icon in the thumb ✓ Show state icons.'],
+ ['Tabs','All other components','have','Tab 398:326 + Tab group 632:443','primary / secondary ✓ Emphasis; scrollable = usage.'],
+ ['Text fields','All other components','have','Input 394:5591','filled / outlined ✓ Filled axis; supporting text ✓; leading / trailing icon ✓; counter ✗ minor.'],
+ ['Toolbars','All other components','near','Toolbar 407:29','Floating ✓; docked ✗, vibrant colour ✗ → R16.'],
+ ['Tooltips','All other components','have','Tooltip 401:116','Plain ✓; rich (title + text + actions) ✓ title + slot, light → Wave 60.']
+].map(r => ({n:r[0], g:r[1], v:r[2], ds:r[3], note:r[4]}));
+
+const EVL = ['no CRM evidence','conditional','basic','proven'];
+const PLAN = [
+ {id:'nav-item',group:'new',kind:'re',order:1,name:'R13 + R14 · Nav item: one master for Bottom nav and rail',eff:2,ev:2,evNote:'the Bottom nav you approved implies a mobile shell; Material uses one item everywhere',sug:'build',why:'Layout Vertical | Horizontal | Icon-only, active indicator pill, filled icon when active, badge or dot. The bar hosts it on phones and tablets, the collapsed rail hosts the icon-only form.',reuse:'Items-slot pattern · Badge 391:9 · Status dot 537:14 · LA solid / regular glyphs · Navigation rail 429:1191 · FAB 570:36',neu:'Nav item master with Layout × State, active indicator, icon swap by state, Show badge',dep:'Wave 55.'},
+ {id:'bottom-sheet',group:'new',kind:'re',order:2,name:'R15 · Bottom sheet = Modal Placement=Bottom + Show drag handle',eff:2,ev:2,evNote:'the mobile counterpart of the approved drawer',sug:'build',why:'Standard or modal bottom sheet with a drag handle and an initial height capped at 50%. The Placement axis of Wave 54 grows by one value.',reuse:'Modal 540:3823 with the Wave 54 axis · Surface-overlay scrim · Menu items or any slot content',neu:'Placement=Bottom · Show drag handle',dep:'Wave 54.'},
+ {id:'toolbar-docked',group:'new',kind:'re',order:3,name:'R16 · Toolbar: Variant Floating | Docked, Emphasis Standard | Vibrant',eff:2,ev:2,evNote:'secondary mobile pages need an action bar that is not the nav bar',sug:'build',why:'Material splits docked (full width, straight corners, global actions) from floating (rounded, contextual) toolbars and never shows a toolbar with the navigation bar.',reuse:'Toolbar 407:29 · Button icon · Nav item for labeled actions',neu:'Variant axis + Emphasis axis on Toolbar',dep:'Wave 55.'},
+ {id:'appbar-mobile',group:'new',kind:'re',order:4,name:'R17 · Navigation Breakpoint=Mobile (small app bar, search app bar)',eff:2,ev:2,evNote:'every mobile page starts with an app bar',sug:'build',why:'Leading back or menu icon, title, up to two actions; the search variant puts the Search bar in place of the title.',reuse:'Navigation 428:344 parts · Button icon · Search bar 399:3479 · Avatar 512:979',neu:'Breakpoint=Mobile on Navigation with Show back / menu, Show search',dep:'Wave 55.'},
+ {id:'rail-extras',group:'new',kind:'near',order:5,name:'Navigation rail: Show menu toggle + FAB slot',eff:1,ev:1,evNote:'tablet layouts',sug:'later',why:'Material tops the rail with a menu toggle that expands it and an optional FAB above the items.',reuse:'Navigation rail 429:1191 · Button icon · FAB 570:36',neu:'Two small props',dep:'After the Nav item.'},
+ {id:'dialog-full',group:'new',kind:'near',order:6,name:'Modal Placement=Full (full-screen dialog)',eff:1,ev:1,evNote:'compact windows only',sug:'later',why:'Material uses a full-screen dialog for complex tasks on phones.',reuse:'Modal 540:3823',neu:'One more Placement value'},
+ {id:'divider-inset',group:'minor',kind:'have',order:7,name:'Divider inset variants',eff:0,ev:0,evNote:'padding at usage',sug:'skip',why:'Inset and middle-inset are paddings.',reuse:'Divider (Wave 52)',neu:'Nothing'},
+ {id:'textfield-counter',group:'minor',kind:'have',order:8,name:'Text field character counter',eff:1,ev:0,evNote:'no length-limited fields evidenced',sug:'skip',why:'Supporting text with a counter.',reuse:'Input 394:5591 helper',neu:'Counter text'},
+ {id:'chips-elevated',group:'minor',kind:'have',order:9,name:'Elevated chips',eff:1,ev:0,evNote:'style only',sug:'skip',why:'Shadowed chips.',reuse:'Chip 379:2205',neu:'Shadow emphasis'},
+ {id:'progress-wavy',group:'minor',kind:'have',order:10,name:'Wavy progress indicator',eff:1,ev:0,evNote:'Expressive styling',sug:'skip',why:'Decorative waveform on the bar.',reuse:'Progress bar 607:2191',neu:'Nothing'},
+ {id:'fab-menu',group:'minor',kind:'comp',order:11,name:'FAB menu · Extended FAB',eff:0,ev:0,evNote:'composable',sug:'skip',why:'A FAB that opens labeled actions, and a FAB with a label.',reuse:'FAB 570:36 · Button 362:338',neu:'Nothing'}
+];
+const LOCKED = [
+ {name:'Pagination · Radio · Divider',status:'Approved · Wave 52',note:'mockup 1131:2295 parked; Material confirms Divider orientation and the Radio'},
+ {name:'Accordion (Section card State)',status:'Approved · Wave 53',note:''},
+ {name:'Drawer (Placement + Show scrim + Show back)',status:'Approved · Wave 54',note:'Side sheets confirm; R15 adds Bottom'},
+ {name:'Bottom nav · Toolbar · Stepper Mobile, Vertical, Error, Path',status:'Approved · Wave 55',note:'R13, R14, R16, R17 reshape this wave'},
+ {name:'Timeline activity item · Comment row',status:'Approved · Wave 56',note:''},
+ {name:'Checkbox · File row · Dropzone states · Choice card',status:'Approved · Wave 57',note:''},
+ {name:'Alert dismiss + actions + Neutral / Brand',status:'Approved · Wave 58',note:''},
+ {name:'Menu item rich row + check · collapsible List section · Tree row (R12 = C)',status:'Approved · Wave 59',note:'Lists confirm the rich row a fourth time'},
+ {name:'Tooltip Light + close · Progress bar',status:'Approved · Wave 60',note:''},
+ {name:'Hero title / text / CTA',status:'Approved · Wave 61',note:''},
+ {name:'Slider (Range, Error, value) · Filter row',status:'Approved · Wave 62',note:'Material favours the value indicator above the handle'},
+ {name:'Table cell inline edit + expand icon · Inline edit field',status:'Approved · Wave 63',note:''},
+ {name:'Breadcrumb N levels · Tabs placement / closable · Rate · Avatar square · Table density · Date picker views · Status dot colours · Cascader · Result illustrations · Modal themed header · Color Picker · Dynamic Icons · Object icon · Alert AI · Badge appearances · Lozenge accents · Spotlight · Code',status:'Skipped (earlier passes)',note:''}
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ids = s => esc(s).replace(/(\d{2,5}:\d{1,6})/g, '<span class="id">$1</span>');
+const FR = {1:'⅛',2:'¼',3:'⅜',4:'½',5:'⅝',6:'¾',7:'⅞'};
+const waves = e => { if (!e) return '0'; const w = Math.floor(e / 8), f = e % 8; return (w ? w : '') + (f ? FR[f] : ''); };
+const wavesLabel = e => { const s = waves(e); return s === '0' ? 'no extra effort' : s + (e === 8 ? ' wave' : ' waves'); };
+const KIND = {have:'have', near:'near', comp:'comp', gap:'gap', re:'re'};
+const KINDL = {have:'have 1:1', near:'have, near', comp:'composable', gap:'gap', re:'rethink'};
+
+(function overview(){
+  const c = {}; ORDER.forEach(k => c[k] = 0); ROWS.forEach(r => c[r.v]++);
+  const covered = c.have + c.near + c.comp;
+  document.getElementById('totals').innerHTML = '<b>' + ROWS.length + '</b> Material components · <b>' + covered + '</b> reproducible today · <b>' + c.gap + '</b> gaps, 1 new (Bottom sheet) · <b>5</b> rethinks on the mobile family';
+  document.getElementById('bar').innerHTML = ORDER.map(k => '<div class="' + k + '" style="flex:' + c[k] + '" title="' + V[k] + ': ' + c[k] + '">' + c[k] + '</div>').join('');
+  document.getElementById('kpis').innerHTML =
+    '<div class="kpi"><b>' + covered + ' / ' + ROWS.length + '</b><span>reproducible today</span></div>' +
+    '<div class="kpi"><b>' + c.have + '</b><span>have 1:1</span></div>' +
+    '<div class="kpi"><b>' + c.near + '</b><span>near — one extension away</span></div>' +
+    '<div class="kpi"><b>' + c.comp + '</b><span>composable at usage</span></div>' +
+    '<div class="kpi"><b>' + c.gap + '</b><span>gaps — 4 approved, Bottom sheet new</span></div>' +
+    '<div class="kpi"><b>5 + 2</b><span>mobile rethinks + later candidates</span></div>';
+  const groups = [...new Set(ROWS.map(r => r.g))];
+  let h = '<thead><tr><th>Group</th><th>Material</th><th>Reproducible</th><th>Mix</th><th>Near</th><th>Gaps</th></tr></thead><tbody>';
+  groups.forEach(g => { const rs = ROWS.filter(r => r.g === g); const gc = {}; ORDER.forEach(k => gc[k] = rs.filter(r => r.v === k).length); const cov = gc.have + gc.near + gc.comp;
+    h += '<tr><td>' + esc(g) + '</td><td>' + rs.length + '</td><td>' + cov + ' / ' + rs.length + '</td><td><div class="mini">' + ORDER.map(k => gc[k] ? '<div style="flex:' + gc[k] + ';background:var(--' + k + ')" title="' + V[k] + ' ' + gc[k] + '"></div>' : '').join('') + '</div></td><td>' + (gc.near ? rs.filter(r => r.v === 'near').map(r => esc(r.n)).join(', ') : '—') + '</td><td>' + (gc.gap ? rs.filter(r => r.v === 'gap').map(r => esc(r.n)).join(', ') : '—') + '</td></tr>'; });
+  document.getElementById('grp').innerHTML = h + '</tbody>';
+})();
+
+(function quad(){
+  const Q = [
+    {k:'first', t:'Do first — strong evidence, cheap', f:p => p.ev >= 2 && p.eff <= 2},
+    {k:'wave', t:'Plan a wave — strong evidence, half a wave or more', f:p => p.ev >= 2 && p.eff > 2},
+    {k:'cheap', t:'Cheap, when a screen asks for it — weak evidence, low cost', f:p => p.ev < 2 && p.eff <= 2},
+    {k:'road', t:'Only with a roadmap reason — weak evidence, real cost', f:p => p.ev < 2 && p.eff > 2}
+  ];
+  const col = {gap:'var(--gap-ink)', near:'var(--near-ink)', comp:'var(--comp-ink)', have:'var(--have-ink)', re:'var(--brass)'};
+  const cand = PLAN.filter(p => p.group === 'new');
+  document.getElementById('quad').innerHTML = Q.map(q => '<div class="q ' + (q.k === 'first' ? 'first' : '') + '"><h4>' + q.t + '</h4>' + cand.filter(q.f).sort((a, b) => b.ev - a.ev || a.eff - b.eff).map(p => '<span class="qi" title="' + esc(p.evNote) + '"><span class="dot" style="background:' + col[p.kind] + '"></span>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></span>').join('') + '</div>').join('');
+})();
+
+const KEY = 'material3-plan-v1';
+let state = {choices:{}, notes:''};
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.choices) state = s; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const CH = {build:'Build now', later:'Later', skip:'Skip'};
+const NEAR_LINK = {'nav-item':'navigation-rail','bottom-sheet':'side-sheets','toolbar-docked':'toolbars','appbar-mobile':'app-bars','rail-extras':'navigation-rail'};
+function rowHTML(p){
+  const ch = state.choices[p.id] || '';
+  return '<div class="prow" id="plan-' + p.id + '" data-id="' + p.id + '">' +
+    '<div class="t"><b>' + esc(p.name) + '</b><span class="chip ' + KIND[p.kind] + '">' + KINDL[p.kind] + '</span><span class="meta"><span class="tag">' + (p.kind === 're' ? 'extra: ' : '') + wavesLabel(p.eff) + '</span><span class="tag ev' + p.ev + '">' + EVL[p.ev] + ' · ' + esc(p.evNote) + '</span></span></div>' +
+    '<div><div class="seg">' + ['build','later','skip'].map(c => '<button class="' + c + (ch === c ? ' on' : '') + '" data-c="' + c + '">' + CH[c] + '</button>').join('') + '</div><div class="sug">suggested: ' + CH[p.sug] + (NEAR_LINK[p.id] ? ' · <a href="#near-' + NEAR_LINK[p.id] + '">what is missing ↑</a>' : '') + '</div></div>' +
+    '<div class="why">' + esc(p.why) + (p.dep ? ' <b>Depends on:</b> ' + esc(p.dep) : '') + '</div>' +
+    '<details><summary>Reused vs new</summary><div class="rn"><div class="re"><b>Reused DS masters</b>' + ids(p.reuse) + '</div><div class="ne"><b>New or changed</b>' + ids(p.neu) + '</div></div></details>' +
+  '</div>';
+}
+function renderPlanner(){
+  ['new','minor'].forEach(g => { document.getElementById('p-' + g).innerHTML = PLAN.filter(p => p.group === g).sort((a, b) => a.order - b.order).map(rowHTML).join(''); });
+  document.getElementById('p-locked').innerHTML = LOCKED.map(l => '<div class="prow locked"><div class="t"><b>' + esc(l.name) + '</b><span class="chip lock">' + esc(l.status) + '</span></div><div class="small muted">' + esc(l.note) + '</div></div>').join('');
+  renderSummary();
+}
+function renderSummary(){
+  const by = c => PLAN.filter(p => state.choices[p.id] === c).sort((a, b) => a.order - b.order);
+  const eff = arr => arr.reduce((s, p) => s + p.eff, 0);
+  const B = by('build'), L = by('later'), S = by('skip'); const U = PLAN.length - B.length - L.length - S.length;
+  document.getElementById('sum-rows').innerHTML =
+    '<div class="row"><span>Accepted / build now</span><b>' + B.length + ' · ' + wavesLabel(eff(B)) + '</b></div>' +
+    '<div class="row"><span>Later</span><b>' + L.length + ' · ' + wavesLabel(eff(L)) + '</b></div>' +
+    '<div class="row"><span>Skip</span><b>' + S.length + '</b></div>' +
+    '<div class="row"><span>Undecided</span><b>' + U + '</b></div>';
+  document.getElementById('ol-build').innerHTML = B.length ? B.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  document.getElementById('ol-later').innerHTML = L.length ? L.map(p => '<li>' + esc(p.name) + ' <span class="muted">' + waves(p.eff) + '</span></li>').join('') : '<li class="muted">nothing yet</li>';
+  const line = (label, arr) => label + (arr.length ? ' (' + wavesLabel(eff(arr)) + '): ' + arr.map(p => p.name).join(' · ') : ': —');
+  let msg = 'Vai — Material 3 pass: the mobile family (' + new Date().toISOString().slice(0, 10) + ')\n' +
+    line('Accepted / build now', B) + '\n' + line('Later', L) + '\n' + 'Skip: ' + (S.length ? S.map(p => p.name).join(' · ') : '—') + '\n' +
+    (U ? 'Undecided: ' + PLAN.filter(p => !state.choices[p.id]).map(p => p.name).join(' · ') + '\n' : '') +
+    (state.notes ? 'Notes: ' + state.notes + '\n' : '') +
+    'Series complete: next the consolidated matrix and the recipe review, then Wave 52 reopens.';
+  document.getElementById('msg').value = msg;
+  document.getElementById('notes').value = state.notes || '';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.seg button'); if (!b) return;
+  const id = b.closest('.prow').dataset.id; const c = b.dataset.c;
+  state.choices[id] = (state.choices[id] === c) ? '' : c; save();
+  const seg = b.closest('.seg'); seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.c === state.choices[id]));
+  renderSummary();
+});
+document.getElementById('apply').onclick = () => { PLAN.forEach(p => state.choices[p.id] = p.sug); save(); renderPlanner(); };
+document.getElementById('reset').onclick = () => { state.choices = {}; state.notes = ''; save(); renderPlanner(); };
+document.getElementById('notes').addEventListener('input', e => { state.notes = e.target.value; save(); renderSummary(); });
+document.getElementById('copy').onclick = async () => {
+  const t = document.getElementById('msg'); const ok = document.getElementById('copied');
+  try { await navigator.clipboard.writeText(t.value); ok.textContent = 'copied'; }
+  catch (e) { t.focus(); t.select(); try { document.execCommand('copy'); ok.textContent = 'copied'; } catch (e2) { ok.textContent = 'select the text and copy'; } }
+  setTimeout(() => ok.textContent = '', 2000);
+};
+renderPlanner();
+
+// Near deep-dive
+const FS = {have:['have','have'], comp:['comp','composable'], miss:['gap','missing'], skip:['scope','not for us']};
+const MOCK = {
+ rail:'<div style="display:flex;gap:14px;align-items:flex-start"><div class="railm m-reuse"><span class="mx m-new" style="font-size:12px">≡</span><span class="fab m-new" style="background:var(--brass-soft);border:1.5px dashed var(--brass)"></span><div class="navit" style="width:48px"><span class="pill m-reuse" style="background:#c9cde0"><span class="ico sm solid"></span></span></div><div class="navit" style="width:48px"><span class="pill"><span class="ico sm"></span></span><span class="badge m-new" style="right:6px;border-style:dashed">3</span></div><div class="navit" style="width:48px"><span class="pill"><span class="ico sm"></span></span></div></div><div class="railm m-reuse" style="width:130px;align-items:stretch;padding:10px"><div class="li" style="padding:4px 6px"><span class="ico sm solid" style="background:#3f4254"></span><span class="lbl" style="width:60px;background:var(--ink)"></span></div><div class="li" style="padding:4px 6px;background:transparent"><span class="ico sm"></span><span class="lbl" style="width:50px"></span></div><div class="li" style="padding:4px 6px;background:transparent"><span class="ico sm"></span><span class="lbl" style="width:56px"></span></div></div></div>',
+ sheets:'<div class="mk-drawer m-reuse"><div class="page"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:140px"></span></div><div class="sheet"><div class="hd"><span class="mx m-reuse" style="width:16px;height:16px;font-size:10px">‹</span><span class="lbl" style="width:50px;background:#8f93a8"></span><span class="mx m-reuse" style="margin-left:auto;width:16px;height:16px;font-size:10px">×</span></div><div class="mtx"><span class="lbl m-reuse" style="width:100%"></span><span class="lbl m-reuse" style="width:80%"></span></div><div class="ft"><span class="mbtn m-reuse">Annulla</span><span class="mbtn m-reuse" style="background:#3f4254;color:#fff;border-color:#3f4254">Salva</span></div></div></div>',
+ appbar:'<div class="phone m-reuse" style="height:110px;width:220px"><div class="appbar m-new" style="border-radius:0;border-left:0;border-right:0;border-top:0"><span class="mx" style="font-size:12px">‹</span><span class="lbl" style="width:80px;background:#8f93a8"></span><span style="flex:1"></span><span class="ico sm"></span><span class="ico sm"></span></div><div class="content"><span class="lbl" style="width:120px"></span><span class="lbl" style="width:80px"></span></div></div>',
+ toolbar:'<div style="display:flex;gap:14px"><div class="phone m-reuse" style="height:130px;width:150px"><div class="content"><span class="lbl" style="width:90px"></span></div><div class="tbdock m-new" style="height:40px;border-radius:0;border-left:0;border-right:0;border-bottom:0"><span class="ico sm"></span><span class="ico sm"></span><span class="ico sm"></span></div></div><div class="phone m-reuse" style="height:130px;width:150px"><div class="content"><span class="lbl" style="width:90px"></span></div><div class="tbfloat m-reuse" style="height:34px;bottom:10px;left:16px;right:16px;background:#3f4254;border-color:#3f4254"><span class="ico sm" style="background:#fff"></span><span class="ico sm" style="background:#fff"></span><span class="ico sm" style="background:#fff"></span></div></div></div>',
+ list:'<div class="mk-list m-reuse"><div class="li"><span class="av m-new"></span><div class="mtx"><span class="lbl" style="width:100px"></span><span class="lbl m-new" style="width:140px;height:7px"></span><span class="lbl m-new" style="width:110px;height:7px"></span></div><span class="cb m-reuse" style="margin-left:auto"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:90px"></span><span class="lbl" style="width:24px;margin-left:auto"></span></div><div class="li"><span class="ico sm"></span><span class="lbl" style="width:70px"></span><span class="chev" style="margin-left:auto;font-size:11px">›</span></div></div>',
+ progress:'<div class="mk-prog"><div class="pb m-reuse"><div class="fill"></div></div><div class="pb m-new"><div class="fill ind"></div></div></div>',
+ checkbox:'<div class="rm"><div class="r"><span class="cb m-reuse on">✓</span><span class="lbl m-reuse" style="width:100px"></span></div><div class="r"><span class="cb m-new mixed">–</span><span class="lbl m-reuse" style="width:90px"></span></div><div class="r"><span class="cb m-new" style="border-color:#c0392b"></span><span class="lbl m-reuse" style="width:70px"></span></div></div>'
+};
+const NEAR = [
+ {id:'navigation-rail', dsi:'Navigation rail', oursShort:'Navigation rail 429:1191', ours:'Navigation rail 429:1191 — Sector (15) × State Collapsed | Expanded; Show logo, Items slot (Collapsed = Button icon column, Expanded = List section)', dsiVars:'Collapsed rail with 3–7 items along the leading edge, never hidden; expanded rail standard (beside content) or modal (over content), opened from a menu icon; anatomy: container, menu, FAB, icons active / inactive, labels, active indicator, large and small badges; top or center alignment', mock:'rail', prog:'',
+  feats:[['Collapsed rail, 3–7 icon items','have','Rail Collapsed (Button icon column)'],['Expanded rail with labels','have','Rail Expanded (List section)'],['Active indicator on the item','miss','Nav item active pill — R13 / R14'],['Badges on rail items','miss','Nav item Show badge — R14'],['Menu toggle at the top','miss','Show menu toggle — later candidate'],['FAB above the items','miss','FAB slot — later candidate'],['Modal expanded rail (over content)','comp','Scrim at usage'],['Top or center alignment','comp','Layout at usage'],['Container fill on or off','have','Sector tints incl. Neutral']],
+  missing:'The item itself: active indicator and badges (R13 / R14), then the menu toggle and FAB slot.'},
+ {id:'side-sheets', dsi:'Side sheets (+ Bottom sheets)', oursShort:'Modal 540:3823 Placement (Wave 54)', ours:'Modal 540:3823 with the approved Placement Center | Right | Left, Show scrim, Show back', dsiVars:'Side sheet standard (docked, body shrinks) or modal (scrim); anatomy: container, headline, close icon button, back icon button, divider, action buttons, scrim; inset 16, fixed width. Bottom sheet standard or modal, drag handle, initial height ≤ 50%, list or grid content', mock:'sheets', prog:'',
+  feats:[['Standard side sheet (docked, body shrinks)','have','Placement Right + Show scrim OFF — Wave 54 (R2)'],['Modal side sheet with scrim','have','Show scrim ON — Wave 54'],['Back and close icon buttons','have','Show back + close — Wave 54'],['Action buttons and divider','have','Actions slot; divider at usage'],['Inset 16 from the edge','comp','Margin at usage'],['Bottom sheet, standard or modal','miss','Placement=Bottom — R15'],['Drag handle','miss','Show drag handle — R15'],['Initial height ≤ 50%','comp','Height at usage']],
+  missing:'The bottom placement and its drag handle; side sheets confirm R2 exactly.'},
+ {id:'app-bars', dsi:'App bars', oursShort:'Navigation 428:344', ours:'Navigation 428:344 — Size S | M | L; Title, Show logo, Show title, Show search, Show actions, Actions slot', dsiVars:'Search app bar (search field instead of heading, leading logo, up to two trailing icons + avatar; four icons on large screens); small (dense layouts or scrolled pages); medium and large flexible (bigger headline collapsing on scroll); one or two actions, filled or tonal for the primary one', mock:'appbar', prog:'',
+  feats:[['Desktop top bar with logo, title, search, actions','have','Navigation 428:344'],['Search app bar','have','Show search'],['Small app bar: leading nav icon, title, ≤ 2 actions','miss','Breakpoint=Mobile — R17'],['Leading back or menu icon','miss','Show back / menu — R17'],['Trailing avatar','comp','Avatar in the Actions slot'],['Medium / large flexible headline','skip','Not for us'],['Filled or tonal primary action','have','Button icon Emphasis']],
+  missing:'The mobile form of the bar.'},
+ {id:'toolbars', dsi:'Toolbars', oursShort:'Toolbar 407:29', ours:'Toolbar 407:29 — standalone, Items slot of Button / Button icon, inverse floating bar', dsiVars:'Docked toolbar (full width, straight corners, global actions) and floating toolbar (rounded, contextual actions, fully visible, overflow menu); standard vs vibrant colour; never shown with a navigation bar; floating toolbars can act as local tabs', mock:'toolbar', prog:'',
+  feats:[['Floating toolbar with icon actions','have','Toolbar 407:29'],['Docked toolbar, full width','miss','Variant Docked — R16'],['Vibrant colour configuration','miss','Emphasis Vibrant — R16'],['Overflow menu','comp','Button icon + Dropdown at usage'],['Labeled actions','miss','Nav item — Wave 55 (Lightning)'],['Floating toolbar as local tabs','comp','Button group or Nav item Selected']],
+  missing:'The docked variant and the vibrant colour.'},
+ {id:'lists', dsi:'Lists', oursShort:'Menu item 404:110 + List section + Data row 581:89', ours:'Menu item 404:110 — State ×5; Label, Number, icons, actions · List section 1090:5381 · Data row 581:89 Control swap', dsiVars:'Container, label text, supporting text (1–3 lines), trailing text / icon / selection control (checkbox, radio, switch), leading avatar / icon / media (image, video); one, two or three-line items', mock:'list', prog:'Wave 59',
+  feats:[['Label text item','have','Menu item'],['Supporting text, 1–3 lines','miss','Description line — Wave 59'],['Leading avatar or media','miss','Avatar leading — Wave 59'],['Leading icon','have','Icon left'],['Trailing text or icon','have','Number · Actions frame'],['Trailing selection control','have','Data row 581:89 Control swap'],['Content-based container colour','skip','Not for us']],
+  missing:'Supporting text and leading media, already in Wave 59.'},
+ {id:'progress', dsi:'Progress indicators', oursShort:'Progress bar 607:2191 · Donut 563:51', ours:'Progress bar 607:2191 — Label, Percentage · Donut chart 563:51', dsiVars:'Linear and circular, determinate and indeterminate; Expressive wavy shape; sizes', mock:'progress', prog:'Wave 60',
+  feats:[['Linear determinate','have','Progress bar'],['Circular determinate','have','Donut chart'],['Indeterminate','miss','Wave 60'],['Wavy shape','skip','Not for us']],
+  missing:'Indeterminate, already in Wave 60.'},
+ {id:'checkbox', dsi:'Checkbox', oursShort:'Checkbox 389:17', ours:'Checkbox 389:17 — State On | Off | Disabled', dsiVars:'Selected, unselected, indeterminate, error, disabled', mock:'checkbox', prog:'Wave 57',
+  feats:[['Selected / unselected / disabled','have','States'],['Indeterminate','miss','Wave 57'],['Error','miss','Wave 57']],
+  missing:'Indeterminate and error, both in Wave 57.'}
+];
+(function near(){
+  const counts = n => { const c = {have:0, comp:0, miss:0, skip:0}; n.feats.forEach(f => c[f[1]]++); return c; };
+  const bar = c => '<div class="mini nbar">' + ['have','comp','miss','skip'].map(k => c[k] ? '<div style="flex:' + c[k] + ';background:var(--' + FS[k][0] + ')" title="' + FS[k][1] + ' ' + c[k] + '"></div>' : '').join('') + '</div>';
+  const link = {'navigation-rail':'nav-item','side-sheets':'bottom-sheet','app-bars':'appbar-mobile','toolbars':'toolbar-docked'};
+  const planById = Object.fromEntries(PLAN.map(p => [p.id, p]));
+  const sorted = [...NEAR].sort((a, b) => counts(b).miss - counts(a).miss || a.dsi.localeCompare(b.dsi));
+  const statusOf = n => { const p = planById[link[n.id]]; if (p) return '<span class="chip re">rethink</span>'; return '<span class="chip lock">' + esc(n.prog) + '</span>'; };
+  let h = '<thead><tr><th>Material</th><th>Our master</th><th>Features</th><th>Missing</th><th>Status</th><th></th></tr></thead><tbody>';
+  sorted.forEach(n => { const c = counts(n), p = planById[link[n.id]];
+    h += '<tr><td class="nm"><a href="#near-' + n.id + '">' + esc(n.dsi) + '</a></td><td class="dsc">' + ids(n.oursShort) + '</td><td>' + bar(c) + '<span class="small muted">' + c.have + ' have · ' + c.comp + ' composable · <b>' + c.miss + ' missing</b> · ' + c.skip + ' not for us</span></td><td class="dsc">' + (c.miss ? n.feats.filter(f => f[1] === 'miss').map(f => esc(f[0])).join(' · ') : '—') + '</td><td>' + statusOf(n) + (p ? '<div class="small muted">extra ' + wavesLabel(p.eff) + '</div>' : '') + '</td><td>' + (p ? '<a class="small" href="#plan-' + p.id + '" style="color:var(--ink)">decide ↑</a>' : '') + '</td></tr>'; });
+  document.getElementById('near-sum').innerHTML = h + '</tbody>';
+  document.getElementById('near-cards').innerHTML = sorted.map(n => { const c = counts(n), p = planById[link[n.id]];
+    return '<div class="card near-card" id="near-' + n.id + '"><div class="card-h"><h3>' + esc(n.dsi) + ' <span class="muted">→</span> ' + ids(n.oursShort) + '</h3><span class="n">' + (p ? 'rethink · extra ' + wavesLabel(p.eff) : 'status: ' + esc(n.prog)) + '</span><span class="n" style="margin-left:auto">' + bar(c) + '</span></div>' +
+      '<div class="near-b"><div><p class="small muted" style="margin:0 0 8px"><b>Material offers:</b> ' + esc(n.dsiVars) + '</p><p class="small muted" style="margin:0 0 10px"><b>Ours:</b> ' + ids(n.ours) + '</p>' +
+      '<table class="feat"><thead><tr><th>Material feature</th><th>Status</th><th>How we cover or close it</th></tr></thead><tbody>' + n.feats.map(f => '<tr><td>' + esc(f[0]) + '</td><td><span class="chip ' + FS[f[1]][0] + '">' + FS[f[1]][1] + '</span></td><td class="dsc">' + ids(f[2]) + '</td></tr>').join('') + '</tbody></table></div>' +
+      '<div><div class="mock">' + MOCK[n.mock] + '</div><p class="small" style="margin:10px 0"><b>Missing, in one line:</b> ' + esc(n.missing) + '</p>' + (p ? '<a class="btn" href="#plan-' + p.id + '" style="display:inline-block;text-decoration:none">Decide in the planner ↑</a>' : '<span class="small muted">Decided earlier: ' + esc(n.prog) + '</span>') + '</div></div></div>'; }).join('');
+})();
+
+(function table(){
+  const f = {q:'', g:'', v:new Set(ORDER), sort:'n', dir:1, hide:false};
+  const gsel = document.getElementById('gsel'); [...new Set(ROWS.map(r => r.g))].forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; gsel.appendChild(o); });
+  document.getElementById('fchips').innerHTML = ORDER.map(k => '<span class="chip ' + k + ' fchip on" data-v="' + k + '">' + V[k] + '</span>').join(' ');
+  const tb = document.getElementById('tb'), cnt = document.getElementById('count');
+  function draw(){
+    let rs = ROWS.filter(r => f.v.has(r.v) && (!f.g || r.g === f.g) && (!f.hide || ['near','gap'].includes(r.v)));
+    if (f.q) { const q = f.q.toLowerCase(); rs = rs.filter(r => (r.n + ' ' + r.ds + ' ' + r.note + ' ' + r.g).toLowerCase().includes(q)); }
+    rs.sort((a, b) => { const ka = f.sort === 'v' ? ORDER.indexOf(a.v) : a[f.sort], kb = f.sort === 'v' ? ORDER.indexOf(b.v) : b[f.sort]; return (ka > kb ? 1 : ka < kb ? -1 : a.n.localeCompare(b.n)) * f.dir; });
+    tb.innerHTML = rs.map(r => '<tr><td class="nm">' + esc(r.n) + '</td><td class="muted small">' + esc(r.g) + '</td><td><span class="chip ' + r.v + '">' + V[r.v] + '</span></td><td class="dsc">' + ids(r.ds) + '</td><td class="dsc">' + esc(r.note) + '</td></tr>').join('');
+    cnt.textContent = rs.length + ' of ' + ROWS.length;
+  }
+  document.getElementById('q').addEventListener('input', e => { f.q = e.target.value; draw(); });
+  gsel.addEventListener('change', e => { f.g = e.target.value; draw(); });
+  document.getElementById('hidecovered').addEventListener('change', e => { f.hide = e.target.checked; draw(); });
+  document.getElementById('fchips').addEventListener('click', e => { const c = e.target.closest('.fchip'); if (!c) return; const v = c.dataset.v; if (f.v.has(v)) f.v.delete(v); else f.v.add(v); c.classList.toggle('on', f.v.has(v)); draw(); });
+  document.querySelectorAll('#all th[data-k]').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; if (f.sort === k) f.dir *= -1; else { f.sort = k; f.dir = 1; } document.querySelectorAll('#all th').forEach(x => x.classList.toggle('sorted', x === th)); draw(); }));
+  draw();
+})();
+</script>
+</body>
+</html>
