@@ -18,6 +18,7 @@ Uso:
   python3 check.py --heartbeat  invia subito il riepilogo settimanale
 """
 
+import gzip
 import html
 import json
 import os
@@ -27,6 +28,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import zlib
 from datetime import datetime, timezone, timedelta
 
 # --- configurazione -------------------------------------------------------
@@ -38,7 +40,25 @@ BASE_URL = f"https://web.spaggiari.eu/sdg2/Comunicati/{CUSTCODE}"
 WATCHED = {30001: "Alunni", 30003: "Famiglie"}
 
 PAGES_QUICK = 3          # pagine lette a ogni run normale (10 doc/pagina)
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) circolari-monitor"
+
+# Dai server di GitHub il sito risponde 403 se la richiesta non sembra un
+# browser: dalla rete di casa passa qualunque cosa, dai range dei datacenter
+# no. Questi sono gli header che manda Chrome, per intero.
+HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                   "AppleWebKit/537.36 (KHTML, like Gecko) "
+                   "Chrome/129.0.0.0 Safari/537.36"),
+    "Accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,"
+               "image/avif,image/webp,*/*;q=0.8"),
+    "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Connection": "keep-alive",
+}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.dirname(HERE)                  # cartella circolari/
@@ -50,15 +70,31 @@ ROME = timezone(timedelta(hours=2))              # solo per l'etichetta "aggiorn
 
 # --- fetch ----------------------------------------------------------------
 
+def leggi(resp):
+    """Legge il corpo della risposta, decomprimendolo se serve."""
+    dati = resp.read()
+    if resp.headers.get("Content-Encoding") in ("gzip", "deflate"):
+        dati = gzip.decompress(dati) if dati[:2] == b"\x1f\x8b" else zlib.decompress(dati)
+    return dati.decode("utf-8", "replace")
+
+
 def fetch_page(page):
     """Scarica una pagina dell'elenco e ne estrae il JSON Inertia."""
     url = BASE_URL if page == 1 else f"{BASE_URL}?page={page}"
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    req = urllib.request.Request(url, headers=HEADERS)
     for attempt in range(3):
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
-                raw = resp.read().decode("utf-8", "replace")
+                raw = leggi(resp)
             break
+        except urllib.error.HTTPError as err:
+            # Un 4xx e' una risposta, non un disguido: ritentarlo e' inutile.
+            # Solo i 5xx meritano un secondo tentativo.
+            if err.code < 500 or attempt == 2:
+                raise SystemExit(
+                    f"il sito ha risposto {err.code} ({err.reason}) su {url}. "
+                    "Se e' 403, sta rifiutando la richiesta.")
+            time.sleep(3 * (attempt + 1))
         except (urllib.error.URLError, TimeoutError) as err:
             if attempt == 2:
                 raise SystemExit(f"errore di rete su {url}: {err}")
