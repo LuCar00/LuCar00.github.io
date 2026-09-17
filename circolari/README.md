@@ -26,15 +26,33 @@ Servono due secret nel repo (Settings → Secrets and variables → Actions):
 | `TELEGRAM_TOKEN` | Il token che [@BotFather](https://t.me/BotFather) restituisce dopo `/newbot` |
 | `TELEGRAM_CHAT_ID` | Il proprio id: scrivere un messaggio al bot, poi aprire `https://api.telegram.org/bot<TOKEN>/getUpdates` e leggere `result[0].message.chat.id` |
 
-`TELEGRAM_CHAT_ID` accetta **piu' destinatari separati da virgola**, per esempio
-`123456789,-1001234567890` per ricevere la notifica in privato e insieme
-pubblicarla su un canale. E' solo un secret: cambiarlo in qualsiasi momento
-basta a spostare le notifiche altrove, senza toccare il codice.
+Un terzo secret, **facoltativo**, separa i due tipi di messaggio:
 
-Per pubblicare su un **canale**: creare il canale, aggiungere il bot come
-amministratore con permesso di pubblicare, scrivere un messaggio nel canale e
-rileggere `getUpdates` — l'id del canale compare come `channel_post.chat.id`
-ed e' un numero negativo che inizia per `-100`.
+| Secret | Chi lo riceve |
+|---|---|
+| `TELEGRAM_CHAT_ID` | Le nuove circolari. Di norma il canale condiviso con gli altri genitori. |
+| `TELEGRAM_HEARTBEAT_ID` | Il battito del lunedi'. Di norma solo la chat personale: nel canale sarebbe rumore. |
+
+Se `TELEGRAM_HEARTBEAT_ID` non e' impostato, il battito va agli stessi
+destinatari delle circolari. Entrambi accettano **piu' id separati da virgola**.
+
+Sono solo secret: cambiarli basta a spostare i messaggi altrove, senza toccare
+il codice.
+
+### Pubblicare su un canale
+
+1. Telegram → nuovo canale, privato (non compare nelle ricerche).
+2. Info canale → Amministratori → aggiungi il bot, lasciando attivo
+   **Pubblica messaggi**. Senza quel permesso il bot non puo' scrivere.
+3. Scrivere un messaggio qualsiasi nel canale.
+4. Riaprire `https://api.telegram.org/bot<TOKEN>/getUpdates` e cercare
+   `"channel_post"`: l'id del canale e' un numero negativo che inizia per
+   `-100`. Se ci sono piu' voci, guardare **l'ultima**.
+5. Mettere quell'id in `TELEGRAM_CHAT_ID` e il proprio in
+   `TELEGRAM_HEARTBEAT_ID`.
+
+Il bot non puo' scrivere a una persona che non ha prima premuto *Avvia* sul
+bot: per condividere con altri genitori il canale e' l'unica strada comoda.
 
 Senza i due secret lo script continua a funzionare: aggiorna la pagina e salta
 solo l'invio della notifica.

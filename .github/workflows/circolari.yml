@@ -30,6 +30,7 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_HEARTBEAT_ID: ${{ secrets.TELEGRAM_HEARTBEAT_ID }}
         run: python3 circolari/_src/check.py ${{ inputs.prova && '--test' || '' }}
 
       - name: Salva archivio e pagina aggiornati

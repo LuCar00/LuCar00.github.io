@@ -135,10 +135,22 @@ def save_archive(data):
 
 # --- telegram -------------------------------------------------------------
 
-def telegram_targets():
-    """Lista dei destinatari. TELEGRAM_CHAT_ID accetta piu' id separati da virgola."""
-    raw = os.environ.get("TELEGRAM_CHAT_ID", "")
+def _ids(variabile):
+    raw = os.environ.get(variabile, "")
     return [t.strip() for t in raw.split(",") if t.strip()]
+
+
+def telegram_targets():
+    """Chi riceve le nuove circolari: di norma il canale condiviso con gli altri
+    genitori. Piu' id separati da virgola."""
+    return _ids("TELEGRAM_CHAT_ID")
+
+
+def heartbeat_targets():
+    """Chi riceve il battito settimanale: di norma solo la chat personale, che
+    e' un segnale di servizio e nel canale sarebbe rumore. Se la variabile non
+    e' impostata si ricade sui destinatari delle circolari."""
+    return _ids("TELEGRAM_HEARTBEAT_ID") or telegram_targets()
 
 
 def send_to(token, chat, testo):
@@ -161,7 +173,7 @@ def send_to(token, chat, testo):
     return False
 
 
-def notify(item, prova=False):
+def notify(item, prova=False, destinatari=None):
     """Manda la notifica a tutti i destinatari configurati.
 
     Restituisce True se almeno uno ha ricevuto, oppure se Telegram non e'
@@ -170,7 +182,7 @@ def notify(item, prova=False):
     per una circolare appena pubblicata.
     """
     token = os.environ.get("TELEGRAM_TOKEN")
-    chats = telegram_targets()
+    chats = telegram_targets() if destinatari is None else destinatari
     if not token or not chats:
         print("   (Telegram non configurato, notifica saltata)")
         return True
@@ -350,7 +362,8 @@ def run_test():
     chat id e permessi del bot siano a posto, senza aspettare che la scuola
     pubblichi qualcosa.
     """
-    if not os.environ.get("TELEGRAM_TOKEN") or not telegram_targets():
+    token = os.environ.get("TELEGRAM_TOKEN")
+    if not token or not (telegram_targets() or heartbeat_targets()):
         print("TELEGRAM_TOKEN e TELEGRAM_CHAT_ID non sono impostati: niente da provare.")
         print("In locale: TELEGRAM_TOKEN=... TELEGRAM_CHAT_ID=... python3 check.py --test")
         return 1
@@ -361,11 +374,13 @@ def run_test():
         return 1
 
     item = documenti[0]
-    destinatari = telegram_targets()
+    # La prova serve a verificare OGNI recapito configurato, canale compreso:
+    # e' l'unico modo di sapere che il bot ha davvero i permessi per postarci.
+    destinatari = list(dict.fromkeys(telegram_targets() + heartbeat_targets()))
     print(f"invio di prova a {len(destinatari)} destinatario/i")
     print(f"   {item['data']}  {item['titolo'][:70]}")
 
-    if notify(item, prova=True):
+    if notify(item, prova=True, destinatari=destinatari):
         print("Fatto: controlla Telegram. L'archivio non e' stato toccato.")
         return 0
     print("Nessun invio riuscito. Controlla i messaggi di errore qui sopra.")
@@ -392,7 +407,7 @@ def heartbeat(archivio, forzato=False):
             return
 
     token = os.environ.get("TELEGRAM_TOKEN")
-    chats = telegram_targets()
+    chats = heartbeat_targets()
     if not token or not chats:
         return
 
