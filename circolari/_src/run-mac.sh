@@ -19,7 +19,14 @@ if [ -f "$LOG" ] && [ "$(wc -l < "$LOG")" -gt 3000 ]; then
   tail -n 1000 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
 fi
 
-exec >> "$LOG" 2>&1
+# Da launchd il log e' l'unica destinazione. Lanciato a mano da Terminale
+# scrive anche a schermo: un comando che non stampa niente qualunque cosa
+# succeda non fa capire se ha funzionato.
+if [ -t 1 ]; then
+  exec > >(tee -a "$LOG") 2>&1
+else
+  exec >> "$LOG" 2>&1
+fi
 echo "=== $(date '+%Y-%m-%d %H:%M:%S') ${*:-controllo} ==="
 
 if [ ! -f "$ENV_FILE" ]; then
