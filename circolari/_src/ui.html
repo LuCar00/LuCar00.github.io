@@ -89,6 +89,12 @@
   </div>
   <div class="card">
     <div class="riga">
+      <button class="btn" id="spegni">Chiudi il pannello</button>
+      <span class="nota">Il controllo automatico continua lo stesso: qui si spegne solo questa finestra.</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="riga">
       <span id="pianoTesto" style="font-size:14px"></span>
       <button class="btn" id="pianoBtn">…</button>
     </div>
@@ -210,7 +216,13 @@ document.querySelectorAll('[data-az]').forEach(b => b.addEventListener('click', 
   const r = await api('/api/azione', {method: 'POST', body: JSON.stringify({azione: b.dataset.az})});
   out.textContent = (r.ok ? '' : 'NON RIUSCITO\n\n') + (r.output || '');
   tutti.forEach(x => x.disabled = false);
-  caricaStato(); caricaDocumenti();
+  document.getElementById('spegni').addEventListener('click', async () => {
+  await api('/api/spegni', {method: 'POST', body: '{}'});
+  document.body.innerHTML = '<div class="wrap"><header><h1>Pannello chiuso</h1>' +
+    '<p class="nota">Puoi chiudere questa scheda. Il controllo automatico continua per conto suo.</p></header></div>';
+});
+
+caricaStato(); caricaDocumenti();
 }));
 
 document.getElementById('salva').addEventListener('click', async () => {
@@ -224,6 +236,12 @@ document.getElementById('salva').addEventListener('click', async () => {
   document.getElementById('salvato').textContent = 'salvato';
   setTimeout(() => document.getElementById('salvato').textContent = '', 2500);
   caricaStato();
+});
+
+document.getElementById('spegni').addEventListener('click', async () => {
+  await api('/api/spegni', {method: 'POST', body: '{}'});
+  document.body.innerHTML = '<div class="wrap"><header><h1>Pannello chiuso</h1>' +
+    '<p class="nota">Puoi chiudere questa scheda. Il controllo automatico continua per conto suo.</p></header></div>';
 });
 
 caricaStato(); caricaDocumenti();

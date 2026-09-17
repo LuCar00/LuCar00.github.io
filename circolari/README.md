@@ -59,14 +59,22 @@ solo l'invio della notifica.
 
 ## Pannello
 
-Doppio clic su **Pannello circolari.command**: apre una paginetta nel browser
+Doppio clic su **Circolari** sulla Scrivania (oppure su
+`Pannello circolari.command`, che fa lo stesso da dentro la cartella):
+apre una paginetta nel browser
 per gestire token e id, lanciare le prove, leggere il log e sfogliare
 l'archivio, senza passare dal Terminale.
 
 Gira solo su `127.0.0.1`, con una chiave di sessione diversa a ogni avvio:
 senza quella chiave nemmeno un'altra pagina aperta nel browser puo' parlarci.
 I valori gia' salvati non vengono mai rimandati al browser, solo le ultime
-cifre. Si spegne chiudendo la finestra del Terminale che si apre insieme.
+cifre. Si spegne dal bottone **Chiudi il pannello**. Un secondo doppio clic non
+avvia un secondo server: riapre quello gia' acceso.
+
+L'app sulla Scrivania e' un guscio di poche righe che punta a questa
+cartella. Se la cartella del progetto cambia posto, o se l'app finisce nel
+cestino, si rifa' con `bash _src/fai-app.sh`; l'icona con
+`python3 _src/fai-icona.py`.
 
 ## Uso manuale
 

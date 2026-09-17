@@ -29,6 +29,7 @@ UI = os.path.join(HERE, "ui.html")
 CONF = os.path.expanduser("~/.circolari")
 ENV = os.path.join(CONF, "env")
 LOG = os.path.join(CONF, "log.txt")
+SEGNALIBRO = os.path.join(CONF, "pannello.url")
 PLIST = os.path.expanduser(
     "~/Library/LaunchAgents/com.lucarnevale.circolari.plist")
 LABEL = "com.lucarnevale.circolari"
@@ -257,19 +258,54 @@ def porta_libera(preferita=8787):
     return 0
 
 
+def gia_acceso():
+    """Se un pannello e' gia' in ascolto, restituisce il suo indirizzo.
+
+    Senza questo controllo un secondo doppio clic aprirebbe un secondo
+    server su un'altra porta, con una chiave diversa: due pannelli vivi e
+    nessun modo ovvio di capire quale sia quale.
+    """
+    if not os.path.exists(SEGNALIBRO):
+        return None
+    try:
+        with open(SEGNALIBRO, encoding="utf-8") as fh:
+            url = fh.read().strip()
+        porta = int(url.split("127.0.0.1:")[1].split("/")[0])
+    except (OSError, ValueError, IndexError):
+        return None
+    with socket.socket() as s:
+        s.settimeout(1)
+        return url if s.connect_ex(("127.0.0.1", porta)) == 0 else None
+
+
 def main():
+    attivo = gia_acceso()
+    if attivo:
+        print("Il pannello era gia' acceso: riapro quello.", flush=True)
+        webbrowser.open(attivo)
+        return
+
     porta = porta_libera()
     server = http.server.ThreadingHTTPServer(("127.0.0.1", porta), Pannello)
     url = f"http://127.0.0.1:{porta}/?k={CHIAVE}"
     print("Pannello circolari acceso.", flush=True)
     print(f"  {url}", flush=True)
     print("  Chiudi questa finestra o premi Ctrl-C per spegnerlo.", flush=True)
+    os.makedirs(CONF, exist_ok=True)
+    with open(SEGNALIBRO, "w", encoding="utf-8") as fh:
+        fh.write(url)
+
     webbrowser.open(url)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
-    print("\nPannello spento.")
+    finally:
+        try:
+            os.remove(SEGNALIBRO)
+        except OSError:
+            pass
+    print("\nPannello spento.", flush=True)
 
 
 if __name__ == "__main__":
