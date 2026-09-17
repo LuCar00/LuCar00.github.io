@@ -1,36 +1,31 @@
 name: Monitor circolari scuola
 
+# Niente schedule: da qui il controllo non puo' funzionare. Spaggiari
+# risponde 403 alle richieste dei runner GitHub (rifiuta le reti dei
+# datacenter), mentre dalla rete di casa risponde 200. Il controllo vero
+# gira sul Mac di Luca; qui restano solo le due prove Telegram, che
+# leggono dall'archivio e non toccano il sito della scuola.
 on:
-  schedule:
-    # orari UTC -> 9:00 11:00 13:00 16:00 18:00 ora italiana (ora legale).
-    # In inverno l'Italia passa a UTC+1 e i controlli slittano un'ora indietro.
-    - cron: '0 7,9,11,14,16 * * *'
   workflow_dispatch:
     inputs:
       azione:
         description: 'Cosa deve fare questa esecuzione'
         type: choice
-        default: controllo
+        default: prova-circolare
         options:
-          - controllo          # controllo normale, come da programma
           - prova-circolare    # manda una circolare di prova ai destinatari
           - prova-riepilogo    # manda il riepilogo del lunedi' a chi lo riceve
 
-# Evita che due run sovrapposti si contendano il commit.
-concurrency:
-  group: circolari
-  cancel-in-progress: false
-
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  check:
+  prova:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Controlla le nuove circolari
+      - name: Prova di invio su Telegram
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -39,15 +34,3 @@ jobs:
           python3 circolari/_src/check.py
           ${{ inputs.azione == 'prova-circolare' && '--test'
           || inputs.azione == 'prova-riepilogo' && '--heartbeat' || '' }}
-
-      - name: Salva archivio e pagina aggiornati
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add circolari/
-          if git diff --staged --quiet; then
-            echo "Nessuna modifica da salvare"
-          else
-            git commit -m "circolari: aggiornamento automatico"
-            git push
-          fi
