@@ -57,6 +57,17 @@ bot: per condividere con altri genitori il canale e' l'unica strada comoda.
 Senza i due secret lo script continua a funzionare: aggiorna la pagina e salta
 solo l'invio della notifica.
 
+## Pannello
+
+Doppio clic su **Pannello circolari.command**: apre una paginetta nel browser
+per gestire token e id, lanciare le prove, leggere il log e sfogliare
+l'archivio, senza passare dal Terminale.
+
+Gira solo su `127.0.0.1`, con una chiave di sessione diversa a ogni avvio:
+senza quella chiave nemmeno un'altra pagina aperta nel browser puo' parlarci.
+I valori gia' salvati non vengono mai rimandati al browser, solo le ultime
+cifre. Si spegne chiudendo la finestra del Terminale che si apre insieme.
+
 ## Uso manuale
 
 ```bash

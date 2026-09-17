@@ -38,7 +38,7 @@ set -a; . "$ENV_FILE"; set +a
 cd "$REPO" || { echo "cartella del repo non trovata: $REPO"; exit 1; }
 
 # Il remoto puo' essere cambiato (altri lavori sullo stesso repo).
-git pull --rebase -q origin main || echo "pull non riuscito, proseguo lo stesso"
+git pull --rebase --autostash -q origin main || echo "pull non riuscito, proseguo lo stesso"
 
 # Gli argomenti passano allo script: "run-mac.sh --test" manda una prova
 # usando i secret del Mac, senza aspettare il prossimo orario.
@@ -62,6 +62,6 @@ for tentativo in 1 2 3; do
     exit 0
   fi
   echo "push rifiutato (tentativo $tentativo), riallineo e riprovo"
-  git pull --rebase -q origin main || break
+  git pull --rebase --autostash -q origin main || break
 done
 echo "push non riuscito: il commit resta in locale, verra' spinto al giro dopo"

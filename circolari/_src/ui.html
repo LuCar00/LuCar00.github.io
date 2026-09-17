@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pannello circolari</title>
+<style>
+  :root {
+    --bg:#fbfaf8; --surface:#fff; --surface-2:#f4f1ec; --border:#e6e2db;
+    --text:#1c1b19; --muted:#6f6a62; --accent:#9a2a1f;
+    --ok:#2f5d50; --ok-bg:#e6efec; --ko:#9a2a1f; --ko-bg:#faece7;
+    --fam:#2f5d50; --fam-bg:#e6efec; --alu:#1f4d7a; --alu-bg:#e4edf5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#151413; --surface:#1e1d1b; --surface-2:#252320; --border:#333029;
+      --text:#f2efea; --muted:#a09a90; --accent:#e0705f;
+      --ok:#8fc9b6; --ok-bg:#21332d; --ko:#e0705f; --ko-bg:#3a2320;
+      --fam:#8fc9b6; --fam-bg:#21332d; --alu:#93bde0; --alu-bg:#1e2d3b;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:0 16px 56px;background:var(--bg);color:var(--text);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto}
+  header{padding:32px 0 20px;border-bottom:1px solid var(--border)}
+  h1{margin:0 0 10px;font-size:23px;letter-spacing:-.02em}
+  .riga{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .pill{font-size:13px;padding:4px 11px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+  .pill.ok{background:var(--ok-bg);color:var(--ok);font-weight:500}
+  .pill.ko{background:var(--ko-bg);color:var(--ko);font-weight:500}
+  nav{display:flex;gap:4px;margin:18px 0 0;flex-wrap:wrap}
+  nav button{background:none;border:1px solid transparent;border-radius:8px;padding:8px 14px;
+    font:inherit;font-size:14px;color:var(--muted);cursor:pointer}
+  nav button[aria-selected="true"]{background:var(--surface);border-color:var(--border);color:var(--text);font-weight:500}
+  nav button:focus-visible,.btn:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  section{display:none;padding-top:20px}
+  section[data-attiva]{display:block}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px}
+  .btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 15px;
+    font:inherit;font-size:14px;color:var(--text);cursor:pointer;min-height:38px}
+  .btn:hover:not(:disabled){border-color:var(--accent)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.primario{background:var(--text);color:var(--bg);border-color:var(--text)}
+  label{display:block;font-size:13px;color:var(--muted);margin:0 0 5px}
+  input[type=password],input[type=text]{width:100%;padding:9px 11px;border:1px solid var(--border);
+    border-radius:8px;background:var(--bg);color:var(--text);font:inherit;font-size:14px}
+  .campo{margin-bottom:14px}
+  .nota{font-size:12.5px;color:var(--muted);margin:5px 0 0}
+  pre{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;
+    overflow:auto;max-height:420px;font-size:12.5px;line-height:1.55;margin:0;white-space:pre-wrap;word-break:break-word}
+  .doc{display:block;padding:13px 15px;background:var(--surface);border:1px solid var(--border);
+    border-radius:10px;margin-bottom:7px;text-decoration:none;color:inherit}
+  .doc:hover{border-color:var(--accent)}
+  .doc time{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .doc .tit{display:block;font-weight:500;margin:3px 0 6px;line-height:1.35}
+  .tag{font-size:11.5px;padding:2px 8px;border-radius:999px;font-weight:500;margin-right:5px}
+  .t-fam{color:var(--fam);background:var(--fam-bg)} .t-alu{color:var(--alu);background:var(--alu-bg)}
+  .vuoto{color:var(--muted);padding:26px 0;text-align:center}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Pannello circolari</h1>
+  <div class="riga" id="stato"><span class="pill">carico…</span></div>
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-t="azioni">Azioni</button>
+    <button role="tab" aria-selected="false" data-t="documenti">Documenti</button>
+    <button role="tab" aria-selected="false" data-t="impostazioni">Impostazioni</button>
+    <button role="tab" aria-selected="false" data-t="log">Log</button>
+  </nav>
+</header>
+
+<section data-s="azioni" data-attiva>
+  <div class="card">
+    <div class="riga">
+      <button class="btn primario" data-az="controllo">Controlla adesso</button>
+      <button class="btn" data-az="prova-circolare">Prova circolare</button>
+      <button class="btn" data-az="prova-riepilogo">Prova riepilogo</button>
+    </div>
+    <p class="nota">La prova circolare arriva a tutti i recapiti, canale compreso. Il riepilogo solo a chi lo riceve di norma.</p>
+  </div>
+  <div class="card">
+    <label>Esito dell'ultima esecuzione</label>
+    <pre id="esito">Nessuna esecuzione da quando hai aperto il pannello.</pre>
+  </div>
+  <div class="card">
+    <div class="riga">
+      <span id="pianoTesto" style="font-size:14px"></span>
+      <button class="btn" id="pianoBtn">…</button>
+    </div>
+    <p class="nota">Il controllo automatico gira agli orari previsti solo mentre il Mac e' acceso. Se e' spento, il controllo saltato parte al risveglio.</p>
+  </div>
+</section>
+
+<section data-s="documenti">
+  <div class="card">
+    <label for="cerca">Cerca fra i documenti</label>
+    <input type="text" id="cerca" placeholder="numero, parola nel titolo, data…">
+  </div>
+  <div id="elenco"><p class="vuoto">carico…</p></div>
+</section>
+
+<section data-s="impostazioni">
+  <div class="card">
+    <div class="campo">
+      <label for="tok">Token del bot</label>
+      <input type="password" id="tok" autocomplete="off" placeholder="lascia vuoto per non cambiarlo">
+      <p class="nota" id="n-tok"></p>
+    </div>
+    <div class="campo">
+      <label for="chat">Dove vanno le circolari nuove</label>
+      <input type="password" id="chat" autocomplete="off" placeholder="lascia vuoto per non cambiarlo">
+      <p class="nota" id="n-chat"></p>
+    </div>
+    <div class="campo">
+      <label for="hb">Dove va il riepilogo del lunedi'</label>
+      <input type="password" id="hb" autocomplete="off" placeholder="lascia vuoto per non cambiarlo">
+      <p class="nota" id="n-hb"></p>
+    </div>
+    <div class="riga">
+      <button class="btn primario" id="salva">Salva</button>
+      <span id="salvato" class="nota"></span>
+    </div>
+    <p class="nota">I valori salvati non vengono piu' mostrati: il pannello ne ricorda solo le ultime cifre, quanto basta per riconoscerli. Restano in <code>~/.circolari/env</code>, leggibile solo da te.</p>
+  </div>
+</section>
+
+<section data-s="log">
+  <div class="card">
+    <div class="riga"><button class="btn" id="ricarica">Ricarica</button>
+      <span class="nota">~/.circolari/log.txt</span></div>
+  </div>
+  <pre id="logTesto">carico…</pre>
+</section>
+
+</div>
+
+<script>
+const K = "__CHIAVE__";
+const api = (p, o = {}) => fetch(p + (p.includes("?") ? "&" : "?") + "k=" + encodeURIComponent(K),
+  Object.assign({headers: {"Content-Type": "application/json"}}, o)).then(r => r.json());
+
+let documenti = [];
+
+document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  document.querySelectorAll('section').forEach(s =>
+    s.dataset.s === b.dataset.t ? s.setAttribute('data-attiva', '') : s.removeAttribute('data-attiva'));
+  if (b.dataset.t === 'log') caricaLog();
+}));
+
+function pill(testo, classe) { return `<span class="pill ${classe || ''}">${testo}</span>`; }
+
+async function caricaStato() {
+  const s = await api('/api/stato');
+  const attivo = s.launchd && s.launchd.attivo;
+  const mancanti = Object.values(s.secrets).filter(v => !v).length;
+  document.getElementById('stato').innerHTML =
+    pill(attivo ? 'controllo automatico attivo' : 'controllo automatico fermo', attivo ? 'ok' : 'ko') +
+    pill(`${s.documenti} documenti`) +
+    (s.ultimo_controllo ? pill('ultimo controllo ' + s.ultimo_controllo) : '') +
+    (mancanti ? pill(`${mancanti} dati mancanti`, 'ko') : '') +
+    (s.in_sospeso ? pill(`${s.in_sospeso} notifiche da inviare`, 'ko') : '');
+
+  document.getElementById('pianoTesto').textContent = attivo
+    ? 'Controlli previsti alle ' + (s.orari || []).join(', ')
+    : 'Il controllo automatico e’ disattivato.';
+  const b = document.getElementById('pianoBtn');
+  b.textContent = attivo ? 'Disattiva' : 'Attiva';
+  b.onclick = async () => { b.disabled = true; await api('/api/launchd', {method: 'POST', body: JSON.stringify({accendi: !attivo})}); b.disabled = false; caricaStato(); };
+
+  const etichetta = (v) => v ? `impostato, finisce con …${v.coda} (${v.lunghezza} caratteri)` : 'non ancora impostato';
+  document.getElementById('n-tok').textContent = etichetta(s.secrets.TELEGRAM_TOKEN);
+  document.getElementById('n-chat').textContent = etichetta(s.secrets.TELEGRAM_CHAT_ID);
+  document.getElementById('n-hb').textContent = etichetta(s.secrets.TELEGRAM_HEARTBEAT_ID);
+}
+
+async function caricaDocumenti() {
+  documenti = await api('/api/documenti');
+  mostra();
+}
+function mostra() {
+  const q = document.getElementById('cerca').value.trim().toLowerCase();
+  const filtrati = q ? documenti.filter(d => (d.titolo + ' ' + d.data).toLowerCase().includes(q)) : documenti;
+  const el = document.getElementById('elenco');
+  if (!filtrati.length) { el.innerHTML = '<p class="vuoto">Nessun documento corrisponde.</p>'; return; }
+  el.innerHTML = filtrati.map(d => `<a class="doc" href="${d.link}" target="_blank" rel="noopener">
+    <time>${d.data}</time><span class="tit">${d.titolo.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>
+    ${(d.watched || []).map(w => `<span class="tag ${w === 'Famiglie' ? 't-fam' : 't-alu'}">${w}</span>`).join('')}</a>`).join('');
+}
+document.getElementById('cerca').addEventListener('input', mostra);
+
+async function caricaLog() {
+  const r = await api('/api/log');
+  const p = document.getElementById('logTesto');
+  p.textContent = r.testo || '(il log e’ vuoto)';
+  p.scrollTop = p.scrollHeight;
+}
+document.getElementById('ricarica').addEventListener('click', caricaLog);
+
+document.querySelectorAll('[data-az]').forEach(b => b.addEventListener('click', async () => {
+  const tutti = document.querySelectorAll('[data-az]');
+  tutti.forEach(x => x.disabled = true);
+  const out = document.getElementById('esito');
+  out.textContent = 'in corso…';
+  const r = await api('/api/azione', {method: 'POST', body: JSON.stringify({azione: b.dataset.az})});
+  out.textContent = (r.ok ? '' : 'NON RIUSCITO\n\n') + (r.output || '');
+  tutti.forEach(x => x.disabled = false);
+  caricaStato(); caricaDocumenti();
+}));
+
+document.getElementById('salva').addEventListener('click', async () => {
+  const corpo = {
+    TELEGRAM_TOKEN: document.getElementById('tok').value,
+    TELEGRAM_CHAT_ID: document.getElementById('chat').value,
+    TELEGRAM_HEARTBEAT_ID: document.getElementById('hb').value,
+  };
+  await api('/api/secrets', {method: 'POST', body: JSON.stringify(corpo)});
+  ['tok', 'chat', 'hb'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('salvato').textContent = 'salvato';
+  setTimeout(() => document.getElementById('salvato').textContent = '', 2500);
+  caricaStato();
+});
+
+caricaStato(); caricaDocumenti();
+setInterval(caricaStato, 30000);
+</script>
+</body>
+</html>
