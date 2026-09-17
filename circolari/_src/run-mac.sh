@@ -44,12 +44,17 @@ git pull --rebase -q origin main || echo "pull non riuscito, proseguo lo stesso"
 # usando i secret del Mac, senza aspettare il prossimo orario.
 python3 circolari/_src/check.py "$@" || { echo "il controllo e' fallito"; exit 1; }
 
-if git diff --quiet -- circolari/; then
+# Solo i due file generati. "git add circolari/" prenderebbe anche le
+# modifiche in corso allo script stesso, committandole come se fossero un
+# aggiornamento automatico: e' gia' successo una volta.
+GENERATI="circolari/index.html circolari/_src/archivio.json"
+
+if git diff --quiet -- $GENERATI; then
   echo "niente da pubblicare"
   exit 0
 fi
 
-git add circolari/
+git add $GENERATI
 git commit -q -m "circolari: aggiornamento automatico"
 for tentativo in 1 2 3; do
   if git push -q origin main; then
