@@ -83,12 +83,15 @@ negli altri quattro controlli del lunedi'.
 
 ## Verificare che le notifiche arrivino
 
-Dopo aver messo i secret, senza aspettare che la scuola pubblichi qualcosa:
-**Actions → Monitor circolari scuola → Run workflow**, spuntare *"Manda una
-notifica di prova"* e avviare. Manda su Telegram la circolare piu' recente
-gia' in archivio, marcata come prova, e non modifica ne' archivio ne' pagina.
+**Actions → Monitor circolari scuola → Run workflow**, poi scegliere dal menu:
 
-Senza la spunta, lo stesso pulsante fa un controllo normale fuori orario.
+| Scelta | Cosa fa |
+|---|---|
+| `controllo` | Controllo normale fuori orario. Nessun messaggio se non c'e' niente di nuovo. |
+| `prova-circolare` | Manda la circolare piu' recente, marcata come prova, a **tutti** i recapiti configurati (canale compreso: e' il modo di verificare che il bot possa postarci). |
+| `prova-riepilogo` | Manda subito il riepilogo del lunedi', a chi lo riceve di norma. |
+
+Nessuna delle due prove modifica archivio o pagina.
 
 Nessuna dipendenza: solo la standard library di Python 3.
 

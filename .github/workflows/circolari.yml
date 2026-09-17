@@ -7,10 +7,14 @@ on:
     - cron: '0 7,9,11,14,16 * * *'
   workflow_dispatch:
     inputs:
-      prova:
-        description: 'Manda una notifica di prova invece del controllo normale'
-        type: boolean
-        default: false
+      azione:
+        description: 'Cosa deve fare questa esecuzione'
+        type: choice
+        default: controllo
+        options:
+          - controllo          # controllo normale, come da programma
+          - prova-circolare    # manda una circolare di prova ai destinatari
+          - prova-riepilogo    # manda il riepilogo del lunedi' a chi lo riceve
 
 # Evita che due run sovrapposti si contendano il commit.
 concurrency:
@@ -31,7 +35,10 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_HEARTBEAT_ID: ${{ secrets.TELEGRAM_HEARTBEAT_ID }}
-        run: python3 circolari/_src/check.py ${{ inputs.prova && '--test' || '' }}
+        run: >-
+          python3 circolari/_src/check.py
+          ${{ inputs.azione == 'prova-circolare' && '--test'
+          || inputs.azione == 'prova-riepilogo' && '--heartbeat' || '' }}
 
       - name: Salva archivio e pagina aggiornati
         run: |
