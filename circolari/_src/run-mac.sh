@@ -6,7 +6,9 @@
 # ~/.circolari/env, che resta sul Mac e non viene mai committato.
 set -u
 
-REPO="/Users/lucacarnevale/Desktop/Lavoro/LuCar00/LuCar00.github.io"
+# Ricavato dalla posizione dello script, non scritto a mano: cosi' la stessa
+# copia funziona ovunque sia il checkout.
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"
 ENV_FILE="$HOME/.circolari/env"
 LOG="$HOME/.circolari/log.txt"
 PATH="/usr/bin:/bin:/usr/sbin:/sbin"     # launchd parte con un PATH minimo
