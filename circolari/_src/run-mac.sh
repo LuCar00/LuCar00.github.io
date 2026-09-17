@@ -20,7 +20,7 @@ if [ -f "$LOG" ] && [ "$(wc -l < "$LOG")" -gt 3000 ]; then
 fi
 
 exec >> "$LOG" 2>&1
-echo "=== $(date '+%Y-%m-%d %H:%M:%S') ==="
+echo "=== $(date '+%Y-%m-%d %H:%M:%S') ${*:-controllo} ==="
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "manca $ENV_FILE: senza token e chat id non si va da nessuna parte"
@@ -33,7 +33,9 @@ cd "$REPO" || { echo "cartella del repo non trovata: $REPO"; exit 1; }
 # Il remoto puo' essere cambiato (altri lavori sullo stesso repo).
 git pull --rebase -q origin main || echo "pull non riuscito, proseguo lo stesso"
 
-python3 circolari/_src/check.py || { echo "il controllo e' fallito"; exit 1; }
+# Gli argomenti passano allo script: "run-mac.sh --test" manda una prova
+# usando i secret del Mac, senza aspettare il prossimo orario.
+python3 circolari/_src/check.py "$@" || { echo "il controllo e' fallito"; exit 1; }
 
 if git diff --quiet -- circolari/; then
   echo "niente da pubblicare"
