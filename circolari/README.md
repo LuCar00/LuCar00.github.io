@@ -46,7 +46,22 @@ python3 _src/check.py              # run normale, 3 pagine
 python3 _src/check.py --full       # rilegge tutto l'archivio (25 pagine)
 python3 _src/check.py --no-notify  # non manda niente su Telegram
 python3 _src/check.py --test       # notifica di prova, non tocca nulla
+python3 _src/check.py --heartbeat # manda subito il riepilogo settimanale
 ```
+
+## Battito settimanale
+
+Ogni **lunedi'**, al primo dei cinque controlli, arriva su Telegram un
+riepilogo: data dell'ultimo controllo, numero di documenti in archivio e
+ultima circolare vista. Se un lunedi' non arriva, il monitor si e' fermato.
+
+Copre l'unico guasto che resterebbe altrimenti invisibile: se la scuola
+cambiasse gli id delle categorie, lo script girerebbe senza errori ma non
+troverebbe mai piu' nulla. Il conteggio dei documenti nel messaggio rende
+evidente quel caso, perche' smetterebbe di crescere durante l'anno.
+
+Il campo `ultimo_battito` in `archivio.json` evita che il messaggio si ripeta
+negli altri quattro controlli del lunedi'.
 
 ## Verificare che le notifiche arrivino
 

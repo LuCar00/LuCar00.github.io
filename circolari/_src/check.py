@@ -15,6 +15,7 @@ Uso:
   python3 check.py --full       crawl completo dell'archivio
   python3 check.py --no-notify  non manda niente su Telegram (seed iniziale)
   python3 check.py --test       invia una notifica di prova e basta
+  python3 check.py --heartbeat  invia subito il riepilogo settimanale
 """
 
 import html
@@ -371,6 +372,58 @@ def run_test():
     return 1
 
 
+def heartbeat(archivio, forzato=False):
+    """Messaggio settimanale del lunedi': "sono vivo".
+
+    Serve a coprire l'unico guasto silenzioso rimasto: se la scuola cambiasse
+    gli id delle categorie, lo script continuerebbe a girare senza errori ma
+    non troverebbe mai piu' niente. Il conteggio dei documenti nel messaggio
+    rende visibile quel caso: se non cresce mai durante l'anno scolastico,
+    qualcosa non va.
+
+    Parte al primo run del lunedi'; `ultimo_battito` evita i doppioni negli
+    altri quattro controlli della giornata.
+    """
+    oggi = datetime.now(ROME)
+    if not forzato:
+        if oggi.weekday() != 0:                       # 0 = lunedi'
+            return
+        if archivio.get("ultimo_battito") == oggi.strftime("%Y-%m-%d"):
+            return
+
+    token = os.environ.get("TELEGRAM_TOKEN")
+    chats = telegram_targets()
+    if not token or not chats:
+        return
+
+    docs = archivio["documenti"]
+    ultimo = docs[0] if docs else None
+    quando = archivio.get("ultimo_controllo") or "\u2014"
+    testo = (
+        "\U0001F7E2 <b>Il monitor e' attivo</b>\n\n"
+        f"Ultimo controllo: {html.escape(quando)}\n"
+        f"Documenti in archivio: <b>{len(docs)}</b>\n"
+    )
+    if ultimo:
+        testo += (
+            f"Ultima circolare: {html.escape(ultimo['data'])}\n"
+            f"<i>{html.escape(ultimo['titolo'][:90])}</i>\n"
+        )
+    testo += (
+        '\n<a href="https://lucar00.github.io/circolari/">Apri l\'elenco completo</a>\n\n'
+        "<i>Messaggio automatico del lunedi'. Se un lunedi' non arriva, "
+        "il monitor si e' fermato.</i>"
+    )
+
+    # list() prima di any(): any() corto-circuita al primo successo e i
+    # destinatari successivi resterebbero senza messaggio.
+    esiti = [send_to(token, chat, testo) for chat in chats]
+    if any(esiti):
+        if not forzato:
+            archivio["ultimo_battito"] = oggi.strftime("%Y-%m-%d")
+        print(f"   battito settimanale inviato a {sum(esiti)}/{len(esiti)} destinatari")
+
+
 def da_ritentare(archivio, escludi):
     """Documenti gia' archiviati la cui notifica non e' mai andata a buon fine.
 
@@ -387,6 +440,14 @@ def da_ritentare(archivio, escludi):
 def main():
     if "--test" in sys.argv:
         return run_test()
+
+    if "--heartbeat" in sys.argv:
+        archivio = load_archive()
+        if not archivio["documenti"]:
+            print("Archivio vuoto: niente da riassumere.")
+            return 1
+        heartbeat(archivio, forzato=True)
+        return 0
 
     full = "--full" in sys.argv
     silent = "--no-notify" in sys.argv
@@ -425,6 +486,8 @@ def main():
         print("   (primo popolamento dell'archivio: nessuna notifica inviata)")
 
     archivio["ultimo_controllo"] = datetime.now(ROME).strftime("%d/%m/%Y alle %H:%M")
+    if not (silent or primo_giro):
+        heartbeat(archivio)
     save_archive(archivio)
 
     with open(PAGE, "w", encoding="utf-8") as fh:
