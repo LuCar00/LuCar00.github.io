@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Circolari — Famiglie e Alunni</title>
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --surface: #ffffff;
+    --border: #e6e2db;
+    --text: #1c1b19;
+    --muted: #6f6a62;
+    --accent: #9a2a1f;
+    --famiglie: #2f5d50;
+    --famiglie-bg: #e6efec;
+    --alunni: #1f4d7a;
+    --alunni-bg: #e4edf5;
+    --altro: #6f6a62;
+    --altro-bg: #efece7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151413;
+      --surface: #1e1d1b;
+      --border: #333029;
+      --text: #f2efea;
+      --muted: #a09a90;
+      --accent: #e0705f;
+      --famiglie: #8fc9b6;
+      --famiglie-bg: #21332d;
+      --alunni: #93bde0;
+      --alunni-bg: #1e2d3b;
+      --altro: #a09a90;
+      --altro-bg: #2a2723;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header { padding: 40px 0 24px; border-bottom: 1px solid var(--border); }
+  h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.02em; }
+  .sub { margin: 0; color: var(--muted); font-size: 14px; }
+  .filtri { display: flex; gap: 8px; flex-wrap: wrap; padding: 20px 0 4px; }
+  .filtro {
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 999px; padding: 7px 15px; font-size: 14px; cursor: pointer;
+    font-family: inherit; min-height: 36px;
+  }
+  .filtro[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .filtro:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  ul { list-style: none; margin: 16px 0 0; padding: 0; }
+  .doc + .doc { margin-top: 8px; }
+  .doc-link {
+    display: grid; gap: 6px; padding: 16px 18px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    text-decoration: none; color: inherit;
+  }
+  .doc-link:hover { border-color: var(--accent); }
+  .doc-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  time { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .doc-title { font-weight: 600; line-height: 1.35; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .tag { font-size: 12px; padding: 3px 9px; border-radius: 999px; font-weight: 600; }
+  .tag-famiglie { color: var(--famiglie); background: var(--famiglie-bg); }
+  .tag-alunni { color: var(--alunni); background: var(--alunni-bg); }
+  .tag-altro { color: var(--altro); background: var(--altro-bg); font-weight: 500; }
+  .vuoto { color: var(--muted); padding: 32px 0; text-align: center; }
+  footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Circolari — Famiglie e Alunni</h1>
+    <p class="sub">IC Locatelli-Quasimodo · 129 documenti · aggiornato 17/09/2026 alle 15:29</p>
+  </header>
+
+  <div class="filtri" role="group" aria-label="Filtra per categoria">
+    <button class="filtro" data-f="tutti" aria-pressed="true">Tutti</button>
+    <button class="filtro" data-f="Famiglie" aria-pressed="false">Famiglie</button>
+    <button class="filtro" data-f="Alunni" aria-pressed="false">Alunni</button>
+  </div>
+
+  <ul id="elenco">
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207780997" target="_blank" rel="noopener">
+          <time datetime="13/09/2026">13/09/2026</time>
+          <span class="doc-title">CIRCOLARE N. 012 ENTRATA E USCITA ALUNNE/I DA MARCIAPIEDE INGRESSO PRINCIPALE SCUOLA &quot;LOCATELLI&quot; VIA VEGLIA 80</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207707379" target="_blank" rel="noopener">
+          <time datetime="10/09/2026">10/09/2026</time>
+          <span class="doc-title">CIRCOLARI N. 010 AVVIO SERVIZIO COMUNALE PRE-SCUOLA SCUOLE PRIMARIE DAL 14 SETTEMBRE 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207589368" target="_blank" rel="noopener">
+          <time datetime="04/09/2026">04/09/2026</time>
+          <span class="doc-title">CIRCOLARE N. 006 COORDINATORI DI CLASSE SCUOLE SECONDARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207589141" target="_blank" rel="noopener">
+          <time datetime="04/09/2026">04/09/2026</time>
+          <span class="doc-title">CIRCOLARE N. 005 COORDINATORI DI CLASSE E INTERCLASSE SCUOLE PRIMARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207558473" target="_blank" rel="noopener">
+          <time datetime="03/09/2026">03/09/2026</time>
+          <span class="doc-title">CIRCOLARE N. 003 ORARI ATTIVITÀ DIDATTICHE SCUOLE “QUASIMODO” E &quot;TOMMASEO&quot; 14-18 SETTEMBRE 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207557804" target="_blank" rel="noopener">
+          <time datetime="03/09/2026">03/09/2026</time>
+          <span class="doc-title">CIRCOLARE N. 002 ORARI ATTIVITÀ DIDATTICHE SCUOLA “RODARI” 14-18 SETTEMBRE 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207557754" target="_blank" rel="noopener">
+          <time datetime="03/09/2026">03/09/2026</time>
+          <span class="doc-title">CIRCOLARE N. 001 ORARI ATTIVITÀ DIDATTICHE SCUOLA “LOCATELLI” 14-18 SETTEMBRE 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206950356" target="_blank" rel="noopener">
+          <time datetime="15/07/2026">15/07/2026</time>
+          <span class="doc-title">CIRCOLARE N. 248 DOCUMENTAZIONE COMPLETAMENTO ISCRIZIONI ALUNNI FUTURE CLASSI PRIME A.S.2026/2027 – INCONTRO CON I GENITORI/TUTORI DELLE CLASSI PRIME - LIBRI DI TESTO CLASSI SCUOLA SECONDARIA  TOMMASEO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206934435" target="_blank" rel="noopener">
+          <time datetime="14/07/2026">14/07/2026</time>
+          <span class="doc-title">CIRCOLARE N. 247 DOCUMENTAZIONE COMPLETAMENTO ISCRIZIONI ALUNNI FUTURE CLASSI PRIME A.S.2026/2027 – INCONTRO CON I GENITORI/TUTORI DELLE CLASSI PRIME - LIBRI DI TESTO CLASSI SCUOLA SECONDARIA  QUASIMODO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206933849" target="_blank" rel="noopener">
+          <time datetime="14/07/2026">14/07/2026</time>
+          <span class="doc-title">CIRCOLARE N. 246 DOCUMENTAZIONE COMPLETAMENTO ISCRIZIONI ALUNNI FUTURE CLASSI PRIME A.S. 2026/2027 – INCONTRO CON I GENITORI/TUTORI DELLE CLASSI PRIME - LIBRI DI TESTO CLASSI SCUOLA  PRIMARIA RODARI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206932785" target="_blank" rel="noopener">
+          <time datetime="14/07/2026">14/07/2026</time>
+          <span class="doc-title">CIRCOLARE N. 245  DOCUMENTAZIONE COMPLETAMENTO ISCRIZIONI ALUNNI FUTURE CLASSI PRIME A.S.2026/2027 – INCONTRO CON I GENITORI/TUTORI DELLE CLASSI PRIME - LIBRI DI TESTO CLASSI SCUOLA PRIMARIA LOCATELLI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206872623" target="_blank" rel="noopener">
+          <time datetime="10/07/2026">10/07/2026</time>
+          <span class="doc-title">CIRCOLARE N. 244 CERTIFICAZIONE COMPETENZE INVALSI A.S. 2025/26</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206741671" target="_blank" rel="noopener">
+          <time datetime="01/07/2026">01/07/2026</time>
+          <span class="doc-title">CIRCOLARE N. 242 SERVIZI COMUNALI DI PRE-SCUOLA E GIOCHI SERALI PER ALUNNI/E DELLE SCUOLE PRIMARIE</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206690631" target="_blank" rel="noopener">
+          <time datetime="29/06/2026">29/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 240 ESITI ESAMI CLASSI TERZE SCUOLE SECONDARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206681570" target="_blank" rel="noopener">
+          <time datetime="29/06/2026">29/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 239 PAGAMENTO PROGETTI A.S. 2025/2026</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206583067" target="_blank" rel="noopener">
+          <time datetime="24/06/2026">24/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 235 CALENDARIO ATTIVITA&#x27; DIDATTICHE A.S. 2026-2027</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206581068" target="_blank" rel="noopener">
+          <time datetime="24/06/2026">24/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 234bis CONVOCAZIONE GLI - GRUPPO DI LAVORO PER L’INCLUSIONE 24 GIUGNO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206128805" target="_blank" rel="noopener">
+          <time datetime="16/06/2026">16/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 233 COMUNICAZIONE DI AMMISSIONE ALLA CLASSE SUCCESSIVA SCUOLE PRIMARIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206090607" target="_blank" rel="noopener">
+          <time datetime="15/06/2026">15/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 232 CALENDARI PROVE ORALI ESAMI FINE PRIMO CICLO A.S. 2025/2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205825126" target="_blank" rel="noopener">
+          <time datetime="09/06/2026">09/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 228 COMUNICAZIONE DI AMMISSIONE ALLA CLASSE SUCCESSIVA SCUOLE SECONDARIE E AGLI ESAMI DI FINE PRIMO CICLO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205511733" target="_blank" rel="noopener">
+          <time datetime="04/06/2026">04/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 226 PAGAMENTO PROGETTI, USCITE DIDATTICHE E VIAGGI DI ISTRUZIONE A.S. 2025-2026 TRAMITE PIATTAFORMA PAGO IN RETE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205510576" target="_blank" rel="noopener">
+          <time datetime="04/06/2026">04/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 225 SABATO DI RIENTRO SCUOLE SECONDARIE DI I GRADO 6 GIUGNO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205509754" target="_blank" rel="noopener">
+          <time datetime="04/06/2026">04/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 224 CONDIVISIONE SCHEDE DI VALUTAZIONE FINALI A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205503646" target="_blank" rel="noopener">
+          <time datetime="03/06/2026">03/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 223 ORARI ULTIMO GIORNO DI SCUOLA 8 GIUGNO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205503576" target="_blank" rel="noopener">
+          <time datetime="03/06/2026">03/06/2026</time>
+          <span class="doc-title">CIRCOLARE N. 222 STRABOTTELLI DOMENICA 7 GIUGNO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205345069" target="_blank" rel="noopener">
+          <time datetime="26/05/2026">26/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 220 SCIOPERO 29 MAGGIO 2026 – INFORMAZIONI ALLE FAMIGLIE SCUOLA LOCATELLI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205310937" target="_blank" rel="noopener">
+          <time datetime="25/05/2026">25/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 219 CALENDARIO PROVE SCRITTE ESAMI FINE PRIMO CICLO A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205310757" target="_blank" rel="noopener">
+          <time datetime="25/05/2026">25/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 218 SCIOPERO 29 MAGGIO 2026 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205310617" target="_blank" rel="noopener">
+          <time datetime="25/05/2026">25/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 217 CONSEGNA COPIA DELLA COSTITUZIONE DELLA REPUBBLICA ITALIANA ALLE CLASSI TERMINALI SCUOLE LOCATELLI E TOMMASEO DA PARTE DEL DIRIGENTE SCOLASTICO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/205109752" target="_blank" rel="noopener">
+          <time datetime="18/05/2026">18/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 213 SCIOPERO 18 MAGGIO 2026 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204622991" target="_blank" rel="noopener">
+          <time datetime="05/05/2026">05/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 206 ADOZIONI LIBRI DI TESTO A.S. 2026-2027</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204564157" target="_blank" rel="noopener">
+          <time datetime="04/05/2026">04/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 203 SCIOPERO 6 E 7 MAGGIO 2026 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204561893" target="_blank" rel="noopener">
+          <time datetime="04/05/2026">04/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 202 PROVE INVALSI SCUOLA LOCATELLI A.S. 2025-2026 E NOMINA REFERENTI E SOMMINISTRATORI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204486012" target="_blank" rel="noopener">
+          <time datetime="04/05/2026">04/05/2026</time>
+          <span class="doc-title">CIRCOLARE N. 201 PROVE INVALSI SCUOLA RODARI A.S. 2025-2026 E NOMINA REFERENTI E SOMMINISTRATORI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204481699" target="_blank" rel="noopener">
+          <time datetime="29/04/2026">29/04/2026</time>
+          <span class="doc-title">CIRCOLARE N. 200 PROGETTO SCUOLA IN ASCOLTO INCONTRI CON FAMIGLIE E DOCENTI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204350568" target="_blank" rel="noopener">
+          <time datetime="23/04/2026">23/04/2026</time>
+          <span class="doc-title">CIRCOLARE N. 197 CONSEGNA COPIA DELLA COSTITUZIONE DELLA REPUBBLICA ITALIANA ALLE CLASSI TERMINALI DA PARTE DEL DIRIGENTE SCOLASTICO – CHIUSURA SCUOLE 30 APRILE E 1 MAGGIO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204311250" target="_blank" rel="noopener">
+          <time datetime="21/04/2026">21/04/2026</time>
+          <span class="doc-title">CIRCOLARE N. 194 RICHIESTE DIETE SPECIALI 2026-2027</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204212629" target="_blank" rel="noopener">
+          <time datetime="16/04/2026">16/04/2026</time>
+          <span class="doc-title">CIRCOLARE N. 185 SCIOPERO 20 APRILE 2026 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204196998" target="_blank" rel="noopener">
+          <time datetime="16/04/2026">16/04/2026</time>
+          <span class="doc-title">CIRCOLARE N. 184 SABATO SPORTIVO DI RIENTRO SCUOLA &quot;QUASIMODO&quot; - 18 APRILE 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/204114205" target="_blank" rel="noopener">
+          <time datetime="13/04/2026">13/04/2026</time>
+          <span class="doc-title">CIRCOLARE N.181 CONSIGLI DI CLASSE APERTI AI RAPPRESENTANTI DEI GENITORI SCUOLE SECONDARIE APRILE-MAGGIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/203918364" target="_blank" rel="noopener">
+          <time datetime="01/04/2026">01/04/2026</time>
+          <span class="doc-title">CIRCOLARE 174 PROVE INVALSI CLASSI TERZE QUASIMODO APRILE 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/203918337" target="_blank" rel="noopener">
+          <time datetime="01/04/2026">01/04/2026</time>
+          <span class="doc-title">CIRCOLARE N. 173 PROVE INVALSI CLASSI TERZE TOMMASEO APRILE 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/203870789" target="_blank" rel="noopener">
+          <time datetime="31/03/2026">31/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 171 RACCOLTA DATI INVALSI SCUOLA PRIMARIA 25-26</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/203776781" target="_blank" rel="noopener">
+          <time datetime="26/03/2026">26/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 168 SCIOPERO 27 MARZO 2026 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/203465386" target="_blank" rel="noopener">
+          <time datetime="24/03/2026">24/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 165 SCAMBIO CON LA FRANCIA – ATTIVITÀ A MILANO 23-27 MARZO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/202099120" target="_blank" rel="noopener">
+          <time datetime="16/03/2026">16/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 152 INCONTRI DEL 2 E 16 MARZO 2026 SULL’EDUCAZIONE AL DIGITALE – RACCOMANDAZIONI PER IL BENESSERE E LA SICUREZZA ONLINE DI BAMBINI E ADOLESCENTI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/202442199" target="_blank" rel="noopener">
+          <time datetime="06/03/2026">06/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 160 PROVA ORIENTATIVO-ATTITUDINALE INDIRIZZO MUSICALE ISCRIZIONI A.S. 2026-2027 SECONDA GIORNATA 6 MARZO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/202441853" target="_blank" rel="noopener">
+          <time datetime="06/03/2026">06/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 159 PROVE INVALSI 2025/2026 – RACCOLTA INFORMAZIONI DI CONTESTO CLASSI TERZE SCUOLE SECONDARIE DI I GRADO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/202368744" target="_blank" rel="noopener">
+          <time datetime="05/03/2026">05/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 158 SCIOPERO 9 MARZO 2026 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/202200147" target="_blank" rel="noopener">
+          <time datetime="03/03/2026">03/03/2026</time>
+          <span class="doc-title">CIRCOLARE N. 157 PROVE ORIENTATIVO-ATTITUDINALI INDIRIZZO MUSICALE ISCRIZIONI A.S. 2026-2027 3 FEBBRAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/202074387" target="_blank" rel="noopener">
+          <time datetime="25/02/2026">25/02/2026</time>
+          <span class="doc-title">CIRCOLARE N. 151 REFERENDUM COSTITUZIONALE 22 E 23 MARZO – ATTIVITÀ DIDATTICA E SERVIZI DI VENERDÌ 20, LUNEDÌ 23 E MARTEDÌ 24 MARZO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/201889116" target="_blank" rel="noopener">
+          <time datetime="17/02/2026">17/02/2026</time>
+          <span class="doc-title">CIRCOLARE N. 142bis CONDIVISIONE SCHEDE DI VALUTAZIONE DEL PRIMO QUADRIMESTRE CON LE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/201719437" target="_blank" rel="noopener">
+          <time datetime="16/02/2026">16/02/2026</time>
+          <span class="doc-title">CIRCOLARE N. 141 COLLOQUI DOCENTI-FAMIGLIE SCUOLE SECONDARIE MARTEDì 17 FEBBRAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/201467930" target="_blank" rel="noopener">
+          <time datetime="03/02/2026">03/02/2026</time>
+          <span class="doc-title">CIRCOLARE N. 139 CONSIGLIO DI CLASSE STRAORDINARIO 1CT 3 FEBBRAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/201361059" target="_blank" rel="noopener">
+          <time datetime="29/01/2026">29/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 137 INAUGURAZIONE PARCO DIDATTICO INNOVATIVO SCUOLA PRIMARIA LOCATELLI 30 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/201094270" target="_blank" rel="noopener">
+          <time datetime="16/01/2026">16/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 132 ORARI LEZIONI POMERIDIANE INDIRIZZO MUSICALE SCUOLA TOMMASEO DAL 19 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/201015497" target="_blank" rel="noopener">
+          <time datetime="15/01/2026">15/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 131 SEDI E ORARI DELLE ATTIVITÀ SCUOLA “QUASIMODO” DAL 16 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200936929" target="_blank" rel="noopener">
+          <time datetime="12/01/2026">12/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 129 SEDI E ORARI SVOLGIMENTO CORSI DELF E KET PER ALUNNE E ALUNNI DELLA SCUOLA QUASIMODO”14-15 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200909706" target="_blank" rel="noopener">
+          <time datetime="11/01/2026">11/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 127 MATERIALI PER COLLEGIO DOCENTI E CONSIGLIO DI ISTITUTO 12 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200909785" target="_blank" rel="noopener">
+          <time datetime="11/01/2026">11/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 125bis SCIOPERO 12-13 GENNAIO 2026 – INFORMAZIONI ALLE FAMIGLIE SCUOLA QUASIMODO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200908549" target="_blank" rel="noopener">
+          <time datetime="10/01/2026">10/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 125 SCIOPERO 12-13 GENNAIO 2026 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200902556" target="_blank" rel="noopener">
+          <time datetime="09/01/2026">09/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 126 SEDI E ORARI DELLE ATTIVITÀ DIDATTICA SCUOLA QUASIMODO 12-15 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200861921" target="_blank" rel="noopener">
+          <time datetime="08/01/2026">08/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 124 ATTIVITÀ DIDATTICA SCUOLA QUASIMODO 9 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200843941" target="_blank" rel="noopener">
+          <time datetime="07/01/2026">07/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 123 ATTIVITÀ DIDATTICA SCUOLA QUASIMODO 8 GENNAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200829835" target="_blank" rel="noopener">
+          <time datetime="07/01/2026">07/01/2026</time>
+          <span class="doc-title">CIRCOLARE N. 122 ISCRIZIONI ALUNNI CLASSI PRIME A.S. 2026-2027</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200471402" target="_blank" rel="noopener">
+          <time datetime="16/12/2025">16/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 117 CONCERTO DI NATALE SCUOLA “TOMMASEO” – INDIRIZZO MUSICALE, 18 DICEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200171163" target="_blank" rel="noopener">
+          <time datetime="11/12/2025">11/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 116 SABATI DI RIENTRO SCUOLE SECONDARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200154079" target="_blank" rel="noopener">
+          <time datetime="10/12/2025">10/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 115 PROGETTO IL PONTE – AIUTO COMPITI IN LINGUA ITALIANA PER ALUNNI DI MADRELINGUA CINESE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200154001" target="_blank" rel="noopener">
+          <time datetime="10/12/2025">10/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 114 PROGETTO EDUCARE ALLE DIFFERENZE CLASSI TERZE SCUOLA SECONDARIA QUASIMODO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200117013" target="_blank" rel="noopener">
+          <time datetime="09/12/2025">09/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 113 SCIOPERO 12 DICEMBRE 2025 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200116014" target="_blank" rel="noopener">
+          <time datetime="09/12/2025">09/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 112 CHIUSURA TEMPORANEA CORTILE SCUOLA LOCATELLI PER POSA ARREDI INNOVATIVI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200107786" target="_blank" rel="noopener">
+          <time datetime="09/12/2025">09/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 111 INIZIATIVA SOS MILANO - SCATOLE DI NATALE SCUOLA RODARI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200001713" target="_blank" rel="noopener">
+          <time datetime="02/12/2025">02/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 107 COLLOQUI POMERIDIANI CONSEGNA CONSIGLI ORIENTATIVI E COLLOQUI SCUOLA-FAMIGLIA - SCUOLE SECONDARIE 9 DICEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/200001655" target="_blank" rel="noopener">
+          <time datetime="02/12/2025">02/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 106 APPUNTAMENTI SCUOLA-FAMIGLIE SCUOLE SECONDARIE DICEMBRE 2025–FEBBRAIO 2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199999833" target="_blank" rel="noopener">
+          <time datetime="02/12/2025">02/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 105 COLLOQUI SCUOLA-FAMIGLIA SCUOLE SECONDARIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199981225" target="_blank" rel="noopener">
+          <time datetime="02/12/2025">02/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 101 RIDUZIONI PER PROGETTI/USCITE DIDATTICHE A.S. 2025/2026 - CONSEGNA ISEE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199967928" target="_blank" rel="noopener">
+          <time datetime="01/12/2025">01/12/2025</time>
+          <span class="doc-title">CIRCOLARE N. 100 PAGAMENTO ASSICURAZIONE ALUNNI A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199936500" target="_blank" rel="noopener">
+          <time datetime="29/11/2025">29/11/2025</time>
+          <span class="doc-title">CIRCOLARE N 099 PASSAGGIO DA SCUOLE PRIMARIE A SCUOLE SECONDARIA - INCONTRO FAMIGLIE CLASSI PRIME SCUOLE SECONDARIE 2-3 DICEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199847009" target="_blank" rel="noopener">
+          <time datetime="25/11/2025">25/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 096 ASSEMBLEA SINDACALE 26 NOVEMBRE 2025 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199823794" target="_blank" rel="noopener">
+          <time datetime="24/11/2025">24/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 095 PUBBLICAZIONE RISULTATI ELEZIONI CONSIGLIO DI ISTITUTO TRIENNIO 2025-2028</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199823283" target="_blank" rel="noopener">
+          <time datetime="24/11/2025">24/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 094 SCIOPERO 28 NOVEMBRE 2025 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199309487" target="_blank" rel="noopener">
+          <time datetime="18/11/2025">18/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 081 CORSO MORE ENGLISH PIANO AGENDA NORD CLASSI QUINTE SCUOLA LOCATELLI - AGGIORNAMENTI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199622970" target="_blank" rel="noopener">
+          <time datetime="14/11/2025">14/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 089 GLI - GRUPPO DI LAVORO SULL&#x27;INCLUSIONE 3 DICEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199586029" target="_blank" rel="noopener">
+          <time datetime="13/11/2025">13/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 087bis PUBBLICAZIONE LISTE CANDIDATI PER IL RINNOVO DEL CONSIGLIO DI ISTITUTO TRIENNIO 2025-2028</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199495385" target="_blank" rel="noopener">
+          <time datetime="10/11/2025">10/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 086 “ÉVEIL À LA LANGUE FRANÇAISE” - CORSO DI LINGUA FRANCESE CLASSI QUINTE SCUOLA LOCATELLI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199476927" target="_blank" rel="noopener">
+          <time datetime="08/11/2025">08/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 085 “ÉVEIL À LA LANGUE FRANÇAISE” - CORSO DI LINGUA FRANCESE CLASSI QUINTE SCUOLA RODARI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199342252" target="_blank" rel="noopener">
+          <time datetime="03/11/2025">03/11/2025</time>
+          <span class="doc-title">CIRCOLARE N. 082 ACCESSI SCUOLA RODARI NOVEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199305481" target="_blank" rel="noopener">
+          <time datetime="31/10/2025">31/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 080 SCIOPERO 4 NOVEMBRE 2025 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199287621" target="_blank" rel="noopener">
+          <time datetime="31/10/2025">31/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 079 DATE OPEN DAY D&#x27;ISTITUTO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199280864" target="_blank" rel="noopener">
+          <time datetime="30/10/2025">30/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 077 ELEZIONE DEI RAPPRESENTANTI DEL CONSIGLIO DI ISTITUTO TRIENNIO 2025 - 2028</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199276942" target="_blank" rel="noopener">
+          <time datetime="30/10/2025">30/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 076  CONSIGLI DI CLASSE APERTI AI RAPPRESENTANTI DEI GENITORI SCUOLE SECONDARIE NOVEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199231292" target="_blank" rel="noopener">
+          <time datetime="28/10/2025">28/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 074 CORSO MORE ENGLISH PIANO AGENDA NORD CLASSI QUINTE SCUOLA LOCATELLI INCONTRO GENITORI 30 OTTOBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199225732" target="_blank" rel="noopener">
+          <time datetime="28/10/2025">28/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 073 CONTRIBUTO SCOLASTICO A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199162554" target="_blank" rel="noopener">
+          <time datetime="24/10/2025">24/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 066bis SERVIZI AL PUBBLICO DELLA SEGRETERIA A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199160857" target="_blank" rel="noopener">
+          <time datetime="24/10/2025">24/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 071 PUBBLICAZIONE ALL&#x27;ALBO ON LINE DEI NOMINATIVI RAPPRESENTANTI GENITORI DI CLASSE SCUOLE SECONDARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199137381" target="_blank" rel="noopener">
+          <time datetime="23/10/2025">23/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 070 ORARI INGRESSI POSTICIPATI E USCITE ANTICIPATE ALUNNE/I SCUOLE PRIMARIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199137312" target="_blank" rel="noopener">
+          <time datetime="23/10/2025">23/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 069 CONVOCAZIONE CONSIGLI DI INTERCLASSE SCUOLE PRIMARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Personale ATA</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/199029034" target="_blank" rel="noopener">
+          <time datetime="20/10/2025">20/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 067 INCONTRO ORGANIZZATO DAL MUNICIPIO 2 “PSICOLOGO DI QUARTIERE: UN PRESIDIO  DI ASCOLTO PER LA COMUNITÀ” 23 OTTOBRE 2025</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198980189" target="_blank" rel="noopener">
+          <time datetime="16/10/2025">16/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 064 ELEZIONI RINNOVO CONSIGLIO DI ISTITUTO AA.SS. 2025-2026, 2026-2027, 2027-2028</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198980172" target="_blank" rel="noopener">
+          <time datetime="16/10/2025">16/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 063 PUBBLICAZIONE ALL&#x27;ALBO ON LINE DEI NOMINATIVI RAPPRESENTANTI GENITORI DI INTERCLASSE SCUOLE PRIMARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198837066" target="_blank" rel="noopener">
+          <time datetime="10/10/2025">10/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 058 PROCEDURA IN CASO DI PEDICULOSI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198836322" target="_blank" rel="noopener">
+          <time datetime="10/10/2025">10/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 057 PRESENTAZIONE E AVVIO ATTIVITA&#x27; DI COUNSELING E LABORATORI SCUOLE PRIMARIE 10 E 17 NOVEBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198817410" target="_blank" rel="noopener">
+          <time datetime="09/10/2025">09/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 056 ORARIO INGRESSO POSTICIPATO E USCITA ANTICIPATA SCUOLA TOMMASEO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198807885" target="_blank" rel="noopener">
+          <time datetime="09/10/2025">09/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 055 ORARIO INGRESSO POSTICIPATO E USCITA ANTICIPATA SCUOLA QUASIMODO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198774131" target="_blank" rel="noopener">
+          <time datetime="08/10/2025">08/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 054 ACCETTAZIONE CREDENZIALI DI ACCESSO ALL’E-MAIL ISTITUZIONALE E A GOOGLE WORKSPACE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198770682" target="_blank" rel="noopener">
+          <time datetime="08/10/2025">08/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 053 CALENDARIO COLLOQUI FAMIGLIE-DOCENTI SCUOLE PRIMARIE A.S. 2025-2026</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198724499" target="_blank" rel="noopener">
+          <time datetime="06/10/2025">06/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 045bis ASSEMBLEE ED ELEZIONI DEI GENITORI RAPPRESENTANTI DI CLASSE SCUOLE PRIMARIE 7 OTTOBRE 2025</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198697754" target="_blank" rel="noopener">
+          <time datetime="06/10/2025">06/10/2025</time>
+          <span class="doc-title">CIRCOLAE N. 050 ASSEMBLEE ED ELEZIONI DEI GENITORI RAPPRESENTANTI DI CLASSE SCUOLE SECONDARIE 14 OTTOBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198653086" target="_blank" rel="noopener">
+          <time datetime="02/10/2025">02/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 049 COMUNICAZIONE DI MILANORISTORAZIONE IN MERITO ALLO SCIOPERO DEL 3 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198623819" target="_blank" rel="noopener">
+          <time datetime="01/10/2025">01/10/2025</time>
+          <span class="doc-title">CIRCOLARE N. 047bis SCIOPERO 3 OTTOBRE 2025 – INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198579248" target="_blank" rel="noopener">
+          <time datetime="30/09/2025">30/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 044  ASSEMBLEA SINDACALE 2 OTTOBRE 2025 – INFORMAZIONI ALLE FAMIGLIE SCUOLA TOMMASEO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198562381" target="_blank" rel="noopener">
+          <time datetime="29/09/2025">29/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 043 ASSEMBLEA SINDACALE 2 OTTOBRE 2025 – INFORMAZIONI ALLE FAMIGLIE SCUOLA QUASIMODO</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198562338" target="_blank" rel="noopener">
+          <time datetime="29/09/2025">29/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 042 ASSEMBLEA SINDACALE 2 OTTOBRE 2025 – INFORMAZIONI ALLE FAMIGLIE SCUOLA LOCATELLI</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198519653" target="_blank" rel="noopener">
+          <time datetime="26/09/2025">26/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 039 CORSO AGENDA NORD “COMPETENZE DIGITALI - VIVIAMO CON SICUREZZA IN UN ECOSISTEMA DIGITALE” SCUOLA RODARI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198519773" target="_blank" rel="noopener">
+          <time datetime="26/09/2025">26/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 040 CORSO AGENDA NORD “IMPARIAMO L’ITALIANO – LA LINGUA CI UNISCE” SCUOLA LOCATELLI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198519448" target="_blank" rel="noopener">
+          <time datetime="26/09/2025">26/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 038 CORSO AGENDA NORD “IMPARIAMO L’ITALIANO – LA LINGUA CI UNISCE”  SCUOLA RODARI</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198494648" target="_blank" rel="noopener">
+          <time datetime="26/09/2025">26/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 037 PRESENTAZIONE E AVVIO ATTIVITA&#x27; DI COUNSELING E LABORATORI SCUOLE SECONDARIE 9 OTTOBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198491377" target="_blank" rel="noopener">
+          <time datetime="25/09/2025">25/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 036 ASSEMBLEA SINDACALE 2 OTTOMBRE 2025 – PRIME INFORMAZIONI ALLE FAMIGLIE</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198460198" target="_blank" rel="noopener">
+          <time datetime="24/09/2025">24/09/2025</time>
+          <span class="doc-title">CIRCOLARI N. 034 AVVIO SERVIZI GIOCHI SERALI SCUOLE PRIMARIE DAL 25 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198428826" target="_blank" rel="noopener">
+          <time datetime="23/09/2025">23/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 033 ORARI ATTIVITÀ DIDATTICHE SCUOLE PRIMARIE DAL 25 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198401131" target="_blank" rel="noopener">
+          <time datetime="23/09/2025">23/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 031 RINGRAZIAMENTI PER LE “AZIONI AGITE” IN OCCASIONE DELL’ESONDAZIONE DEL SEVESO E DELL’EVACUAZIONE DELLE ALUNNE, DEGLI ALUNNI E DEL PERSONALE DELLE SCUOLE “LOCATELLI” E “TOMMASEO” 22 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198400981" target="_blank" rel="noopener">
+          <time datetime="22/09/2025">22/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 030 INAUGURAZIONE DA PARTE DEL PRESIDENTE DELLA REPUBBLICA DELL’ANNO SCOLASTICO 2025-2026 E PAROLE PRESE IN PRESTITO PER IL SALUTO DA PARTE DEL DIRIGENTE SCOLASTICO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198391167" target="_blank" rel="noopener">
+          <time datetime="22/09/2025">22/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 028 INDICAZIONI ESONDAZIONE SEVESO 22/09/2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198370657" target="_blank" rel="noopener">
+          <time datetime="21/09/2025">21/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 022 SCIOPERO 22 SETTEMBRE 2025 – INFORMAZIONI ALLE FAMIGLIE SCUOLA QUASIMODO</span>
+          <span class="tags"><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Docenti</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198361835" target="_blank" rel="noopener">
+          <time datetime="19/09/2025">19/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 027 ORARI LEZIONI POMERIDIANE INDIRIZZO MUSICALE SCUOLA TOMMASEO DAL 22 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198361580" target="_blank" rel="noopener">
+          <time datetime="19/09/2025">19/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 025 CORSO MORE ENGLISH PIANO AGENDA NORD CLASSI QUINTE SCUOLA RODARI INCONTRO GENITORI 23 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198323013" target="_blank" rel="noopener">
+          <time datetime="18/09/2025">18/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 024 ORARI ATTIVITA&#x27; DIDATTICHE SCUOLE PRIMARIE DAL 22 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198322496" target="_blank" rel="noopener">
+          <time datetime="18/09/2025">18/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 023 SCIOPERO 22 SETTEMBRE 2025 – INFORMAZIONI ALLE FAMIGLIE SCUOLA TOMMASEO</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+      <li class="doc" data-cats="Alunni Famiglie">
+        <a class="doc-link" href="https://web.spaggiari.eu/sdg2/Documenti/MIME0093/198321775" target="_blank" rel="noopener">
+          <time datetime="18/09/2025">18/09/2025</time>
+          <span class="doc-title">CIRCOLARE N. 021 “PULIAMO IL MONDO” INIZIATIVA LEGAMBIENTE CLASSI PRIME SCUOLA TOMMASEO 19 SETTEMBRE 2025</span>
+          <span class="tags"><span class="tag tag-alunni">Alunni</span><span class="tag tag-famiglie">Famiglie</span><span class="tag tag-altro">Tutto il personale</span></span>
+        </a>
+      </li>
+  </ul>
+
+  <footer>
+    Fonte: <a href="https://web.spaggiari.eu/sdg2/Comunicati/MIME0093" target="_blank" rel="noopener">albo comunicati su Spaggiari</a>.
+    Pagina rigenerata automaticamente cinque volte al giorno.
+  </footer>
+</div>
+
+<script>
+  const bottoni = document.querySelectorAll('.filtro');
+  const voci = document.querySelectorAll('.doc');
+  bottoni.forEach(b => b.addEventListener('click', () => {
+    bottoni.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const f = b.dataset.f;
+    voci.forEach(v => {
+      v.hidden = f !== 'tutti' && !v.dataset.cats.split(' ').includes(f);
+    });
+  }));
+</script>
+</body>
+</html>
