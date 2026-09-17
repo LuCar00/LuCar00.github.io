@@ -39,7 +39,8 @@ BASE_URL = f"https://web.spaggiari.eu/sdg2/Comunicati/{CUSTCODE}"
 # id delle categorie da sorvegliare (vedi props.categorie nella pagina)
 WATCHED = {30001: "Alunni", 30003: "Famiglie"}
 
-PAGES_QUICK = 3          # pagine lette a ogni run normale (10 doc/pagina)
+PAGES_MIN = 3            # pagine lette sempre (10 doc/pagina), poi si continua
+                         # finche' restano documenti piu' recenti dell'archivio
 
 # Dai server di GitHub il sito risponde 403 se la richiesta non sembra un
 # browser: dalla rete di casa passa qualunque cosa, dai range dei datacenter
@@ -126,15 +127,34 @@ def normalize(entry):
     }
 
 
-def collect(full=False):
-    """Restituisce i documenti Famiglie/Alunni piu' recenti."""
-    first = fetch_page(1)
-    pages = first["last_page"] if full else min(PAGES_QUICK, first["last_page"])
+def collect(full=False, fino_a=None):
+    """Restituisce i documenti Famiglie/Alunni piu' recenti.
 
-    entries = list(first["data"])
-    for page in range(2, pages + 1):
-        entries.extend(fetch_page(page)["data"])
+    `fino_a` e' la data (formato yyyymmdd) del documento piu' recente che
+    abbiamo gia' in archivio. Le pagine sono ordinate dal piu' nuovo al piu'
+    vecchio, quindi si continua a leggerle finche' ne compaiono di piu'
+    recenti di quella data: se il Mac e' rimasto spento per settimane, il
+    primo run recupera tutto l'arretrato invece di fermarsi alle prime tre
+    pagine e perdere quello che nel frattempo e' scivolato piu' in basso.
+    """
+    prima = fetch_page(1)
+    ultima_pagina = prima["last_page"]
+    entries = list(prima["data"])
+
+    pagina = 2
+    while pagina <= ultima_pagina:
+        if not full and pagina > PAGES_MIN and fino_a:
+            # La pagina precedente conteneva solo roba gia' archiviata:
+            # da qui in giu' e' tutto piu' vecchio, non serve proseguire.
+            piu_vecchia = min((stamp(normalize(e)["data"]) for e in entries), default="0")
+            if piu_vecchia <= fino_a:
+                break
         time.sleep(0.5)          # gentile con il server della scuola
+        entries.extend(fetch_page(pagina)["data"])
+        pagina += 1
+
+    if pagina > PAGES_MIN + 1:
+        print(f"lette {pagina - 1} pagine per coprire l'arretrato")
 
     keep = []
     for entry in entries:
@@ -146,14 +166,18 @@ def collect(full=False):
 
 # --- archivio -------------------------------------------------------------
 
+def stamp(data):
+    """Da "13/09/2026" a "20260913", cosi' le date si confrontano come stringhe."""
+    try:
+        giorno, mese, anno = data.split("/")
+        return f"{anno}{mese}{giorno}"
+    except ValueError:
+        return "00000000"
+
+
 def sort_key(item):
     """Ordina per data di pubblicazione decrescente, id come spareggio."""
-    try:
-        day, month, year = item["data"].split("/")
-        stamp = f"{year}{month}{day}"
-    except ValueError:
-        stamp = "00000000"
-    return (stamp, item["id"] or 0)
+    return (stamp(item["data"]), item["id"] or 0)
 
 
 def load_archive():
@@ -507,7 +531,8 @@ def main():
     visti = {d["id"]: d for d in archivio["documenti"]}
     primo_giro = not visti
 
-    trovati = collect(full=full)
+    piu_recente = stamp(archivio["documenti"][0]["data"]) if archivio["documenti"] else None
+    trovati = collect(full=full, fino_a=piu_recente)
     nuovi = [d for d in trovati if d["id"] not in visti]
 
     print(f"letti {len(trovati)} documenti Famiglie/Alunni, {len(nuovi)} nuovi")
