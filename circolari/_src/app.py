@@ -17,6 +17,7 @@ import re
 import secrets
 import socket
 import subprocess
+import time
 import threading
 import urllib.parse
 import webbrowser
@@ -94,13 +95,73 @@ def stato_launchd():
             "plist": os.path.exists(PLIST)}
 
 
+INTERVALLI = (30, 60, 120, 240, 360, 480, 720)
+
+
 def orari_previsti():
+    """Legge il piano dal plist e lo riassume in intervallo, inizio e fine.
+
+    Gli orari nel plist sono un elenco piatto: l'intervallo si ricava dalla
+    distanza fra i primi due. Se le distanze non fossero regolari (piano
+    scritto a mano) si restituisce comunque l'elenco, senza inventarsi un
+    intervallo che non c'e'.
+    """
+    vuoto = {"intervallo": None, "dalle": None, "alle": None, "elenco": []}
     if not os.path.exists(PLIST):
-        return []
+        return vuoto
     with open(PLIST, encoding="utf-8") as fh:
         testo = fh.read()
-    ore = re.findall(r"<key>Hour</key><integer>(\d+)</integer>", testo)
-    return [f"{int(o):02d}:00" for o in ore]
+    coppie = re.findall(
+        r"<key>Hour</key><integer>(\d+)</integer>"
+        r"<key>Minute</key><integer>(\d+)</integer>", testo)
+    if not coppie:
+        return vuoto
+
+    minuti = sorted(int(h) * 60 + int(m) for h, m in coppie)
+    elenco = [f"{t // 60:02d}:{t % 60:02d}" for t in minuti]
+    distanze = {b - a for a, b in zip(minuti, minuti[1:])}
+    intervallo = distanze.pop() if len(distanze) == 1 else None
+    return {"intervallo": intervallo,
+            "dalle": minuti[0] // 60,
+            "alle": minuti[-1] // 60,
+            "elenco": elenco}
+
+
+def scrivi_orari(intervallo, dalle, alle):
+    """Riscrive il piano nel plist e ricarica il job."""
+    try:
+        intervallo, dalle, alle = int(intervallo), int(dalle), int(alle)
+    except (TypeError, ValueError):
+        return {"ok": False, "output": "valori non validi"}
+    if intervallo not in INTERVALLI:
+        return {"ok": False, "output": "intervallo non ammesso"}
+    if not (0 <= dalle <= 23 and 0 <= alle <= 23 and dalle <= alle):
+        return {"ok": False, "output": "l'ora di inizio deve venire prima di quella di fine"}
+    if not os.path.exists(PLIST):
+        return {"ok": False, "output": "manca il file del piano"}
+
+    istanti = list(range(dalle * 60, alle * 60 + 1, intervallo))
+    righe = "\n".join(
+        f"        <dict><key>Hour</key><integer>{t // 60}</integer>"
+        f"<key>Minute</key><integer>{t % 60}</integer></dict>" for t in istanti)
+
+    with open(PLIST, encoding="utf-8") as fh:
+        testo = fh.read()
+    inizio = testo.index("<key>StartCalendarInterval</key>")
+    fine = testo.index("</array>", inizio) + len("</array>")
+    nuovo = ("<key>StartCalendarInterval</key>\n    <array>\n"
+             + righe + "\n    </array>")
+    with open(PLIST, "w", encoding="utf-8") as fh:
+        fh.write(testo[:inizio] + nuovo + testo[fine:])
+
+    # Ricaricare e' obbligatorio: launchd tiene in memoria il piano letto
+    # all'avvio e non si accorge da solo che il file e' cambiato.
+    if stato_launchd().get("attivo"):
+        cambia_launchd(False)
+    esito = cambia_launchd(True)
+    if not esito["ok"]:
+        return esito
+    return {"ok": True, "output": f"{len(istanti)} controlli al giorno"}
 
 
 def coda_log(righe=400):
@@ -127,17 +188,27 @@ AZIONI = {
 
 _in_corso = threading.Lock()
 
+# La pagina interroga /api/stato ogni 30 secondi. Se smette, vuol dire che
+# e' stata chiusa e il server non serve piu' a nessuno: si spegne da solo,
+# invece di restare acceso fino al riavvio. Il margine e' largo perche' i
+# browser rallentano i timer nelle schede in secondo piano.
+INATTIVITA_MAX = 180
+_ultimo_contatto = [time.time()]
 
-def esegui(azione):
+
+def esegui(azione, anche_canale=False):
     """Lancia run-mac.sh e restituisce quello che ha scritto nel log."""
     if azione not in AZIONI:
         return {"ok": False, "output": "azione sconosciuta"}
+    argomenti = list(AZIONI[azione])
+    if azione == "prova-circolare" and anche_canale:
+        argomenti.append("--canale")
     if not _in_corso.acquire(blocking=False):
         return {"ok": False, "output": "c'e' gia' un'esecuzione in corso"}
     try:
         prima = len(coda_log(100000).splitlines())
         try:
-            esito = subprocess.run(["bash", RUN_MAC] + AZIONI[azione],
+            esito = subprocess.run(["bash", RUN_MAC] + argomenti,
                                    capture_output=True, text=True, timeout=300)
         except subprocess.TimeoutExpired:
             return {"ok": False, "output": "l'esecuzione non e' terminata entro 5 minuti"}
@@ -168,6 +239,9 @@ class Pannello(http.server.BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass                      # niente rumore sul terminale
 
+    def _tocca(self):
+        _ultimo_contatto[0] = time.time()
+
     def _autorizzato(self, query):
         fornita = (query.get("k", [""])[0]
                    or self.headers.get("X-Chiave", ""))
@@ -183,6 +257,7 @@ class Pannello(http.server.BaseHTTPRequestHandler):
         self.wfile.write(corpo)
 
     def do_GET(self):
+        self._tocca()
         percorso, _, stringa = self.path.partition("?")
         query = urllib.parse.parse_qs(stringa)
 
@@ -225,6 +300,7 @@ class Pannello(http.server.BaseHTTPRequestHandler):
             self._json({"errore": "non trovato"}, 404)
 
     def do_POST(self):
+        self._tocca()
         percorso, _, stringa = self.path.partition("?")
         if not self._autorizzato(urllib.parse.parse_qs(stringa)):
             self._json({"errore": "non autorizzato"}, 403)
@@ -240,7 +316,10 @@ class Pannello(http.server.BaseHTTPRequestHandler):
             scrivi_env(corpo)
             self._json({"ok": True})
         elif percorso == "/api/azione":
-            self._json(esegui(corpo.get("azione", "")))
+            self._json(esegui(corpo.get("azione", ""), bool(corpo.get("canale"))))
+        elif percorso == "/api/orari":
+            self._json(scrivi_orari(corpo.get("intervallo"),
+                                    corpo.get("dalle"), corpo.get("alle")))
         elif percorso == "/api/launchd":
             self._json(cambia_launchd(bool(corpo.get("accendi"))))
         elif percorso == "/api/spegni":
@@ -294,6 +373,15 @@ def main():
     os.makedirs(CONF, exist_ok=True)
     with open(SEGNALIBRO, "w", encoding="utf-8") as fh:
         fh.write(url)
+
+    def guardiano():
+        while True:
+            time.sleep(15)
+            if time.time() - _ultimo_contatto[0] > INATTIVITA_MAX:
+                print("Nessuno guarda piu' il pannello: spengo.", flush=True)
+                threading.Thread(target=server.shutdown, daemon=True).start()
+                return
+    threading.Thread(target=guardiano, daemon=True).start()
 
     webbrowser.open(url)
     try:

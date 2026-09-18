@@ -14,7 +14,8 @@ Uso:
   python3 check.py              run normale (3 pagine, notifica le novita')
   python3 check.py --full       crawl completo dell'archivio
   python3 check.py --no-notify  non manda niente su Telegram (seed iniziale)
-  python3 check.py --test       invia una notifica di prova e basta
+  python3 check.py --test       prova di invio alla sola chat personale
+  python3 check.py --test --canale   prova di invio anche al canale
   python3 check.py --heartbeat  invia subito il riepilogo settimanale
 """
 
@@ -489,9 +490,14 @@ def run_test():
         return 1
 
     item = documenti[0]
-    # La prova serve a verificare OGNI recapito configurato, canale compreso:
-    # e' l'unico modo di sapere che il bot ha davvero i permessi per postarci.
-    destinatari = list(dict.fromkeys(telegram_targets() + heartbeat_targets()))
+    # Di norma la prova va SOLO a chi riceve il riepilogo, cioe' la chat
+    # personale: il canale e' letto da altri genitori e non deve riempirsi di
+    # messaggi di prova. Con --canale si raggiungono anche loro, che serve
+    # una volta sola per verificare che il bot possa postare nel canale.
+    if "--canale" in sys.argv:
+        destinatari = list(dict.fromkeys(telegram_targets() + heartbeat_targets()))
+    else:
+        destinatari = heartbeat_targets() or telegram_targets()
     print(f"invio di prova a {len(destinatari)} destinatario/i")
     print(f"   {item['data']}  {item['titolo'][:70]}")
 

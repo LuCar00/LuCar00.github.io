@@ -57,6 +57,20 @@
   .tag{font-size:11.5px;padding:2px 8px;border-radius:999px;font-weight:500;margin-right:5px}
   .t-fam{color:var(--fam);background:var(--fam-bg)} .t-alu{color:var(--alu);background:var(--alu-bg)}
   .vuoto{color:var(--muted);padding:26px 0;text-align:center}
+  .velo{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;
+    justify-content:center;padding:20px;z-index:10}
+  .velo[hidden]{display:none}
+  .modale{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:22px 24px;max-width:460px;width:100%}
+  .modale h2{margin:0 0 10px;font-size:18px}
+  .modale p{margin:0 0 14px;font-size:14px;color:var(--muted);line-height:1.6}
+  .dove{display:block;padding:10px 12px;background:var(--surface-2);border-radius:8px;
+    font-size:13.5px;margin:0 0 14px}
+  .scelta{display:flex;gap:9px;align-items:flex-start;margin:0 0 16px;font-size:13.5px;cursor:pointer}
+  .scelta input{margin:2px 0 0;flex-shrink:0}
+  .infondo{display:flex;gap:9px;justify-content:flex-end}
+  select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);
+    color:var(--text);font:inherit;font-size:14px}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 </style>
 </head>
@@ -81,7 +95,7 @@
       <button class="btn" data-az="prova-circolare">Prova circolare</button>
       <button class="btn" data-az="prova-riepilogo">Prova riepilogo</button>
     </div>
-    <p class="nota">La prova circolare arriva a tutti i recapiti, canale compreso. Il riepilogo solo a chi lo riceve di norma.</p>
+    <p class="nota">Ogni pulsante spiega cosa fa prima di partire. Le prove arrivano solo nella tua chat, non sul canale.</p>
   </div>
   <div class="card">
     <label>Esito dell'ultima esecuzione</label>
@@ -89,16 +103,29 @@
   </div>
   <div class="card">
     <div class="riga">
-      <button class="btn" id="spegni">Chiudi il pannello</button>
-      <span class="nota">Il controllo automatico continua lo stesso: qui si spegne solo questa finestra.</span>
-    </div>
-  </div>
-  <div class="card">
-    <div class="riga">
       <span id="pianoTesto" style="font-size:14px"></span>
+      <button class="btn" id="pianoModifica">Modifica</button>
       <button class="btn" id="pianoBtn">…</button>
     </div>
-    <p class="nota">Il controllo automatico gira agli orari previsti solo mentre il Mac e' acceso. Se e' spento, il controllo saltato parte al risveglio.</p>
+    <div id="pianoEditor" hidden style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div class="riga" style="gap:14px">
+        <label for="intervallo" style="margin:0">Ogni</label>
+        <select id="intervallo">
+          <option value="30">mezz'ora</option><option value="60">ora</option>
+          <option value="120">due ore</option><option value="240">quattro ore</option>
+          <option value="360">sei ore</option><option value="480">otto ore</option>
+          <option value="720">dodici ore</option>
+        </select>
+        <label for="dalle" style="margin:0">dalle</label><select id="dalle"></select>
+        <label for="alle" style="margin:0">alle</label><select id="alle"></select>
+      </div>
+      <p class="nota" id="anteprima"></p>
+      <div class="riga" style="margin-top:10px">
+        <button class="btn primario" id="pianoSalva">Salva</button>
+        <button class="btn" id="pianoAnnulla">Annulla</button>
+      </div>
+    </div>
+    <p class="nota" style="margin-top:12px">Il controllo gira solo mentre il Mac e' acceso. Se e' spento, quello saltato parte al risveglio &mdash; una volta sola, non uno per orario perso.</p>
   </div>
 </section>
 
@@ -145,12 +172,29 @@
 
 </div>
 
+<div class="velo" id="velo" hidden>
+  <div class="modale" role="dialog" aria-modal="true" aria-labelledby="mTitolo">
+    <h2 id="mTitolo"></h2>
+    <p id="mTesto"></p>
+    <strong class="dove" id="mDove"></strong>
+    <label class="scelta" id="mScelta" hidden>
+      <input type="checkbox" id="mCanale">
+      <span>Manda anche al canale. Lo leggono gli altri genitori: serve solo per verificare che il bot possa scriverci.</span>
+    </label>
+    <div class="infondo">
+      <button class="btn" id="mAnnulla">Annulla</button>
+      <button class="btn primario" id="mConferma"></button>
+    </div>
+  </div>
+</div>
+
 <script>
 const K = "__CHIAVE__";
 const api = (p, o = {}) => fetch(p + (p.includes("?") ? "&" : "?") + "k=" + encodeURIComponent(K),
   Object.assign({headers: {"Content-Type": "application/json"}}, o)).then(r => r.json());
 
 let documenti = [];
+let piano = {};
 
 document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => {
   document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
@@ -172,9 +216,10 @@ async function caricaStato() {
     (mancanti ? pill(`${mancanti} dati mancanti`, 'ko') : '') +
     (s.in_sospeso ? pill(`${s.in_sospeso} notifiche da inviare`, 'ko') : '');
 
-  document.getElementById('pianoTesto').textContent = attivo
-    ? 'Controlli previsti alle ' + (s.orari || []).join(', ')
+  piano = s.orari || {};
+  document.getElementById('pianoTesto').textContent = attivo ? descriviPiano(piano)
     : 'Il controllo automatico e’ disattivato.';
+  document.getElementById('pianoModifica').hidden = !attivo;
   const b = document.getElementById('pianoBtn');
   b.textContent = attivo ? 'Disattiva' : 'Attiva';
   b.onclick = async () => { b.disabled = true; await api('/api/launchd', {method: 'POST', body: JSON.stringify({accendi: !attivo})}); b.disabled = false; caricaStato(); };
@@ -208,23 +253,6 @@ async function caricaLog() {
 }
 document.getElementById('ricarica').addEventListener('click', caricaLog);
 
-document.querySelectorAll('[data-az]').forEach(b => b.addEventListener('click', async () => {
-  const tutti = document.querySelectorAll('[data-az]');
-  tutti.forEach(x => x.disabled = true);
-  const out = document.getElementById('esito');
-  out.textContent = 'in corso…';
-  const r = await api('/api/azione', {method: 'POST', body: JSON.stringify({azione: b.dataset.az})});
-  out.textContent = (r.ok ? '' : 'NON RIUSCITO\n\n') + (r.output || '');
-  tutti.forEach(x => x.disabled = false);
-  document.getElementById('spegni').addEventListener('click', async () => {
-  await api('/api/spegni', {method: 'POST', body: '{}'});
-  document.body.innerHTML = '<div class="wrap"><header><h1>Pannello chiuso</h1>' +
-    '<p class="nota">Puoi chiudere questa scheda. Il controllo automatico continua per conto suo.</p></header></div>';
-});
-
-caricaStato(); caricaDocumenti();
-}));
-
 document.getElementById('salva').addEventListener('click', async () => {
   const corpo = {
     TELEGRAM_TOKEN: document.getElementById('tok').value,
@@ -238,10 +266,93 @@ document.getElementById('salva').addEventListener('click', async () => {
   caricaStato();
 });
 
-document.getElementById('spegni').addEventListener('click', async () => {
-  await api('/api/spegni', {method: 'POST', body: '{}'});
-  document.body.innerHTML = '<div class="wrap"><header><h1>Pannello chiuso</h1>' +
-    '<p class="nota">Puoi chiudere questa scheda. Il controllo automatico continua per conto suo.</p></header></div>';
+const NOMI = {30: "mezz’ora", 60: "ora", 120: "due ore", 240: "quattro ore",
+  360: "sei ore", 480: "otto ore", 720: "dodici ore"};
+
+function descriviPiano(p) {
+  if (!p.elenco || !p.elenco.length) return 'Nessun orario impostato.';
+  if (!p.intervallo) return 'Controlli alle ' + p.elenco.join(', ');
+  const ogni = NOMI[p.intervallo] || (p.intervallo + ' minuti');
+  return `Ogni ${ogni}, dalle ${p.elenco[0]} alle ${p.elenco[p.elenco.length - 1]} — ${p.elenco.length} controlli al giorno`;
+}
+
+const sel = (id) => document.getElementById(id);
+for (const id of ['dalle', 'alle']) {
+  sel(id).innerHTML = Array.from({length: 24}, (_, h) =>
+    `<option value="${h}">${String(h).padStart(2, '0')}:00</option>`).join('');
+}
+
+function anteprima() {
+  const i = +sel('intervallo').value, d = +sel('dalle').value, a = +sel('alle').value;
+  if (d > a) { sel('anteprima').textContent = 'L’ora di inizio deve venire prima di quella di fine.'; return false; }
+  const n = Math.floor((a * 60 - d * 60) / i) + 1;
+  sel('anteprima').textContent = `${n} controlli al giorno.` +
+    (n > 40 ? ' Sono parecchi: il Mac regge, ma la scuola non pubblica cosi’ spesso.' : '');
+  return true;
+}
+['intervallo', 'dalle', 'alle'].forEach(id => sel(id).addEventListener('change', anteprima));
+
+sel('pianoModifica').addEventListener('click', () => {
+  sel('intervallo').value = String(piano.intervallo || 60);
+  sel('dalle').value = String(piano.dalle != null ? piano.dalle : 7);
+  sel('alle').value = String(piano.alle != null ? piano.alle : 22);
+  anteprima();
+  sel('pianoEditor').hidden = false;
+});
+sel('pianoAnnulla').addEventListener('click', () => { sel('pianoEditor').hidden = true; });
+sel('pianoSalva').addEventListener('click', async () => {
+  if (!anteprima()) return;
+  sel('pianoSalva').disabled = true;
+  const r = await api('/api/orari', {method: 'POST', body: JSON.stringify({
+    intervallo: +sel('intervallo').value, dalle: +sel('dalle').value, alle: +sel('alle').value})});
+  sel('pianoSalva').disabled = false;
+  sel('esito').textContent = (r.ok ? 'Orari aggiornati: ' : 'NON RIUSCITO\n\n') + (r.output || '');
+  if (r.ok) sel('pianoEditor').hidden = true;
+  caricaStato();
+});
+
+const SPIEGA = {
+  'controllo': {titolo: 'Controlla adesso',
+    testo: 'Legge subito l’albo della scuola, fuori dagli orari previsti. Se trova circolari nuove le manda e aggiorna la pagina. Se non c’e’ niente di nuovo non succede niente e nessuno riceve messaggi.',
+    dove: 'Manda qualcosa solo se ci sono davvero circolari nuove — in quel caso al canale.',
+    conferma: 'Controlla'},
+  'prova-circolare': {titolo: 'Prova circolare',
+    testo: 'Prende la circolare piu’ recente che hai gia’ in archivio e te la rimanda marcata come prova, per farti vedere che aspetto ha un avviso vero. Non cambia l’archivio e non pubblica niente.',
+    dove: 'Arriva solo nella tua chat.', conferma: 'Manda la prova', scelta: true},
+  'prova-riepilogo': {titolo: 'Prova riepilogo',
+    testo: 'Manda subito il messaggio che arriva ogni lunedi’: data dell’ultimo controllo, quanti documenti ci sono in archivio e qual e’ l’ultima circolare. Serve a sapere che il monitor e’ vivo. Non cambia niente.',
+    dove: 'Arriva solo nella tua chat.', conferma: 'Manda il riepilogo'},
+};
+
+let azionePendente = null;
+function chiudiModale() { sel('velo').hidden = true; azionePendente = null; }
+sel('mAnnulla').addEventListener('click', chiudiModale);
+sel('velo').addEventListener('click', e => { if (e.target === sel('velo')) chiudiModale(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sel('velo').hidden) chiudiModale(); });
+
+document.querySelectorAll('[data-az]').forEach(b => b.addEventListener('click', () => {
+  const info = SPIEGA[b.dataset.az];
+  azionePendente = b.dataset.az;
+  sel('mTitolo').textContent = info.titolo;
+  sel('mTesto').textContent = info.testo;
+  sel('mDove').textContent = info.dove;
+  sel('mConferma').textContent = info.conferma;
+  sel('mScelta').hidden = !info.scelta;
+  sel('mCanale').checked = false;
+  sel('velo').hidden = false;
+  sel('mConferma').focus();
+}));
+
+sel('mConferma').addEventListener('click', async () => {
+  const azione = azionePendente, canale = sel('mCanale').checked;
+  chiudiModale();
+  const tutti = document.querySelectorAll('[data-az]');
+  tutti.forEach(x => x.disabled = true);
+  sel('esito').textContent = 'in corso…';
+  const r = await api('/api/azione', {method: 'POST', body: JSON.stringify({azione, canale})});
+  sel('esito').textContent = (r.ok ? '' : 'NON RIUSCITO\n\n') + (r.output || '');
+  tutti.forEach(x => x.disabled = false);
+  caricaStato(); caricaDocumenti();
 });
 
 caricaStato(); caricaDocumenti();
