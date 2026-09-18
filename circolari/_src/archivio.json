@@ -1,6 +1,74 @@
 {
  "documenti": [
   {
+   "id": 2564179,
+   "titolo": "CIRCOLARE N. 017 ORARI LEZIONI POMERIDIANE DELLE ALUNNE/I INDIRIZZO MUSICALE SCUOLA “TOMMASEO” SETTIMANA 21-25 SETTEMBRE 2026",
+   "data": "17/09/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207945030",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
+   "id": 2564175,
+   "titolo": "CIRCOLARE N. 016 AVVIO ORARIO ATTIVITÀ DIDATTICHE DELLA MATTINA A TEMPO PIENO SCUOLA “TOMMASEO” DAL 21 SETTEMBRE 2026",
+   "data": "17/09/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207945003",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
+   "id": 2564169,
+   "titolo": "CIRCOLARE N. 015 AVVIO ORARIO ATTIVITÀ DIDATTICHE A TEMPO PIENO SCUOLA \"QUASIMODO” DAL 21 SETTEMBRE 2026",
+   "data": "17/09/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207943793",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
+   "id": 2564157,
+   "titolo": "CIRCOLARE N. 014 ORARI ATTIVITÀ DIDATTICHE SCUOLE PRIMARIE DAL 21 SETTEMBRE 2026",
+   "data": "17/09/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207943201",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
    "id": 2562782,
    "titolo": "CIRCOLARE N. 012 ENTRATA E USCITA ALUNNE/I DA MARCIAPIEDE INGRESSO PRINCIPALE SCUOLA \"LOCATELLI\" VIA VEGLIA 80",
    "data": "13/09/2026",
@@ -2107,5 +2175,5 @@
    ]
   }
  ],
- "ultimo_controllo": "17/09/2026 alle 18:00"
+ "ultimo_controllo": "18/09/2026 alle 09:00"
 }
