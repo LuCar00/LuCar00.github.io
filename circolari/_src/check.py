@@ -47,6 +47,16 @@ WATCHED = {30001: "Alunni", 30003: "Famiglie"}
 SCUOLA_NOSTRA = "LOCATELLI"
 SCUOLE_ALTRUI = ("RODARI", "QUASIMODO", "TOMMASEO")
 
+# Secondo asse: l'ordine di scuola. La Locatelli e' una primaria, e le
+# secondarie dell'istituto sono proprio Quasimodo e Tommaseo. Una circolare
+# rivolta alle sole secondarie non ci riguarda nemmeno quando non nomina il
+# plesso. Nominare entrambi gli ordini, invece, si': "passaggio dalle
+# primarie alle secondarie" e' esattamente una cosa che ci riguarda.
+# Prefissi, per prendere sia il singolare che il plurale senza inciampare
+# in parole come "seconda" o "prime".
+ORDINE_NOSTRO = "PRIMARI"
+ORDINE_ALTRUI = "SECONDARI"
+
 PAGES_MIN = 3            # pagine lette sempre (10 doc/pagina), poi si continua
                          # finche' restano documenti piu' recenti dell'archivio
 
@@ -123,12 +133,18 @@ def solo_lettere(testo):
                    if unicodedata.category(c) != "Mn").upper()
 
 
-def di_altra_scuola(titolo):
-    """True se la circolare riguarda un altro plesso e non il nostro."""
+def non_ci_riguarda(titolo):
+    """True se la circolare e' rivolta a un altro plesso o a un altro ordine.
+
+    Nominare la nostra scuola chiude il discorso: la circolare ci riguarda,
+    qualunque altra cosa dica il titolo.
+    """
     testo = solo_lettere(titolo)
     if SCUOLA_NOSTRA in testo:
         return False
-    return any(scuola in testo for scuola in SCUOLE_ALTRUI)
+    if any(scuola in testo for scuola in SCUOLE_ALTRUI):
+        return True
+    return ORDINE_ALTRUI in testo and ORDINE_NOSTRO not in testo
 
 
 def normalize(entry):
@@ -186,13 +202,13 @@ def collect(full=False, fino_a=None):
         item = normalize(entry)
         if not (item["watched"] and item["id"] is not None):
             continue
-        if di_altra_scuola(item["titolo"]):
+        if non_ci_riguarda(item["titolo"]):
             scartate += 1
             continue
         keep.append(item)
 
     if scartate:
-        print(f"{scartate} circolari di altri plessi ignorate")
+        print(f"{scartate} circolari di altri plessi o ordini ignorate")
     # La data piu' recente vista, comprese quelle scartate: serve alla
     # paginazione, altrimenti una raffica di circolari di altri plessi
     # lascerebbe l'archivio indietro e ogni run rileggerebbe pagine in piu'.

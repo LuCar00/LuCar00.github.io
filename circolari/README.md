@@ -12,10 +12,30 @@ segnala ogni nuovo documento classificato **Famiglie** e/o **Alunni**.
 2. Lo script legge le prime 3 pagine dell'elenco. I dati arrivano gia' strutturati:
    la pagina Spaggiari e' un'app Inertia e incorpora il JSON dei documenti
    nell'attributo `data-page` dell'HTML, quindi non serve ne' login ne' scraping.
-3. Tiene i documenti con categoria 30001 (Alunni) o 30003 (Famiglie).
+3. Tiene i documenti con categoria 30001 (Alunni) o 30003 (Famiglie), e fra
+   questi scarta quelli rivolti a un altro plesso o a un altro ordine di
+   scuola (vedi sotto).
 4. Confronta con `_src/archivio.json`. Per ogni documento mai visto manda una
    notifica Telegram con titolo, data e link diretto al PDF.
 5. Rigenera `index.html` e ricommitta archivio + pagina.
+
+## Quali circolari passano
+
+L'istituto ha quattro scuole e pubblica spesso la stessa circolare una volta
+per ciascuna. Il filtro guarda il titolo, normalizzato senza accenti ne'
+maiuscole (i titoli usano virgolette curve e maiuscole a caso):
+
+| Nel titolo | Esito |
+|---|---|
+| Nomina **Locatelli** | passa, qualunque altra cosa dica |
+| Nomina Rodari, Quasimodo o Tommaseo, non Locatelli | scartata |
+| Rivolta alle sole **secondarie** (senza "primarie") | scartata |
+| Nomina entrambi gli ordini | passa — es. "passaggio dalle primarie alle secondarie" |
+| Non nomina ne' plessi ne' ordini | passa |
+
+Le scartate non vengono notificate ne' archiviate: non compaiono sulla pagina.
+I nomi stanno in cima a `check.py` (`SCUOLA_NOSTRA`, `SCUOLE_ALTRUI`,
+`ORDINE_NOSTRO`, `ORDINE_ALTRUI`): se la scuola cambia, si cambiano li'.
 
 ## Configurazione Telegram
 
