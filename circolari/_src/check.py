@@ -25,6 +25,7 @@ import os
 import re
 import sys
 import time
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -38,6 +39,13 @@ BASE_URL = f"https://web.spaggiari.eu/sdg2/Comunicati/{CUSTCODE}"
 
 # id delle categorie da sorvegliare (vedi props.categorie nella pagina)
 WATCHED = {30001: "Alunni", 30003: "Famiglie"}
+
+# L'istituto comprende quattro scuole e spesso pubblica la stessa circolare
+# una volta per ciascuna. Quelle che nominano un'altra scuola senza nominare
+# anche la nostra riguardano un altro plesso: non entrano in archivio.
+# Nominarle entrambe (o nessuna) vuol dire che ci riguarda.
+SCUOLA_NOSTRA = "LOCATELLI"
+SCUOLE_ALTRUI = ("RODARI", "QUASIMODO", "TOMMASEO")
 
 PAGES_MIN = 3            # pagine lette sempre (10 doc/pagina), poi si continua
                          # finche' restano documenti piu' recenti dell'archivio
@@ -107,6 +115,22 @@ def fetch_page(page):
     return json.loads(html.unescape(match.group(1)))["props"]["documenti"]
 
 
+def solo_lettere(testo):
+    """Maiuscole e senza accenti: i titoli mescolano virgolette curve,
+    accenti e maiuscole a caso, il confronto deve ignorarli."""
+    scomposto = unicodedata.normalize("NFD", testo)
+    return "".join(c for c in scomposto
+                   if unicodedata.category(c) != "Mn").upper()
+
+
+def di_altra_scuola(titolo):
+    """True se la circolare riguarda un altro plesso e non il nostro."""
+    testo = solo_lettere(titolo)
+    if SCUOLA_NOSTRA in testo:
+        return False
+    return any(scuola in testo for scuola in SCUOLE_ALTRUI)
+
+
 def normalize(entry):
     """Riduce un documento del payload ai campi che ci servono."""
     doc = entry.get("documento") or {}
@@ -157,11 +181,23 @@ def collect(full=False, fino_a=None):
         print(f"lette {pagina - 1} pagine per coprire l'arretrato")
 
     keep = []
+    scartate = 0
     for entry in entries:
         item = normalize(entry)
-        if item["watched"] and item["id"] is not None:
-            keep.append(item)
-    return keep
+        if not (item["watched"] and item["id"] is not None):
+            continue
+        if di_altra_scuola(item["titolo"]):
+            scartate += 1
+            continue
+        keep.append(item)
+
+    if scartate:
+        print(f"{scartate} circolari di altri plessi ignorate")
+    # La data piu' recente vista, comprese quelle scartate: serve alla
+    # paginazione, altrimenti una raffica di circolari di altri plessi
+    # lascerebbe l'archivio indietro e ogni run rileggerebbe pagine in piu'.
+    viste = [stamp(normalize(e)["data"]) for e in entries]
+    return keep, (max(viste) if viste else None)
 
 
 # --- archivio -------------------------------------------------------------
@@ -531,8 +567,12 @@ def main():
     visti = {d["id"]: d for d in archivio["documenti"]}
     primo_giro = not visti
 
-    piu_recente = stamp(archivio["documenti"][0]["data"]) if archivio["documenti"] else None
-    trovati = collect(full=full, fino_a=piu_recente)
+    piu_recente = archivio.get("ultimo_visto")
+    if not piu_recente and archivio["documenti"]:
+        piu_recente = stamp(archivio["documenti"][0]["data"])
+    trovati, visto = collect(full=full, fino_a=piu_recente)
+    if visto:
+        archivio["ultimo_visto"] = max(visto, archivio.get("ultimo_visto") or "")
     nuovi = [d for d in trovati if d["id"] not in visti]
 
     print(f"letti {len(trovati)} documenti Famiglie/Alunni, {len(nuovi)} nuovi")
