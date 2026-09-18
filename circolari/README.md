@@ -1,6 +1,6 @@
 # Monitor circolari — IC Locatelli-Quasimodo
 
-Controlla cinque volte al giorno l'albo comunicati della scuola su Spaggiari e
+Controlla ogni ora, dalle 7 alle 22, l'albo comunicati della scuola su Spaggiari e
 segnala ogni nuovo documento classificato **Famiglie** e/o **Alunni**.
 
 - Pagina consultabile: <https://lucar00.github.io/circolari/>
@@ -76,6 +76,17 @@ bot: per condividere con altri genitori il canale e' l'unica strada comoda.
 
 Senza i due secret lo script continua a funzionare: aggiorna la pagina e salta
 solo l'invio della notifica.
+
+## Quando pubblica
+
+Il controllo gira ogni ora, ma la pagina non viene ripubblicata a ogni giro:
+sarebbero migliaia di commit l'anno che dicono solo "e' cambiato l'orario".
+Si pubblica quando ci sono circolari nuove, oppure quando l'orario in pagina
+comincia a invecchiare (soglia: `ORE_MAX_SENZA_PUBBLICARE` in `run-mac.sh`,
+3 ore). Nel frattempo le modifiche restano nella copia di lavoro.
+
+Se il Mac e' spento a un orario previsto, `launchd` recupera con **una sola**
+esecuzione al risveglio, non una per ogni slot saltato.
 
 ## Pannello
 

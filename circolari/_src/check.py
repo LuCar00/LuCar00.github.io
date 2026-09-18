@@ -83,6 +83,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.dirname(HERE)                  # cartella circolari/
 ARCHIVE = os.path.join(HERE, "archivio.json")    # storico dei doc gia' visti
 PAGE = os.path.join(OUT_DIR, "index.html")
+# Fuori dal repo di proposito: se stesse dentro, scriverlo creerebbe da solo
+# la modifica che serve a decidere se pubblicare.
+SEGNALE = os.path.expanduser("~/.circolari/ultimo-cambio")
 
 ROME = timezone(timedelta(hours=2))              # solo per l'etichetta "aggiornato"
 
@@ -626,6 +629,15 @@ def main():
         fh.write(render(archivio))
 
     print(f"archivio: {len(archivio['documenti'])} documenti \u2014 pagina rigenerata")
+
+    # Quante novita' ha portato questo giro: run-mac.sh lo legge per capire
+    # se vale la pena pubblicare o se e' cambiato solo l'orario.
+    try:
+        os.makedirs(os.path.dirname(SEGNALE), exist_ok=True)
+        with open(SEGNALE, "w", encoding="utf-8") as fh:
+            fh.write(str(len(nuovi)))
+    except OSError:
+        pass
     return 0
 
 

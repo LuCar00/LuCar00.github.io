@@ -56,6 +56,21 @@ if git diff --quiet -- $GENERATI; then
   exit 0
 fi
 
+# Con un controllo ogni ora, pubblicare a ogni giro vorrebbe dire migliaia di
+# commit l'anno che dicono solo "e' cambiato l'orario". Si pubblica quando ci
+# sono novita' vere, oppure quando la pagina comincia a mostrare un orario
+# vecchio: cosi' resta credibile come segno di vita senza sommergere la
+# cronologia. Nel frattempo le modifiche restano qui, non si perde niente.
+ORE_MAX_SENZA_PUBBLICARE=3
+NUOVI=$(cat "$HOME/.circolari/ultimo-cambio" 2>/dev/null || echo 0)
+ULTIMA=$(git log -1 --format=%ct -- circolari/index.html 2>/dev/null || echo 0)
+ORE=$(( ($(date +%s) - ULTIMA) / 3600 ))
+
+if [ "${NUOVI:-0}" -eq 0 ] && [ "$ORE" -lt "$ORE_MAX_SENZA_PUBBLICARE" ]; then
+  echo "nessuna novita' e pagina aggiornata ${ORE}h fa: non pubblico"
+  exit 0
+fi
+
 git add $GENERATI
 git commit -q -m "circolari: aggiornamento automatico"
 for tentativo in 1 2 3; do
