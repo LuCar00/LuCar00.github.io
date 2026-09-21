@@ -58,6 +58,14 @@ SCUOLE_ALTRUI = ("RODARI", "QUASIMODO", "TOMMASEO")
 ORDINE_NOSTRO = "PRIMARI"
 ORDINE_ALTRUI = "SECONDARI"
 
+# Circolari che annunciano un possibile disservizio: vanno riconosciute a
+# colpo d'occhio, sia nel canale che sulla pagina. "Assemblea" da sola non
+# basta: le assemblee dei genitori non c'entrano niente con quelle sindacali.
+AVVISI = (
+    ("Sciopero", ("SCIOPER",)),
+    ("Assemblea sindacale", ("ASSEMBLE", "SINDACAL")),
+)
+
 PAGES_MIN = 3            # pagine lette sempre (10 doc/pagina), poi si continua
                          # finche' restano documenti piu' recenti dell'archivio
 
@@ -151,6 +159,15 @@ def non_ci_riguarda(titolo):
     return ORDINE_ALTRUI in testo and ORDINE_NOSTRO not in testo
 
 
+def tipo_avviso(titolo):
+    """Etichetta dell'avviso, se il titolo ne annuncia uno. Altrimenti None."""
+    testo = solo_lettere(titolo)
+    for etichetta, richieste in AVVISI:
+        if all(parola in testo for parola in richieste):
+            return etichetta
+    return None
+
+
 def normalize(entry):
     """Riduce un documento del payload ai campi che ci servono."""
     doc = entry.get("documento") or {}
@@ -160,9 +177,11 @@ def normalize(entry):
     titolo = (prot.get("oggetto") or doc.get("nome_file_origine") or "").strip()
     titolo = re.sub(r"\.pdf$", "", titolo, flags=re.I)
 
+    titolo = titolo or "(senza titolo)"
     return {
         "id": entry.get("id"),
-        "titolo": titolo or "(senza titolo)",
+        "titolo": titolo,
+        "avviso": tipo_avviso(titolo),
         "data": entry.get("data_pubblicazione") or "",
         "tipo": ((doc.get("tipo") or {}).get("description") or "").strip(),
         "link": doc.get("url") or "",
@@ -311,9 +330,15 @@ def notify(item, prova=False, destinatari=None):
     ) if prova else ""
 
     tag = " + ".join(item["watched"])
+    # Un avviso di sciopero o di assemblea si deve distinguere dalla circolare
+    # di routine gia' scorrendo l'elenco delle chat, senza aprirla.
+    if item.get("avviso"):
+        apertura = f"\u26A0\uFE0F <b>{html.escape(item['avviso'].upper())}</b>"
+    else:
+        apertura = "\U0001F4C4 <b>Nuova circolare</b>"
     testo = (
         f"{intestazione}"
-        f"\U0001F4C4 <b>Nuova circolare \u2014 {html.escape(tag)}</b>\n\n"
+        f"{apertura} \u2014 <i>{html.escape(tag)}</i>\n\n"
         f"{html.escape(item['titolo'])}\n\n"
         f"<i>Pubblicata il {html.escape(item['data'])}</i>\n"
         f'<a href="{html.escape(item["link"])}">Apri il PDF</a>'
@@ -333,17 +358,21 @@ def render(data):
     aggiornato = data.get("ultimo_controllo") or ""
 
     def card(item):
+        avviso = item.get("avviso")
+        avviso_html = (f'<span class="tag tag-avviso">{html.escape(avviso)}</span>'
+                       if avviso else "")
         tags = "".join(
             f'<span class="tag tag-{t.lower()}">{html.escape(t)}</span>'
             for t in item["watched"])
         altre = [c for c in item["categorie"] if c not in item["watched"]]
         altre_html = "".join(
             f'<span class="tag tag-altro">{html.escape(c)}</span>' for c in altre)
-        return f"""      <li class="doc" data-cats="{html.escape(' '.join(item['watched']))}">
+        classe = "doc avviso" if avviso else "doc"
+        return f"""      <li class="{classe}" data-cats="{html.escape(' '.join(item['watched']))}" data-avviso="{'1' if avviso else ''}">
         <a class="doc-link" href="{html.escape(item['link'])}" target="_blank" rel="noopener">
           <time datetime="{html.escape(item['data'])}">{html.escape(item['data'])}</time>
           <span class="doc-title">{html.escape(item['titolo'])}</span>
-          <span class="tags">{tags}{altre_html}</span>
+          <span class="tags">{avviso_html}{tags}{altre_html}</span>
         </a>
       </li>"""
 
@@ -371,6 +400,9 @@ def render(data):
     --alunni-bg: #e4edf5;
     --altro: #6f6a62;
     --altro-bg: #efece7;
+    --avviso: #8a4a06;
+    --avviso-bg: #fbeedb;
+    --avviso-bordo: #e0b877;
   }}
   @media (prefers-color-scheme: dark) {{
     :root:not([data-theme="light"]) {{
@@ -386,6 +418,9 @@ def render(data):
       --alunni-bg: #1e2d3b;
       --altro: #a09a90;
       --altro-bg: #2a2723;
+      --avviso: #f0c07a;
+      --avviso-bg: #3a2e1c;
+      --avviso-bordo: #6b5121;
     }}
   }}
   * {{ box-sizing: border-box; }}
@@ -425,6 +460,8 @@ def render(data):
   .tag-famiglie {{ color: var(--famiglie); background: var(--famiglie-bg); }}
   .tag-alunni {{ color: var(--alunni); background: var(--alunni-bg); }}
   .tag-altro {{ color: var(--altro); background: var(--altro-bg); font-weight: 500; }}
+  .tag-avviso {{ color: var(--avviso); background: var(--avviso-bg); }}
+  .doc.avviso .doc-link {{ border-color: var(--avviso-bordo); background: var(--avviso-bg); }}
   .vuoto {{ color: var(--muted); padding: 32px 0; text-align: center; }}
   footer {{ margin-top: 40px; color: var(--muted); font-size: 13px; }}
   footer a {{ color: inherit; }}
@@ -441,6 +478,7 @@ def render(data):
     <button class="filtro" data-f="tutti" aria-pressed="true">Tutti</button>
     <button class="filtro" data-f="Famiglie" aria-pressed="false">Famiglie</button>
     <button class="filtro" data-f="Alunni" aria-pressed="false">Alunni</button>
+    <button class="filtro" data-f="avvisi" aria-pressed="false">Scioperi e assemblee</button>
   </div>
 
   <ul id="elenco">
@@ -460,7 +498,9 @@ def render(data):
     bottoni.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     const f = b.dataset.f;
     voci.forEach(v => {{
-      v.hidden = f !== 'tutti' && !v.dataset.cats.split(' ').includes(f);
+      v.hidden = f === 'tutti' ? false
+        : f === 'avvisi' ? !v.dataset.avviso
+        : !v.dataset.cats.split(' ').includes(f);
     }});
   }}));
 </script>

@@ -3,6 +3,7 @@
   {
    "id": 2564157,
    "titolo": "CIRCOLARE N. 014 ORARI ATTIVITÀ DIDATTICHE SCUOLE PRIMARIE DAL 21 SETTEMBRE 2026",
+   "avviso": null,
    "data": "17/09/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207943201",
@@ -20,6 +21,7 @@
   {
    "id": 2562782,
    "titolo": "CIRCOLARE N. 012 ENTRATA E USCITA ALUNNE/I DA MARCIAPIEDE INGRESSO PRINCIPALE SCUOLA \"LOCATELLI\" VIA VEGLIA 80",
+   "avviso": null,
    "data": "13/09/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207780997",
@@ -37,6 +39,7 @@
   {
    "id": 2562097,
    "titolo": "CIRCOLARI N. 010 AVVIO SERVIZIO COMUNALE PRE-SCUOLA SCUOLE PRIMARIE DAL 14 SETTEMBRE 2026",
+   "avviso": null,
    "data": "10/09/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207707379",
@@ -54,6 +57,7 @@
   {
    "id": 2561238,
    "titolo": "CIRCOLARE N. 005 COORDINATORI DI CLASSE E INTERCLASSE SCUOLE PRIMARIE A.S. 2025-2026",
+   "avviso": null,
    "data": "04/09/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207589141",
@@ -71,6 +75,7 @@
   {
    "id": 2560957,
    "titolo": "CIRCOLARE N. 001 ORARI ATTIVITÀ DIDATTICHE SCUOLA “LOCATELLI” 14-18 SETTEMBRE 2026",
+   "avviso": null,
    "data": "03/09/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/207557754",
@@ -88,6 +93,7 @@
   {
    "id": 2556150,
    "titolo": "CIRCOLARE N. 245  DOCUMENTAZIONE COMPLETAMENTO ISCRIZIONI ALUNNI FUTURE CLASSI PRIME A.S.2026/2027 – INCONTRO CON I GENITORI/TUTORI DELLE CLASSI PRIME - LIBRI DI TESTO CLASSI SCUOLA PRIMARIA LOCATELLI",
+   "avviso": null,
    "data": "14/07/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206932785",
@@ -105,6 +111,7 @@
   {
    "id": 2555725,
    "titolo": "CIRCOLARE N. 244 CERTIFICAZIONE COMPETENZE INVALSI A.S. 2025/26",
+   "avviso": null,
    "data": "10/07/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206872623",
@@ -122,6 +129,7 @@
   {
    "id": 2554439,
    "titolo": "CIRCOLARE N. 242 SERVIZI COMUNALI DI PRE-SCUOLA E GIOCHI SERALI PER ALUNNI/E DELLE SCUOLE PRIMARIE",
+   "avviso": null,
    "data": "01/07/2026",
    "tipo": "Circolari",
    "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/206741671",
@@ -147,7 +155,8 @@
    "watched": [
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2553038,
@@ -164,7 +173,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2553019,
@@ -181,7 +191,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2551822,
@@ -198,7 +209,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2551550,
@@ -215,7 +227,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2543739,
@@ -232,7 +245,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2543706,
@@ -249,7 +263,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2543669,
@@ -266,7 +281,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2543665,
@@ -283,7 +299,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2541955,
@@ -300,7 +317,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": "Sciopero"
   },
   {
    "id": 2541618,
@@ -318,7 +336,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2541610,
@@ -335,7 +354,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": "Sciopero"
   },
   {
    "id": 2541606,
@@ -352,7 +372,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2539233,
@@ -369,7 +390,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": "Sciopero"
   },
   {
    "id": 2532845,
@@ -385,7 +407,8 @@
    "watched": [
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2532306,
@@ -402,7 +425,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": "Sciopero"
   },
   {
    "id": 2532270,
@@ -420,7 +444,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2531504,
@@ -438,7 +463,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2530082,
@@ -455,7 +481,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2529612,
@@ -472,7 +499,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2528517,
@@ -489,7 +517,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": "Sciopero"
   },
   {
    "id": 2524045,
@@ -506,7 +535,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2522865,
@@ -523,7 +553,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": "Sciopero"
   },
   {
    "id": 2520092,
@@ -540,7 +571,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2517688,
@@ -557,7 +589,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2502309,
@@ -574,7 +607,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2501957,
@@ -591,7 +625,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": "Sciopero"
   },
   {
    "id": 2501032,
@@ -608,7 +643,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2500144,
@@ -625,7 +661,8 @@
     "Alunni",
     "Famiglie"
    ],
-   "notificato": true
+   "notificato": true,
+   "avviso": null
   },
   {
    "id": 2497844,
@@ -642,7 +679,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2493735,
@@ -659,7 +697,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2492516,
@@ -675,7 +714,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2481094,
@@ -690,7 +730,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2481079,
@@ -706,7 +747,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Sciopero"
   },
   {
    "id": 2480022,
@@ -722,7 +764,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2472273,
@@ -739,7 +782,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2471790,
@@ -755,7 +799,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Sciopero"
   },
   {
    "id": 2471778,
@@ -772,7 +817,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2470024,
@@ -788,7 +834,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2469889,
@@ -802,7 +849,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2469428,
@@ -818,7 +866,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2467978,
@@ -834,7 +883,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Assemblea sindacale"
   },
   {
    "id": 2467559,
@@ -849,7 +899,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2467550,
@@ -865,7 +916,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Sciopero"
   },
   {
    "id": 2465661,
@@ -881,7 +933,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2464820,
@@ -897,7 +950,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2464276,
@@ -913,7 +967,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2463045,
@@ -929,7 +984,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2460551,
@@ -945,7 +1001,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Sciopero"
   },
   {
    "id": 2460507,
@@ -961,7 +1018,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2460201,
@@ -975,7 +1033,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2459456,
@@ -991,7 +1050,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2459379,
@@ -1005,7 +1065,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2458298,
@@ -1019,7 +1080,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2457907,
@@ -1035,7 +1097,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2457903,
@@ -1052,7 +1115,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2456379,
@@ -1066,7 +1130,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2455556,
@@ -1082,7 +1147,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2455532,
@@ -1098,7 +1164,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2453581,
@@ -1114,7 +1181,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2453572,
@@ -1130,7 +1198,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2452929,
@@ -1146,7 +1215,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2452856,
@@ -1162,7 +1232,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2452249,
@@ -1176,7 +1247,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2451213,
@@ -1192,7 +1264,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Sciopero"
   },
   {
    "id": 2450679,
@@ -1208,7 +1281,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Sciopero"
   },
   {
    "id": 2449988,
@@ -1223,7 +1297,8 @@
    ],
    "watched": [
     "Famiglie"
-   ]
+   ],
+   "avviso": "Assemblea sindacale"
   },
   {
    "id": 2449366,
@@ -1239,7 +1314,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2449045,
@@ -1255,7 +1331,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": "Assemblea sindacale"
   },
   {
    "id": 2448603,
@@ -1271,7 +1348,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2448226,
@@ -1287,7 +1365,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2447861,
@@ -1303,7 +1382,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2447854,
@@ -1319,7 +1399,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2447747,
@@ -1335,7 +1416,8 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   },
   {
    "id": 2447036,
@@ -1351,10 +1433,11 @@
    "watched": [
     "Alunni",
     "Famiglie"
-   ]
+   ],
+   "avviso": null
   }
  ],
- "ultimo_controllo": "21/09/2026 alle 13:00",
- "ultimo_visto": "20260917",
+ "ultimo_controllo": "21/09/2026 alle 16:18",
+ "ultimo_visto": "20260921",
  "ultimo_battito": "2026-09-21"
 }
