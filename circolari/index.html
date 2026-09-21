@@ -20,8 +20,9 @@
     --altro: #6f6a62;
     --altro-bg: #efece7;
     --avviso: #8a4a06;
-    --avviso-bg: #fbeedb;
-    --avviso-bordo: #e0b877;
+    --avviso-bg: #f7dfba;
+    --avviso-card: #fdf6ea;
+    --avviso-bordo: #dfb173;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -38,7 +39,8 @@
       --altro: #a09a90;
       --altro-bg: #2a2723;
       --avviso: #f0c07a;
-      --avviso-bg: #3a2e1c;
+      --avviso-bg: #4a3a20;
+      --avviso-card: #2a2318;
       --avviso-bordo: #6b5121;
     }
   }
@@ -80,7 +82,7 @@
   .tag-alunni { color: var(--alunni); background: var(--alunni-bg); }
   .tag-altro { color: var(--altro); background: var(--altro-bg); font-weight: 500; }
   .tag-avviso { color: var(--avviso); background: var(--avviso-bg); }
-  .doc.avviso .doc-link { border-color: var(--avviso-bordo); background: var(--avviso-bg); }
+  .doc.avviso .doc-link { border-color: var(--avviso-bordo); background: var(--avviso-card); }
   .vuoto { color: var(--muted); padding: 32px 0; text-align: center; }
   footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   footer a { color: inherit; }
@@ -90,7 +92,7 @@
 <div class="wrap">
   <header>
     <h1>Circolari — Famiglie e Alunni</h1>
-    <p class="sub">IC Locatelli-Quasimodo · 83 documenti · aggiornato 21/09/2026 alle 16:18</p>
+    <p class="sub">IC Locatelli-Quasimodo · 83 documenti · aggiornato 21/09/2026 alle 16:19</p>
   </header>
 
   <div class="filtri" role="group" aria-label="Filtra per categoria">
