@@ -1,6 +1,42 @@
 {
  "documenti": [
   {
+   "id": 2567298,
+   "titolo": "CIRCOLARE N. 034 ACCESSO GENITORI ALUNNI NUOVI ISCRITTI AL REGISTRO ELETTRONICO SPAGGIARI CLASSEVIVA – INVIO CREDENZIALI",
+   "avviso": null,
+   "data": "29/09/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/208297380",
+   "categorie": [
+    "Alunni",
+    "Docenti",
+    "Famiglie",
+    "Personale ATA"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
+   "id": 2567287,
+   "titolo": "CIRCOLARE N. 032 CALENDARIO COLLOQUI FAMIGLIE-DOCENTI SCUOLE PRIMARIE A.S. 2026-2027",
+   "avviso": null,
+   "data": "29/09/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/208297297",
+   "categorie": [
+    "Docenti",
+    "Famiglie",
+    "Personale ATA"
+   ],
+   "watched": [
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
    "id": 2567198,
    "titolo": "CIRCOLARE N. 031 CALENDARIO COLLOQUI FAMIGLIE-DOCENTI SCUOLE PRIMARIE A.S. 2026-2027",
    "avviso": null,
@@ -1524,7 +1560,7 @@
    "avviso": null
   }
  ],
- "ultimo_controllo": "29/09/2026 alle 21:04",
+ "ultimo_controllo": "30/09/2026 alle 07:08",
  "ultimo_visto": "20260929",
  "ultimo_battito": "2026-09-28"
 }
