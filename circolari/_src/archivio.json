@@ -1,6 +1,60 @@
 {
  "documenti": [
   {
+   "id": 2568043,
+   "titolo": "CIRCOLARE N. 040 PROCEDURA IN CASO DI PEDICULOSI",
+   "avviso": null,
+   "data": "01/10/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/8nin31f6af",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
+   "id": 2568021,
+   "titolo": "CIRCOLARE N. 037 ORARI INGRESSI POSTICIPATI E USCITE ANTICIPATE ALUNNE/I SCUOLE PRIMARIE",
+   "avviso": null,
+   "data": "01/10/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/iq3kscavbj",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
+   "id": 2568015,
+   "titolo": "CIRCOLARE N. 036 CREDENZIALI DI ACCESSO ALL'E-MAIL E A GOOGLE WORKSPACE",
+   "avviso": null,
+   "data": "01/10/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/2cntfqvm24",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
    "id": 2567298,
    "titolo": "CIRCOLARE N. 034 ACCESSO GENITORI ALUNNI NUOVI ISCRITTI AL REGISTRO ELETTRONICO SPAGGIARI CLASSEVIVA – INVIO CREDENZIALI",
    "avviso": null,
@@ -1560,7 +1614,7 @@
    "avviso": null
   }
  ],
- "ultimo_controllo": "01/10/2026 alle 07:00",
- "ultimo_visto": "20260929",
+ "ultimo_controllo": "01/10/2026 alle 18:00",
+ "ultimo_visto": "20261001",
  "ultimo_battito": "2026-09-28"
 }
