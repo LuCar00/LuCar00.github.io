@@ -1,6 +1,24 @@
 {
  "documenti": [
   {
+   "id": 2568047,
+   "titolo": "CIRCOLARE N. 041 CONSIGLIO DI CLASSE STRAORDINARIO 3CT 1 OTTOBRE 2026",
+   "avviso": null,
+   "data": "01/10/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/gijj2emncg",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
    "id": 2568043,
    "titolo": "CIRCOLARE N. 040 PROCEDURA IN CASO DI PEDICULOSI",
    "avviso": null,
@@ -1614,7 +1632,7 @@
    "avviso": null
   }
  ],
- "ultimo_controllo": "01/10/2026 alle 18:00",
+ "ultimo_controllo": "01/10/2026 alle 20:09",
  "ultimo_visto": "20261001",
  "ultimo_battito": "2026-09-28"
 }
