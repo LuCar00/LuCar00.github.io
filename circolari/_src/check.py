@@ -95,6 +95,11 @@ PAGE = os.path.join(OUT_DIR, "index.html")
 # Fuori dal repo di proposito: se stesse dentro, scriverlo creerebbe da solo
 # la modifica che serve a decidere se pubblicare.
 SEGNALE = os.path.expanduser("~/.circolari/ultimo-cambio")
+CIECO = os.path.expanduser("~/.circolari/giri-falliti")
+# Quanti giri di fila devono fallire prima di avvisare. Tre vuol dire tre ore
+# di silenzio: abbastanza da non allarmare per un Mac che si riaddormenta,
+# poco abbastanza da accorgersene nella stessa mattinata.
+SOGLIA_CIECO = 3
 
 ROME = timezone(timedelta(hours=2))              # solo per l'etichetta "aggiornato"
 
@@ -615,6 +620,65 @@ def da_ritentare(archivio, escludi):
             if not d.get("notificato", True) and d["id"] not in escludi]
 
 
+def leggi_falliti():
+    try:
+        with open(CIECO, encoding="utf-8") as fh:
+            return int(fh.read().strip() or 0)
+    except (OSError, ValueError):
+        return 0
+
+
+def scrivi_falliti(n):
+    try:
+        os.makedirs(os.path.dirname(CIECO), exist_ok=True)
+        with open(CIECO, "w", encoding="utf-8") as fh:
+            fh.write(str(n))
+    except OSError:
+        pass
+
+
+def avvisa_personale(testo):
+    """Messaggio di servizio: va solo a chi riceve il riepilogo, mai al canale."""
+    token = os.environ.get("TELEGRAM_TOKEN")
+    for chat in heartbeat_targets():
+        if token:
+            send_to(token, chat, testo)
+
+
+def segnala_cecita(motivo):
+    """Avvisa che il monitor non riesce piu' a leggere il sito.
+
+    Senza questo, una rete che blocca Spaggiari produce esattamente lo stesso
+    silenzio di una giornata senza circolari, e non c'e' modo di distinguerli.
+    Si avvisa una volta sola per episodio, non a ogni giro.
+    """
+    falliti = leggi_falliti() + 1
+    scrivi_falliti(falliti)
+    if falliti == SOGLIA_CIECO:
+        avvisa_personale(
+            "\U0001F6D1 <b>Il monitor non riesce a leggere il sito</b>\n\n"
+            f"Ultimi {falliti} controlli falliti.\n"
+            f"<i>{html.escape(motivo[:160])}</i>\n\n"
+            "Di solito e' la rete da cui sta guardando il Mac: dalla rete "
+            "dell'ufficio Spaggiari risponde 403. Riprende da solo appena "
+            "il Mac torna su una rete buona, e recupera le circolari "
+            "pubblicate nel frattempo."
+        )
+        print("   avvisata la chat personale: il monitor e' cieco")
+
+
+def fine_cecita():
+    """Chiude l'episodio e lo dice, se era stato segnalato."""
+    if leggi_falliti() >= SOGLIA_CIECO:
+        avvisa_personale(
+            "\u2705 <b>Il monitor ci vede di nuovo</b>\n\n"
+            "Il sito risponde. Le circolari pubblicate mentre era cieco "
+            "sono state recuperate."
+        )
+        print("   avvisata la chat personale: tornato a funzionare")
+    scrivi_falliti(0)
+
+
 def main():
     if "--test" in sys.argv:
         return run_test()
@@ -637,7 +701,14 @@ def main():
     piu_recente = archivio.get("ultimo_visto")
     if not piu_recente and archivio["documenti"]:
         piu_recente = stamp(archivio["documenti"][0]["data"])
-    trovati, visto = collect(full=full, fino_a=piu_recente)
+    try:
+        trovati, visto = collect(full=full, fino_a=piu_recente)
+    except SystemExit as stop:
+        # fetch_page esce cosi' quando il sito rifiuta o la rete non c'e'.
+        if not (silent or primo_giro):
+            segnala_cecita(str(stop))
+        raise
+    fine_cecita()
     if visto:
         archivio["ultimo_visto"] = max(visto, archivio.get("ultimo_visto") or "")
     nuovi = [d for d in trovati if d["id"] not in visti]
