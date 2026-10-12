@@ -24,6 +24,7 @@ import html
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 import unicodedata
@@ -106,6 +107,57 @@ ROME = timezone(timedelta(hours=2))              # solo per l'etichetta "aggiorn
 
 # --- fetch ----------------------------------------------------------------
 
+# Akamai, che sta davanti a Spaggiari, riconosce il fingerprint di urllib e
+# risponde 403 mentre lascia passare un browser vero. Quando succede si passa
+# a Safari: e' gia' sul Mac, non va installato niente, e la sua stretta di
+# mano TLS e' quella di un browser perche' lo e'.
+PRESIDIO = "https://web.spaggiari.eu/sdg2/Comunicati"
+
+APPLESCRIPT = """
+set esito to ""
+tell application "Safari"
+    make new document with properties {URL:"%s"}
+    set giri to 0
+    repeat until giri > 60
+        delay 0.5
+        try
+            if (URL of front document) starts with "%s" then
+                set esito to source of front document
+                if esito contains "data-page=" then exit repeat
+            end if
+        end try
+        set giri to giri + 1
+    end repeat
+    try
+        if (URL of front document) starts with "%s" then close front document
+    end try
+end tell
+return esito
+"""
+
+
+def fetch_con_safari(url):
+    """Scarica la pagina facendola aprire a Safari in una finestra di servizio.
+
+    La finestra nasce dietro a quello che stai facendo e si richiude da sola:
+    non serve nessun permesso di Accessibilita'. Prima di leggere e chiudere
+    si controlla che il documento davanti sia davvero il nostro, per non
+    chiudere una pagina aperta da te.
+    """
+    script = APPLESCRIPT % (url.replace('"', "%22"), PRESIDIO, PRESIDIO)
+    try:
+        esito = subprocess.run(["osascript", "-e", script],
+                               capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.SubprocessError) as err:
+        raise SystemExit("Safari non ha risposto: %s" % err)
+    if esito.returncode != 0:
+        raise SystemExit("Safari ha rifiutato di collaborare: %s"
+                         % (esito.stderr or "").strip()[:200])
+    if "data-page=" not in esito.stdout:
+        raise SystemExit("Safari ha aperto %s ma la pagina non contiene i dati attesi" % url)
+    return esito.stdout
+
+
 def leggi(resp):
     """Legge il corpo della risposta, decomprimendolo se serve."""
     dati = resp.read()
@@ -114,9 +166,17 @@ def leggi(resp):
     return dati.decode("utf-8", "replace")
 
 
+_bloccati = [False]
+
+
 def fetch_page(page):
     """Scarica una pagina dell'elenco e ne estrae il JSON Inertia."""
     url = BASE_URL if page == 1 else f"{BASE_URL}?page={page}"
+
+    if _bloccati[0]:
+        # Gia' respinti in questo giro: inutile ribussare per ogni pagina,
+        # sarebbero altri 403 sotto il naso di chi ci sta filtrando.
+        return estrai(fetch_con_safari(url), url)
     req = urllib.request.Request(url, headers=HEADERS)
     for attempt in range(3):
         try:
@@ -124,8 +184,15 @@ def fetch_page(page):
                 raw = leggi(resp)
             break
         except urllib.error.HTTPError as err:
-            # Un 4xx e' una risposta, non un disguido: ritentarlo e' inutile.
-            # Solo i 5xx meritano un secondo tentativo.
+            # Il 403 di Akamai non si batte con gli header: il controllo sta
+            # nel TLS, dove urllib non puo' fingere. Si passa a Safari.
+            if err.code == 403:
+                if not _bloccati[0]:
+                    print("   il sito ci respinge, passo da Safari")
+                _bloccati[0] = True
+                raw = fetch_con_safari(url)
+                break
+            # Gli altri 4xx sono risposte, non disguidi: ritentarli e' inutile.
             if err.code < 500 or attempt == 2:
                 raise SystemExit(
                     f"il sito ha risposto {err.code} ({err.reason}) su {url}. "
@@ -136,6 +203,11 @@ def fetch_page(page):
                 raise SystemExit(f"errore di rete su {url}: {err}")
             time.sleep(3 * (attempt + 1))
 
+    return estrai(raw, url)
+
+
+def estrai(raw, url):
+    """Tira fuori l'elenco documenti dal payload Inertia incorporato."""
     match = re.search(r'data-page="(.*?)"\s*>', raw, re.S)
     if not match:
         raise SystemExit(f"payload Inertia non trovato in {url} (il sito e' cambiato?)")
