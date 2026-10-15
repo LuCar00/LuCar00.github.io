@@ -136,6 +136,32 @@ return esito
 """
 
 
+def assicura_safari():
+    """Avvia Safari in background se e' chiuso, e aspetta che risponda.
+
+    La verifica "if not running" dentro AppleScript non e' affidabile: a
+    Safari chiuso risultava comunque in esecuzione e il primo comando
+    falliva con -600. Si fa dalla shell: pgrep per sapere se il processo
+    c'e', "open -g" per avviarlo senza portarlo davanti, e poi si bussa con
+    un comando innocuo finche' Safari non accetta gli Apple Event.
+    """
+    acceso = subprocess.run(["pgrep", "-x", "Safari"],
+                            capture_output=True).returncode == 0
+    if not acceso:
+        subprocess.run(["open", "-g", "-a", "Safari"], capture_output=True)
+    for _ in range(40):
+        try:
+            prova = subprocess.run(
+                ["osascript", "-e", 'tell application "Safari" to count windows'],
+                capture_output=True, text=True, timeout=10)
+            if prova.returncode == 0:
+                return
+        except subprocess.SubprocessError:
+            pass
+        time.sleep(0.5)
+    raise SystemExit("Safari non si e' avviato entro 20 secondi")
+
+
 def fetch_con_safari(url):
     """Scarica la pagina facendola aprire a Safari in una finestra di servizio.
 
@@ -144,6 +170,7 @@ def fetch_con_safari(url):
     si controlla che il documento davanti sia davvero il nostro, per non
     chiudere una pagina aperta da te.
     """
+    assicura_safari()
     script = APPLESCRIPT % (url.replace('"', "%22"), PRESIDIO, PRESIDIO)
     try:
         esito = subprocess.run(["osascript", "-e", script],
