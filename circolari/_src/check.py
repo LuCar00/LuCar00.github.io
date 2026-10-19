@@ -19,6 +19,7 @@ Uso:
   python3 check.py --heartbeat  invia subito il riepilogo settimanale
 """
 
+import atexit
 import gzip
 import html
 import json
@@ -111,29 +112,101 @@ ROME = timezone(timedelta(hours=2))              # solo per l'etichetta "aggiorn
 # risponde 403 mentre lascia passare un browser vero. Quando succede si passa
 # a Safari: e' gia' sul Mac, non va installato niente, e la sua stretta di
 # mano TLS e' quella di un browser perche' lo e'.
-PRESIDIO = "https://web.spaggiari.eu/sdg2/Comunicati"
+#
+# La finestra di servizio si individua per id (la sola che prima non c'era) e
+# si chiude sempre per id. Cercarla come "front document" funzionava finche'
+# Safari era pulito, ma bastava una finestra rimasta davanti perche' ogni giro
+# leggesse quella invece della propria, falliva in silenzio e ne lasciasse
+# un'altra: dal 17 al 19 ottobre sono rimaste nove finestre fantasma.
+ATTESA_SAFARI = 60          # secondi di attesa del caricamento della pagina
 
 APPLESCRIPT = """
 set esito to ""
+set diag to ""
 tell application "Safari"
+    set prima to id of every window
     make new document with properties {URL:"%s"}
-    set giri to 0
-    repeat until giri > 60
-        delay 0.5
-        try
-            if (URL of front document) starts with "%s" then
-                set esito to source of front document
-                if esito contains "data-page=" then exit repeat
+    set mio to 0
+    set t0 to current date
+    repeat while mio is 0 and ((current date) - t0) < 15
+        delay 0.25
+        set adesso to id of every window
+        repeat with idx from 1 to (count of adesso)
+            set k to item idx of adesso
+            if prima does not contain k then
+                set mio to k
+                exit repeat
             end if
-        end try
-        set giri to giri + 1
+        end repeat
     end repeat
+    if mio is 0 then return "@@SENZA_FINESTRA@@"
+    set t0 to current date
+    repeat while ((current date) - t0) < %d
+        try
+            set esito to source of document of window id mio
+            if esito contains "data-page=" then exit repeat
+        end try
+        delay 0.5
+    end repeat
+    if esito does not contain "data-page=" then
+        set titolo to ""
+        set indirizzo to ""
+        try
+            set titolo to name of window id mio
+        end try
+        try
+            set indirizzo to (URL of document of window id mio) as text
+        end try
+        set n to length of esito
+        set lim to 160
+        if n < lim then set lim to n
+        set inizio to ""
+        if lim > 0 then set inizio to text 1 thru lim of esito
+        set diag to "@@SENZA_DATI@@ titolo=" & titolo & " | url=" & indirizzo & " | byte=" & n & " | " & inizio
+    end if
     try
-        if (URL of front document) starts with "%s" then close front document
+        close window id mio
     end try
 end tell
+if diag is not "" then return diag
 return esito
 """
+
+CONTA_PAGINE_VERE = """
+tell application "Safari"
+    set reali to 0
+    repeat with d in documents
+        try
+            set u to URL of d
+            if u is not missing value and u is not "" and u does not start with "favorites:" then
+                set reali to reali + 1
+            end if
+        end try
+    end repeat
+    return reali
+end tell
+"""
+
+_atexit_safari = [False]
+
+
+def chiudi_safari_se_inutilizzato():
+    """A fine giro chiude Safari, ma solo se non lo sta usando nessuno.
+
+    Tenerlo aperto per giorni lo riempiva di finestre che AppleScript non
+    riesce piu' a chiudere. Se invece c'e' anche una sola pagina vera aperta
+    (cioe' Luca lo sta usando) non si tocca niente.
+    """
+    if subprocess.run(["pgrep", "-x", "Safari"], capture_output=True).returncode != 0:
+        return
+    try:
+        pagine = subprocess.run(["osascript", "-e", CONTA_PAGINE_VERE],
+                                capture_output=True, text=True, timeout=20)
+        if pagine.returncode == 0 and pagine.stdout.strip() == "0":
+            subprocess.run(["osascript", "-e", 'tell application "Safari" to quit'],
+                           capture_output=True, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        pass
 
 
 def assicura_safari():
@@ -145,6 +218,9 @@ def assicura_safari():
     c'e', "open -g" per avviarlo senza portarlo davanti, e poi si bussa con
     un comando innocuo finche' Safari non accetta gli Apple Event.
     """
+    if not _atexit_safari[0]:
+        atexit.register(chiudi_safari_se_inutilizzato)
+        _atexit_safari[0] = True
     acceso = subprocess.run(["pgrep", "-x", "Safari"],
                             capture_output=True).returncode == 0
     if not acceso:
@@ -166,23 +242,29 @@ def fetch_con_safari(url):
     """Scarica la pagina facendola aprire a Safari in una finestra di servizio.
 
     La finestra nasce dietro a quello che stai facendo e si richiude da sola:
-    non serve nessun permesso di Accessibilita'. Prima di leggere e chiudere
-    si controlla che il documento davanti sia davvero il nostro, per non
-    chiudere una pagina aperta da te.
+    non serve nessun permesso di Accessibilita'.
     """
     assicura_safari()
-    script = APPLESCRIPT % (url.replace('"', "%22"), PRESIDIO, PRESIDIO)
+    script = APPLESCRIPT % (url.replace('"', "%22"), ATTESA_SAFARI)
     try:
         esito = subprocess.run(["osascript", "-e", script],
-                               capture_output=True, text=True, timeout=120)
+                               capture_output=True, text=True,
+                               timeout=ATTESA_SAFARI + 60)
     except (OSError, subprocess.SubprocessError) as err:
         raise SystemExit("Safari non ha risposto: %s" % err)
     if esito.returncode != 0:
         raise SystemExit("Safari ha rifiutato di collaborare: %s"
                          % (esito.stderr or "").strip()[:200])
-    if "data-page=" not in esito.stdout:
+    uscita = esito.stdout
+    if uscita.startswith("@@SENZA_FINESTRA@@"):
+        raise SystemExit("Safari non ha aperto nessuna finestra per %s" % url)
+    if uscita.startswith("@@SENZA_DATI@@"):
+        visto = " ".join(uscita[len("@@SENZA_DATI@@"):].split())[:300]
+        raise SystemExit("Safari non ha caricato i dati entro %d secondi:%s"
+                         % (ATTESA_SAFARI, visto))
+    if "data-page=" not in uscita:
         raise SystemExit("Safari ha aperto %s ma la pagina non contiene i dati attesi" % url)
-    return esito.stdout
+    return uscita
 
 
 def leggi(resp):

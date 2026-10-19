@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lanciato da launchd cinque volte al giorno. Vedi
+# Lanciato da launchd agli orari del piano. Vedi
 # ~/Library/LaunchAgents/com.lucarnevale.circolari.plist
 #
 # I secret NON stanno qui: questo file e' in un repo pubblico. Vivono in
@@ -31,6 +31,13 @@ else
 fi
 echo "=== $(date '+%Y-%m-%d %H:%M:%S') ${*:-controllo} ==="
 
+# Un giro lanciato da un risveglio "scuro" (il Mac dorme e si sveglia per
+# pochi secondi) potrebbe ritrovarsi addormentato a meta': l'orologio salta in
+# avanti, i collegamenti cadono e il giro fallisce senza colpa di nessuno.
+# caffeinate -w tiene sveglio il sistema finche' questo script e' vivo, poi
+# rilascia da solo.
+caffeinate -i -w $$ &
+
 if [ ! -f "$ENV_FILE" ]; then
   echo "manca $ENV_FILE: senza token e chat id non si va da nessuna parte"
   exit 1
@@ -38,6 +45,15 @@ fi
 set -a; . "$ENV_FILE"; set +a
 
 cd "$REPO" || { echo "cartella del repo non trovata: $REPO"; exit 1; }
+
+# Al risveglio la rete puo' metterci qualche secondo a tornare: partire subito
+# fa fallire sia il pull sia il controllo per un DNS non ancora pronto (e'
+# successo lunedi' 19/10 alle 8:05). Si aspetta fino a un minuto; se la rete
+# non arriva si prosegue comunque e sara' il controllo a segnalarlo.
+for _ in $(seq 1 30); do
+  curl -s -o /dev/null --max-time 3 https://github.com && break
+  sleep 2
+done
 
 # Il remoto puo' essere cambiato (altri lavori sullo stesso repo).
 git pull --rebase --autostash -q origin main || echo "pull non riuscito, proseguo lo stesso"
