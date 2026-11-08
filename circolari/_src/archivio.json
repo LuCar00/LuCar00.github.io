@@ -1,6 +1,25 @@
 {
  "documenti": [
   {
+   "id": 2579824,
+   "titolo": "CIRCOLARE N. 066 PUBBLICAZIONE ALL'ALBO ON LINE DEI NOMINATIVI DEI GENITORI RAPPRESENTANTI DI CLASSE SCUOLE PRIMARIE A.S. 2026-2027",
+   "avviso": null,
+   "data": "07/11/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/fl0ko9hf28",
+   "categorie": [
+    "Alunni",
+    "Docenti",
+    "Famiglie",
+    "Personale ATA"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
    "id": 2577561,
    "titolo": "CIRCOLARE N. 235bis CALENDARIO ATTIVITA' DIDATTICHE A.S. 2026-2027",
    "avviso": null,
@@ -1812,7 +1831,7 @@
    "avviso": null
   }
  ],
- "ultimo_controllo": "07/11/2026 alle 21:13",
- "ultimo_visto": "20261105",
+ "ultimo_controllo": "08/11/2026 alle 09:05",
+ "ultimo_visto": "20261107",
  "ultimo_battito": "2026-11-02"
 }
