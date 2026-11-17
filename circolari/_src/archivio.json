@@ -1,6 +1,24 @@
 {
  "documenti": [
   {
+   "id": 2582841,
+   "titolo": "CIRCOLARE N. 077 SCIOPERO 20 NOVEMBRE 2026 - INFORMAZIONI ALLE FAMIGLIE SCUOLA LOCATELLI",
+   "avviso": "Sciopero",
+   "data": "17/11/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/o3cre4l5a5",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
    "id": 2582824,
    "titolo": "CIRCOLARE N. 077 SCIOPERO 20 NOVEMBRE 2026- INFORMAZIONI ALLE FAMIGLIE SCUOLA LOCATELLI",
    "avviso": "Sciopero",
@@ -1867,7 +1885,7 @@
    "avviso": null
   }
  ],
- "ultimo_controllo": "17/11/2026 alle 19:00",
+ "ultimo_controllo": "17/11/2026 alle 21:00",
  "ultimo_visto": "20261117",
  "ultimo_battito": "2026-11-16"
 }
