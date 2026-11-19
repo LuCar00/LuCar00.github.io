@@ -1,6 +1,24 @@
 {
  "documenti": [
   {
+   "id": 2583335,
+   "titolo": "CIRCOLARE N. 079 SCIOPERO 20 NOVEMBRE 2026 - INDICAZIONI OPERATIVE SERVIZIO REFEZIONE SCUOLE LOCATELLI E RODARI",
+   "avviso": "Sciopero",
+   "data": "19/11/2026",
+   "tipo": "Circolari",
+   "link": "https://web.spaggiari.eu/sdg2/Documenti/MIME0093/4o2a7m62qt",
+   "categorie": [
+    "Alunni",
+    "Famiglie",
+    "Tutto il personale"
+   ],
+   "watched": [
+    "Alunni",
+    "Famiglie"
+   ],
+   "notificato": true
+  },
+  {
    "id": 2582841,
    "titolo": "CIRCOLARE N. 077 SCIOPERO 20 NOVEMBRE 2026 - INFORMAZIONI ALLE FAMIGLIE SCUOLA LOCATELLI",
    "avviso": "Sciopero",
@@ -1885,7 +1903,7 @@
    "avviso": null
   }
  ],
- "ultimo_controllo": "19/11/2026 alle 09:01",
- "ultimo_visto": "20261118",
+ "ultimo_controllo": "19/11/2026 alle 13:00",
+ "ultimo_visto": "20261119",
  "ultimo_battito": "2026-11-16"
 }
